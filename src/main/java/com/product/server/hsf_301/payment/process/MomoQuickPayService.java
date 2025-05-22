@@ -24,7 +24,7 @@ public class MomoQuickPayService {
         request.setStoreId("Test Store");
         request.setRequestId(uuid);
         request.setOrderId(uuid);
-        request.setOrderInfo("pay with MoMo");
+        request.setOrderInfo("Nạp tiền blindBox");
         request.setAmount(5000);
         request.setRedirectUrl(""); // Nếu có thể bỏ trống
         request.setIpnUrl("https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b");

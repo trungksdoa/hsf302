@@ -1,13 +1,17 @@
 package com.product.server.hsf_301.blindBox.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-
-import java.math.BigDecimal;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "Prize_Items")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PrizeItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,11 +25,11 @@ public class PrizeItem {
     private String itemImage;
     
     @Column(name = "rarity", nullable = false, length = 20)
-    private String rarity;
+    private RareEnum rarity;
     
     @ManyToOne
     @JoinColumn(name = "bag_type_id")
-    private BlindBagType blindBagType;
+    private BlindPackage blindBagType;
     
     @Column(name = "probability", nullable = false)
     private Double probability;

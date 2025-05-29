@@ -25,7 +25,9 @@ public class SpinHistoryController {
     public String getAllSpinHistory(Model model) {
         List<SpinHistory> spinHistories = spinHistoryService.getAllSpinHistory();
         model.addAttribute("spinHistories", spinHistories);
-        return "spinHistory/list";
+        model.addAttribute("showSidebar", false);
+        model.addAttribute("content", "view/spin-history");
+        return "view/layout";
     }
     
     @GetMapping("/{id}")

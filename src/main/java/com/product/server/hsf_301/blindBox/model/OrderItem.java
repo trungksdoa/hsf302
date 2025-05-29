@@ -12,7 +12,7 @@ public class OrderItem {
     private Order orderId;
 
     @ManyToOne
-    private BlindBagType blindBagId;
+    private BlindPackage blindBagId;
 
     @ManyToOne
     private PrizeItem prizeItemId;

@@ -1,6 +1,6 @@
 package com.product.server.hsf_301.blindBox.service.impl;
 
-import com.product.server.hsf_301.blindBox.model.BlindBagType;
+import com.product.server.hsf_301.blindBox.model.BlindPackage;
 import com.product.server.hsf_301.blindBox.model.PrizeItem;
 import com.product.server.hsf_301.blindBox.repository.PrizeItemRepository;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
@@ -47,12 +47,12 @@ public class PrizeItemServiceImpl implements PrizeItemService {
     }
 
     @Override
-    public List<PrizeItem> getPrizeItemsByBlindBagType(BlindBagType blindBagType) {
+    public List<PrizeItem> getPrizeItemsByBlindBagType(BlindPackage blindBagType) {
         return prizeItemRepository.findByBlindBagType(blindBagType);
     }
 
     @Override
-    public List<PrizeItem> getPrizeItemByBlindBoxAndActive(BlindBagType blindBagType) {
+    public List<PrizeItem> getPrizeItemByBlindBoxAndActive(BlindPackage blindBagType) {
         return prizeItemRepository.findByBlindBagTypeAndIsActiveTrue(blindBagType);
     }
 
@@ -63,7 +63,7 @@ public class PrizeItemServiceImpl implements PrizeItemService {
 
     @Override
     public PrizeItem getRandomPrizeByBagType(Integer bagTypeId) {
-        BlindBagType blindBagType = blindBagTypeService.getBlindBagTypeById(bagTypeId);
+        BlindPackage blindBagType = blindBagTypeService.getBlindBagTypeById(bagTypeId);
         List<PrizeItem> activePrizes = prizeItemRepository.findByBlindBagTypeAndIsActiveTrue(blindBagType);
         
         if (activePrizes.isEmpty()) {

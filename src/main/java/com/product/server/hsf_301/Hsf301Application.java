@@ -21,6 +21,8 @@ public class Hsf301Application {
     @Bean
     public CommandLineRunner initializeData(BlindBoxRepository blindBagTypeRepository) {
         return args -> {
+
+            if(blindBagTypeRepository.count() != 0) return;
             // Anime Series
             BlindBagType animeSeries = new BlindBagType();
             animeSeries.setTypeName("Anime Series");

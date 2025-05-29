@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface PrizeItemService {
     List<PrizeItem> getAllPrizeItems();
-    
+    List<PrizeItem> getAllPrizeItemsByBlindId(int id);
     PrizeItem getPrizeItemById(Integer id);
     
     PrizeItem savePrizeItem(PrizeItem prizeItem);

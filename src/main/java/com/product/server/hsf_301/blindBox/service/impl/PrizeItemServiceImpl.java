@@ -31,6 +31,11 @@ public class PrizeItemServiceImpl implements PrizeItemService {
     }
 
     @Override
+    public List<PrizeItem> getAllPrizeItemsByBlindId(int id) {
+        return prizeItemRepository.findAllByBlindBagType_Id(id);
+    }
+
+    @Override
     public PrizeItem getPrizeItemById(Integer id) {
         return prizeItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("PrizeItem not found with id: " + id));

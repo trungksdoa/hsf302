@@ -14,4 +14,6 @@ public interface PrizeItemRepository extends JpaRepository<PrizeItem, Integer> {
     List<PrizeItem> findByIsActiveTrue();
     
     List<PrizeItem> findByBlindBagTypeAndIsActiveTrue(BlindPackage blindBagType);
+
+    List<PrizeItem> findAllByBlindBagType_Id(Integer blindBagTypeId);
 }

@@ -5,6 +5,7 @@ import com.product.server.hsf_301.blindBox.model.PrizeItem;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import com.product.server.hsf_301.blindBox.service.PrizeItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,19 @@ public class PrizeItemController {
     public String getPrizeItemById(@PathVariable Integer id, Model model) {
         PrizeItem prizeItem = prizeItemService.getPrizeItemById(id);
         model.addAttribute("prizeItem", prizeItem);
+        return "prizeItem/details";
+    }
+
+    @GetMapping("/box/{blindBoxId}")
+    @ResponseBody
+    public List<PrizeItem> getPrizesByBlindBoxId(@PathVariable String blindBoxId) {
+        return prizeItemService.getAllPrizeItemsByBlindId(Integer.parseInt(blindBoxId));
+    }
+
+    @GetMapping("/view/{blindBoxId}")
+    public String getPrizesByBlindId(@PathVariable Integer blindBoxId, Model model) {
+        List<PrizeItem> prizeItems = prizeItemService.getAllPrizeItemsByBlindId(blindBoxId);
+        model.addAttribute("prizeItems", prizeItems);
         return "prizeItem/details";
     }
 

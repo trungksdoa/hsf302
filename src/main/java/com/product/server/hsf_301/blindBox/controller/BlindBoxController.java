@@ -2,8 +2,13 @@ package com.product.server.hsf_301.blindBox.controller;
 
 import com.product.server.hsf_301.blindBox.model.BlindPackage;
 import com.product.server.hsf_301.blindBox.model.PrizeItem;
+import com.product.server.hsf_301.blindBox.model.SpinHistory;
+import com.product.server.hsf_301.blindBox.model.User;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import com.product.server.hsf_301.blindBox.service.PrizeItemService;
+import com.product.server.hsf_301.blindBox.service.SpinHistoryService;
+import com.product.server.hsf_301.blindBox.service.UserService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -17,7 +22,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -27,6 +35,9 @@ public class BlindBoxController {
 
     private final BlindBagTypeService blindBagTypeService;
     private final PrizeItemService prizeItemService;
+    private final SpinHistoryService spinHistoryService;
+    private final UserService userService;
+
     
     // Directory where uploaded files will be stored
 
@@ -46,36 +57,30 @@ public class BlindBoxController {
         return "blindBagType/details";
     }
 
-    // API endpoint to get possible items for a blind box
-    @GetMapping("/{id}/items")
+
+
+
+    @PostMapping("/{boxId}/spin")
     @ResponseBody
-    public ResponseEntity<List<PrizeItem>> getPossibleItems(@PathVariable Integer id) {
-        BlindPackage blindBagType = blindBagTypeService.getBlindBagTypeById(id);
-        if(blindBagType == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        List<PrizeItem> items = prizeItemService.getPrizeItemByBlindBoxAndActive(blindBagType);
-        return ResponseEntity.ok(items);
-    }
-
-    // Handle purchase
-    @PostMapping("/{id}/purchase")
-    @ResponseBody
-    public ResponseEntity<?> purchaseBlindBox(@PathVariable Integer id) {
-        BlindPackage blindBagType = blindBagTypeService.getBlindBagTypeById(id);
-
-        if(blindBagType == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        return ResponseEntity.ok().body("{\"status\":\"success\",\"message\":\"Purchase initiated\"}");
-
-    }
-
-    // Redirect to payment page
-    @GetMapping("/{id}/purchase")
-    public String purchasePage(@PathVariable Integer id, Model model) {
-        BlindPackage blindBagType = blindBagTypeService.getBlindBagTypeById(id);
-        if(blindBagType == null) return "redirect:/blindbox/list";
-
-        model.addAttribute("blindBagType", blindBagType);
-        return "blindbox/purchase";
+    public ResponseEntity<?> spinBox(@PathVariable Integer boxId) {
+        try {
+            // This is for future implementation - right now we're just returning a stub response
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("spinId", 1);
+            response.put("itemId", 1);
+            response.put("itemName", "Sample Prize");
+            response.put("itemImage", "https://via.placeholder.com/200x200?text=Prize");
+            response.put("rarity", "RARE");
+            response.put("timestamp", java.time.LocalDateTime.now());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "Error: " + e.getMessage()
+            ));
+        }
     }
 
 }

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,7 +28,9 @@ public class UserController {
         if (user == null) {
             user = new User(); // Fallback to empty user if not found
         }
-        
+
+
+
         model.addAttribute("user", user);
         model.addAttribute("content", "view/profile");
         return "view/layout";

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSF Store - Spin History</title>
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/simple-style.css">
+</head>
+<body>
+    <!-- Simple Header -->
+    <header class="simple-header bg-white shadow-sm">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-light py-3">
+                <a class="navbar-brand fw-bold text-primary" href="test.html">
+                    <i class="fas fa-cube me-2"></i>HSF Store
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="test.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="blog.html">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="spin-history.html">Spin History</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="profile.html">Profile</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="bg-primary text-white py-5">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold mb-3">
+                <i class="fas fa-history me-3"></i>Spin History
+            </h1>
+            <p class="lead">Track all your lucky spins and prizes</p>
+        </div>
+    </section>
+
+    <!-- Spin History Content -->
+    <section class="py-5">
+        <div class="container">
+            <!-- Filter and Stats -->
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Filter Results</h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <select class="form-select" id="filterPrize">
+                                        <option value="">All Prizes</option>
+                                        <option value="common">Common</option>
+                                        <option value="rare">Rare</option>
+                                        <option value="epic">Epic</option>
+                                        <option value="legendary">Legendary</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="date" class="form-control" id="filterDate">
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-primary" onclick="applyFilter()">
+                                        <i class="fas fa-filter me-1"></i>Filter
+                                    </button>
+                                    <button class="btn btn-outline-secondary ms-2" onclick="clearFilter()">
+                                        <i class="fas fa-times me-1"></i>Clear
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Total Spins</h5>
+                            <h2 class="mb-0">247</h2>
+                            <small>This month: 18</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spin History Table -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Spins</h5>
+                    <button class="btn btn-success btn-sm" onclick="exportHistory()">
+                        <i class="fas fa-download me-1"></i>Export
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Date & Time</th>
+                                    <th>Prize Won</th>
+                                    <th>Rarity</th>
+                                    <th>Value</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="spinHistoryTable">
+                                <tr>
+                                    <td>001</td>
+                                    <td>
+                                        <div>March 15, 2024</div>
+                                        <small class="text-muted">14:30:25</small>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://via.placeholder.com/40x40" class="me-2 rounded" alt="Prize">
+                                            <div>
+                                                <div class="fw-bold">Golden Dragon Figure</div>
+                                                <small class="text-muted">Limited Edition</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-warning text-dark">Legendary</span></td>
+                                    <td class="fw-bold text-success">$150.00</td>
+                                    <td><span class="badge bg-success">Claimed</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewPrize('001')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>002</td>
+                                    <td>
+                                        <div>March 14, 2024</div>
+                                        <small class="text-muted">09:15:42</small>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://via.placeholder.com/40x40" class="me-2 rounded" alt="Prize">
+                                            <div>
+                                                <div class="fw-bold">Silver Coin</div>
+                                                <small class="text-muted">Common Item</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-secondary">Common</span></td>
+                                    <td class="fw-bold text-success">$5.00</td>
+                                    <td><span class="badge bg-warning">Pending</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-success" onclick="claimPrize('002')">
+                                            <i class="fas fa-gift"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>003</td>
+                                    <td>
+                                        <div>March 13, 2024</div>
+                                        <small class="text-muted">16:45:18</small>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://via.placeholder.com/40x40" class="me-2 rounded" alt="Prize">
+                                            <div>
+                                                <div class="fw-bold">Ruby Gem</div>
+                                                <small class="text-muted">Rare Collection</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-danger">Epic</span></td>
+                                    <td class="fw-bold text-success">$75.00</td>
+                                    <td><span class="badge bg-success">Claimed</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewPrize('003')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>004</td>
+                                    <td>
+                                        <div>March 12, 2024</div>
+                                        <small class="text-muted">11:20:33</small>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://via.placeholder.com/40x40" class="me-2 rounded" alt="Prize">
+                                            <div>
+                                                <div class="fw-bold">Blue Crystal</div>
+                                                <small class="text-muted">Magic Series</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-info">Rare</span></td>
+                                    <td class="fw-bold text-success">$25.00</td>
+                                    <td><span class="badge bg-success">Claimed</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewPrize('004')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>005</td>
+                                    <td>
+                                        <div>March 11, 2024</div>
+                                        <small class="text-muted">13:55:07</small>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://via.placeholder.com/40x40" class="me-2 rounded" alt="Prize">
+                                            <div>
+                                                <div class="fw-bold">Bronze Medal</div>
+                                                <small class="text-muted">Starter Pack</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-secondary">Common</span></td>
+                                    <td class="fw-bold text-success">$3.00</td>
+                                    <td><span class="badge bg-success">Claimed</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewPrize('005')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Spin history pagination" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">Previous</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Prize Detail Modal -->
+    <div class="modal fade" id="prizeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Prize Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="prizeDetails">
+                    <!-- Prize details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 HSF Store. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function viewPrize(prizeId) {
+            const prizeDetails = {
+                '001': {
+                    name: 'Golden Dragon Figure',
+                    rarity: 'Legendary',
+                    value: '$150.00',
+                    description: 'A magnificent golden dragon figure from the limited edition fantasy collection.',
+                    image: 'https://via.placeholder.com/300x300'
+                },
+                '002': {
+                    name: 'Silver Coin',
+                    rarity: 'Common',
+                    value: '$5.00',
+                    description: 'A shiny silver coin from the treasure collection.',
+                    image: 'https://via.placeholder.com/300x300'
+                }
+            };
+
+            const prize = prizeDetails[prizeId] || prizeDetails['001'];
+            
+            document.getElementById('prizeDetails').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <img src="${prize.image}" class="img-fluid rounded" alt="${prize.name}">
+                    </div>
+                    <div class="col-md-6">
+                        <h4>${prize.name}</h4>
+                        <p><strong>Rarity:</strong> <span class="badge bg-warning">${prize.rarity}</span></p>
+                        <p><strong>Value:</strong> <span class="text-success fw-bold">${prize.value}</span></p>
+                        <p><strong>Description:</strong></p>
+                        <p>${prize.description}</p>
+                        <p><strong>Spin ID:</strong> ${prizeId}</p>
+                    </div>
+                </div>
+            `;
+            
+            const modal = new bootstrap.Modal(document.getElementById('prizeModal'));
+            modal.show();
+        }
+
+        function claimPrize(prizeId) {
+            if (confirm('Are you sure you want to claim this prize?')) {
+                // Update status in table
+                const row = document.querySelector(`tr:has([onclick="claimPrize('${prizeId}')"])`);
+                if (row) {
+                    const statusCell = row.cells[5];
+                    statusCell.innerHTML = '<span class="badge bg-success">Claimed</span>';
+                    const actionCell = row.cells[6];
+                    actionCell.innerHTML = `<button class="btn btn-sm btn-outline-primary" onclick="viewPrize('${prizeId}')"><i class="fas fa-eye"></i></button>`;
+                }
+                
+                // Show success message
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-success position-fixed top-0 end-0 m-3';
+                alert.style.zIndex = '9999';
+                alert.innerHTML = 'Prize claimed successfully!';
+                document.body.appendChild(alert);
+                
+                setTimeout(() => alert.remove(), 3000);
+            }
+        }
+
+        function applyFilter() {
+            const prizeFilter = document.getElementById('filterPrize').value;
+            const dateFilter = document.getElementById('filterDate').value;
+            
+            console.log('Applying filters:', { prize: prizeFilter, date: dateFilter });
+            // Filter logic would be implemented here
+        }
+
+        function clearFilter() {
+            document.getElementById('filterPrize').value = '';
+            document.getElementById('filterDate').value = '';
+            // Clear filter logic would be implemented here
+        }
+
+        function exportHistory() {
+            alert('Export functionality would be implemented here');
+        }
+    </script>
+</body>
+</html>

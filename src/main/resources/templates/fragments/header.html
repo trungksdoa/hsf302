@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <title>Blind Box Collection | HSF Store</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Fragment -->
+    <header th:fragment="header" class="site-header">
+        <!-- Top Bar -->
+        <div class="top-bar bg-dark text-white py-2">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 d-none d-lg-block">
+                        <span class="me-3"><i class="fas fa-phone-alt me-2"></i> (123) 456-7890</span>
+                        <span><i class="fas fa-envelope me-2"></i> info@hsfstore.com</span>
+                    </div>
+                    <div class="col-lg-6 text-end">
+                        <div class="top-bar-links">
+                            <a href="#" class="text-white me-3"><i class="fas fa-user me-1"></i> My Account</a>
+                            <a href="#" class="text-white"><i class="fas fa-question-circle me-1"></i> Help</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Header -->
+        <div class="main-header py-3">
+            <div class="container">
+                <div class="row align-items-center">
+                    <!-- Logo -->
+                    <div class="col-lg-3 col-md-3 col-6">
+                        <div class="site-logo">
+                            <a th:href="@{/}">
+                                <img th:src="@{/images/logo.png}" alt="HSF Store" class="img-fluid">
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Search -->
+                    <div class="col-lg-6 col-md-6 d-none d-md-block">
+                        <form class="search-form">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search for blind boxes...">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Mobile Menu Toggle -->
+                    <div class="col-lg-3 col-md-3 col-6 text-end">
+                        <button class="mobile-menu-toggle d-lg-none">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="site-navigation bg-primary">
+            <div class="container">
+                <nav class="navbar navbar-expand-lg navbar-dark p-0">
+                    <div class="container-fluid px-0">
+                        <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="mainNavbar">
+                            <ul class="navbar-nav me-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link" th:href="@{/}">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" th:href="@{/blindbox/list}">Blind Boxes</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+</body>
+</html>
+                                <li class="nav-item">
+                                    <a class="nav-link active" th:href="@{/blindbox/list}">Blind Boxes</a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                        Categories
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">Anime</a></li>
+                                        <li><a class="dropdown-item" href="#">Disney</a></li>
+                                        <li><a class="dropdown-item" href="#">Marvel</a></li>
+                                        <li><a class="dropdown-item" href="#">Gaming</a></li>
+                                        <li><a class="dropdown-item" href="#">Movies</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">New Arrivals</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">Best Sellers</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">Deals</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" th:href="@{/contact}">Contact</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+</body>
+</html>

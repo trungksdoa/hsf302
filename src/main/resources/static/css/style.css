@@ -1,0 +1,368 @@
+/**
+ * Main Stylesheet for HSF Store
+ */
+
+/* Base Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    color: #333;
+    background-color: #f8f9fa;
+    line-height: 1.6;
+}
+
+a {
+    text-decoration: none;
+    color: #0d6efd;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: #0a58ca;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Header Styles */
+.site-header {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.top-bar {
+    font-size: 0.85rem;
+}
+
+.top-bar-links a {
+    font-size: 0.85rem;
+}
+
+.site-logo img {
+    max-height: 60px;
+}
+
+.search-form .form-control {
+    border-radius: 50px 0 0 50px;
+    border: 2px solid #0d6efd;
+    border-right: none;
+}
+
+.search-form .btn {
+    border-radius: 0 50px 50px 0;
+    padding: 0.375rem 1.25rem;
+}
+
+.header-action-link {
+    color: #333;
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+}
+
+.header-action-link:hover {
+    color: #0d6efd;
+}
+
+.header-action-link i {
+    font-size: 1.5rem;
+}
+
+.cart-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #0d6efd;
+    color: white;
+    font-size: 0.7rem;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.mobile-menu-toggle {
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.site-navigation {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.site-navigation .nav-link {
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    padding: 1rem 1.25rem;
+}
+
+.site-navigation .nav-link:hover,
+.site-navigation .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.site-navigation .dropdown-menu {
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 0.25rem;
+    margin-top: 0;
+}
+
+.site-navigation .dropdown-item {
+    padding: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+}
+
+.site-navigation .dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #0d6efd;
+}
+
+/* Banner Section */
+.banner-section {
+    background-color: #f1f5fe;
+    padding: 3rem 0;
+    margin-bottom: 3rem;
+}
+
+.banner-content h1 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.breadcrumb {
+    background: transparent;
+}
+
+/* Product Cards */
+.product-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.product-img {
+    position: relative;
+    overflow: hidden;
+}
+
+.product-img img {
+    width: 100%;
+    height: auto;
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-img img {
+    transform: scale(1.05);
+}
+
+.product-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.product-card:hover .product-overlay {
+    opacity: 1;
+}
+
+.product-buttons {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.product-buttons li {
+    margin: 0 5px;
+}
+
+.product-buttons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: #fff;
+    border-radius: 50%;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.product-buttons a:hover {
+    background-color: #0d6efd;
+    color: #fff;
+}
+
+.product-content {
+    padding: 1rem;
+}
+
+.product-content h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.product-content h4 a {
+    color: #333;
+}
+
+.product-content h4 a:hover {
+    color: #0d6efd;
+}
+
+.product-price {
+    font-weight: 700;
+    color: #0d6efd;
+}
+
+/* Footer Styles */
+.site-footer {
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.widget-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.widget-title:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 50px;
+    height: 2px;
+    background-color: #0d6efd;
+}
+
+.footer-links li {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    color: #555;
+    transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #0d6efd;
+    padding-left: 5px;
+}
+
+.social-links {
+    display: flex;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background-color: #e9ecef;
+    border-radius: 50%;
+    color: #333;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.contact-info p {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.contact-info i {
+    margin-right: 10px;
+    color: #0d6efd;
+    width: 20px;
+    text-align: center;
+}
+
+.newsletter h5 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.payment-methods i {
+    font-size: 1.5rem;
+    margin-left: 5px;
+    color: #e9ecef;
+}
+
+/* Responsive Styles */
+@media (max-width: 991.98px) {
+    .site-navigation {
+        display: none;
+    }
+    
+    .site-navigation.mobile-active {
+        display: block;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .banner-section {
+        padding: 2rem 0;
+    }
+    
+    .social-links, .payment-methods {
+        justify-content: center;
+    }
+    
+    .footer-widget {
+        text-align: center;
+    }
+    
+    .widget-title:after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .contact-info p {
+        justify-content: center;
+    }
+}

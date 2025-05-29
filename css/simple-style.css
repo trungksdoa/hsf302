@@ -1,0 +1,104 @@
+/* Simple and Clean Styles */
+
+body {
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+}
+
+/* Header */
+.simple-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+/* Hero Section */
+.hero-section {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+}
+
+/* Cards */
+.card {
+    transition: transform 0.3s ease;
+    border: none;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Blog Cards */
+.blog-card .card-title a:hover {
+    color: #0d6efd !important;
+}
+
+.blog-tags .badge {
+    font-size: 0.75rem;
+}
+
+.blog-meta {
+    border-top: 1px solid #eee;
+    padding-top: 0.5rem;
+    margin-top: 1rem;
+}
+
+/* Blog Tags Cloud */
+.blog-tags-cloud .badge {
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.blog-tags-cloud .badge:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Sections */
+section {
+    scroll-margin-top: 80px;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card, .blog-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-section .display-4 {
+        font-size: 2rem;
+    }
+    
+    .blog-tags-cloud .badge {
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+    }
+}

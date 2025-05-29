@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{view/layout}">
+
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Spin History</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <!-- Spin History Header -->
+        <section class="bg-primary text-white py-5">
+            <div class="container">
+                <h1 class="display-5 fw-bold mb-2">Spin History</h1>
+                <p class="lead mb-0">Track all your spins and prizes</p>
+            </div>
+        </section>
+
+        <!-- Spin History Content -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row">
+                    <!-- Spin Stats -->
+                    <div class="col-lg-3 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Spin Stats</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Total Spins:</span>
+                                    <strong th:text="${spinStats?.totalSpins ?: '247'}">247</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Prizes Won:</span>
+                                    <strong th:text="${spinStats?.prizesWon ?: '156'}">156</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Win Rate:</span>
+                                    <strong th:text="${spinStats?.winRate ?: '63%'}">63%</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Total Value:</span>
+                                    <strong class="text-success" th:text="'$' + ${spinStats?.totalValue ?: '1,234'}">$1,234</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filter Options -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Filter</h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/spin-history}" method="get">
+                                    <div class="mb-3">
+                                        <label for="rarityFilter" class="form-label">Rarity</label>
+                                        <select class="form-select" id="rarityFilter" name="rarity">
+                                            <option value="">All Rarities</option>
+                                            <option value="COMMON" th:selected="${param.rarity != null and param.rarity[0] == 'COMMON'}">Common</option>
+                                            <option value="RARE" th:selected="${param.rarity != null and param.rarity[0] == 'RARE'}">Rare</option>
+                                            <option value="EPIC" th:selected="${param.rarity != null and param.rarity[0] == 'EPIC'}">Epic</option>
+                                            <option value="LEGENDARY" th:selected="${param.rarity != null and param.rarity[0] == 'LEGENDARY'}">Legendary</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="statusFilter" class="form-label">Status</label>
+                                        <select class="form-select" id="statusFilter" name="status">
+                                            <option value="">All Status</option>
+                                            <option value="AVAILABLE" th:selected="${param.status != null and param.status[0] == 'AVAILABLE'}">Available</option>
+                                            <option value="ORDERED" th:selected="${param.status != null and param.status[0] == 'ORDERED'}">Ordered</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm w-100">Apply Filter</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spin History Table -->
+                    <div class="col-lg-9">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-history me-2"></i>All Spins
+                                </h5>
+                                <div th:if="${spinHistory != null and !spinHistory.isEmpty()}">
+                                    <button class="btn btn-success btn-sm me-2" onclick="orderSelected()" id="orderBtn" disabled>
+                                        <i class="fas fa-shopping-cart me-1"></i>Order Selected (<span id="selectedCount">0</span>)
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="toggleSelectAll()">
+                                        <i class="fas fa-check-double me-1"></i>Select All
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- Spin History Table -->
+                                <div th:if="${spinHistory != null and !spinHistory.isEmpty()}" class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th width="50">
+                                                    <input type="checkbox" class="form-check-input" id="selectAllCheckbox" onchange="selectAll()">
+                                                </th>
+                                                <th>Prize</th>
+                                                <th>Rarity</th>
+                                                <th>Date</th>
+                                                <th>Value</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="spinHistoryTable">
+                                            <tr th:each="spin : ${spinHistory}">
+                                                <td>
+                                                    <input type="checkbox" class="form-check-input prize-checkbox" 
+                                                           th:data-prize-id="${spin.id}" 
+                                                           th:data-value="${spin.value}" 
+                                                           onchange="updateSelection()" 
+                                                           th:disabled="${spin.status == 'ORDERED'}">
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <img th:src="${spin.prize?.imageUrl ?: 'https://via.placeholder.com/40x40'}" 
+                                                             class="me-2 rounded" alt="Prize">
+                                                        <div>
+                                                            <div class="fw-bold" th:text="${spin.prize?.name ?: 'No Prize'}">Prize Name</div>
+                                                            <small class="text-muted" th:text="${spin.prize?.series ?: 'N/A'}">Series</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge" 
+                                                          th:if="${spin.prize}"
+                                                          th:classappend="${spin.prize.rarity == 'LEGENDARY'} ? 'bg-warning text-dark' : 
+                                                                         ${spin.prize.rarity == 'EPIC'} ? 'bg-danger' : 
+                                                                         ${spin.prize.rarity == 'RARE'} ? 'bg-info' : 'bg-secondary'"
+                                                          th:text="${spin.prize.rarity}">Common</span>
+                                                    <span th:unless="${spin.prize}" class="badge bg-secondary">No Prize</span>
+                                                </td>
+                                                <td>
+                                                    <div th:text="${#temporals.format(spin.spinDate, 'MMMM dd, yyyy')}">March 15, 2024</div>
+                                                    <small class="text-muted" th:text="${#temporals.format(spin.spinDate, 'HH:mm')}">14:30</small>
+                                                </td>
+                                                <td class="fw-bold" th:classappend="${spin.value > 0} ? 'text-success' : 'text-muted'" 
+                                                    th:text="'$' + ${spin.value}">$150.00</td>
+                                                <td>
+                                                    <span class="badge" 
+                                                          th:classappend="${spin.status == 'AVAILABLE'} ? 'bg-success' : 
+                                                                         ${spin.status == 'ORDERED'} ? 'bg-warning' : 'bg-secondary'"
+                                                          th:text="${spin.status}">Available</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <!-- Pagination -->
+                                    <nav aria-label="Spin history pagination" class="mt-4" th:if="${totalPages > 1}">
+                                        <ul class="pagination justify-content-center">
+                                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                                <a class="page-link" th:href="@{/spin-history(page=${currentPage - 1}, rarity=${param.rarity}, status=${param.status})}">Previous</a>
+                                            </li>
+                                            <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}" 
+                                                class="page-item" th:classappend="${pageNum == currentPage} ? 'active'">
+                                                <a class="page-link" 
+                                                   th:href="@{/spin-history(page=${pageNum}, rarity=${param.rarity}, status=${param.status})}" 
+                                                   th:text="${pageNum + 1}">1</a>
+                                            </li>
+                                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                                <a class="page-link" th:href="@{/spin-history(page=${currentPage + 1}, rarity=${param.rarity}, status=${param.status})}">Next</a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+
+                                <!-- Empty Spin History State -->
+                                <div th:if="${spinHistory == null or spinHistory.isEmpty()}" class="text-center py-5">
+                                    <div class="card border-0">
+                                        <div class="card-body">
+                                            <i class="fas fa-dice fa-4x text-muted mb-4"></i>
+                                            <h4 class="text-muted mb-3">No Spin History Found</h4>
+                                            <p class="text-muted mb-4">
+                                                <span th:if="${param.rarity != null or param.status != null}">
+                                                    No spins match your current filters. Try adjusting the filters or
+                                                </span>
+                                                <span th:unless="${param.rarity != null or param.status != null}">
+                                                    You haven't made any spins yet.
+                                                </span>
+                                                Start spinning to win amazing prizes!
+                                            </p>
+                                            <div>
+                                                <a th:if="${param.rarity != null or param.status != null}" href="/spin-history" class="btn btn-outline-secondary me-2">Clear Filters</a>
+                                                <a href="/#products" class="btn btn-primary">Start Spinning</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Order Summary -->
+                                <div id="orderSummary" class="alert alert-info mt-3" style="display: none;">
+                                    <h6><i class="fas fa-info-circle me-1"></i>Order Summary</h6>
+                                    <p class="mb-1">Selected items: <span id="summaryCount">0</span></p>
+                                    <p class="mb-0">Total value: $<span id="summaryTotal">0.00</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Order Confirmation Modal -->
+        <div class="modal fade" id="orderModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Order</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="orderModalBody">
+                        <!-- Order details will be populated here -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="confirmOrder()">Confirm Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <script>
+            let selectedPrizes = [];
+
+            function updateSelection() {
+                const checkboxes = document.querySelectorAll('.prize-checkbox:checked');
+                const count = checkboxes.length;
+                let total = 0;
+
+                selectedPrizes = [];
+                checkboxes.forEach(checkbox => {
+                    const value = parseFloat(checkbox.dataset.value);
+                    total += value;
+                    selectedPrizes.push({
+                        id: checkbox.dataset.prizeId,
+                        value: value,
+                        element: checkbox.closest('tr')
+                    });
+                });
+
+                document.getElementById('selectedCount').textContent = count;
+                document.getElementById('orderBtn').disabled = count === 0;
+
+                const orderSummary = document.getElementById('orderSummary');
+                if (count > 0) {
+                    document.getElementById('summaryCount').textContent = count;
+                    document.getElementById('summaryTotal').textContent = total.toFixed(2);
+                    orderSummary.style.display = 'block';
+                } else {
+                    orderSummary.style.display = 'none';
+                }
+            }
+
+            function selectAll() {
+                const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+                const checkboxes = document.querySelectorAll('.prize-checkbox:not([disabled])');
+                
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+                
+                updateSelection();
+            }
+
+            function toggleSelectAll() {
+                const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+                selectAllCheckbox.checked = !selectAllCheckbox.checked;
+                selectAll();
+            }
+
+            function orderSelected() {
+                if (selectedPrizes.length === 0) return;
+
+                let orderDetails = '<h6>Selected Items:</h6><ul class="list-group">';
+                let total = 0;
+
+                selectedPrizes.forEach(prize => {
+                    const row = prize.element;
+                    const prizeInfo = row.cells[1].textContent.trim();
+                    const value = prize.value;
+                    total += value;
+
+                    orderDetails += `<li class="list-group-item d-flex justify-content-between">
+                        <span>${prizeInfo}</span>
+                        <strong>$${value.toFixed(2)}</strong>
+                    </li>`;
+                });
+
+                orderDetails += `</ul>
+                    <div class="mt-3 p-3 bg-light rounded">
+                        <h6>Order Total: <span class="text-success">$${total.toFixed(2)}</span></h6>
+                    </div>`;
+
+                document.getElementById('orderModalBody').innerHTML = orderDetails;
+                
+                const modal = new bootstrap.Modal(document.getElementById('orderModal'));
+                modal.show();
+            }
+
+            function confirmOrder() {
+                // Collect selected prize IDs
+                const prizeIds = selectedPrizes.map(prize => prize.id);
+                
+                // Send order request
+                fetch('/api/orders/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prizeIds: prizeIds })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Mark selected items as ordered
+                        selectedPrizes.forEach(prize => {
+                            const row = prize.element;
+                            const statusCell = row.cells[5];
+                            statusCell.innerHTML = '<span class="badge bg-warning">Ordered</span>';
+                            
+                            // Disable the checkbox
+                            const checkbox = row.querySelector('.prize-checkbox');
+                            checkbox.checked = false;
+                            checkbox.disabled = true;
+                        });
+
+                        // Close modal
+                        bootstrap.Modal.getInstance(document.getElementById('orderModal')).hide();
+
+                        // Update selection
+                        updateSelection();
+
+                        // Show success message
+                        showNotification(`Order placed successfully! ${selectedPrizes.length} items ordered.`, 'success');
+                    } else {
+                        showNotification('Failed to place order. Please try again.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('An error occurred while placing the order.', 'error');
+                });
+            }
+
+            // Initialize
+            document.addEventListener('DOMContentLoaded', function() {
+                updateSelection();
+            });
+        </script>
+    </th:block>
+</body>
+</html>

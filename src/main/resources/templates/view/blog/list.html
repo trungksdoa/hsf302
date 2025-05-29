@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{view/layout}">
+
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Blog</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <!-- Blog Header -->
+        <section class="bg-light py-4">
+            <div class="container">
+                <h1 class="h2 mb-0">Blog</h1>
+                <p class="text-muted">Latest news and updates</p>
+            </div>
+        </section>
+
+        <!-- Blog Content -->
+        <section class="py-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <!-- Blog Posts -->
+                        <div th:if="${posts != null and !posts.isEmpty()}">
+                            <article th:each="post : ${posts}" class="card mb-4 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <a th:href="@{/blog/{id}(id=${post.id})}" class="text-decoration-none text-dark" th:text="${post.title}">Blog Title</a>
+                                    </h5>
+                                    <p class="text-muted small mb-2">
+                                        <span th:text="${#temporals.format(post.createdAt, 'MMMM dd, yyyy')}">March 15, 2024</span> • 
+                                        <span>By <span th:text="${post.author}">Admin</span></span>
+                                    </p>
+                                    <p class="card-text" th:text="${#strings.abbreviate(post.content, 200)}">Blog excerpt...</p>
+                                    <a th:href="@{/blog/{id}(id=${post.id})}" class="btn btn-primary btn-sm">Read More</a>
+                                </div>
+                            </article>
+
+                            <!-- Pagination -->
+                            <nav aria-label="Blog pagination" class="mt-4" th:if="${totalPages > 1}">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                        <a class="page-link" th:href="@{/blog(page=${currentPage - 1})}">Previous</a>
+                                    </li>
+                                    <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}" 
+                                        class="page-item" th:classappend="${pageNum == currentPage} ? 'active'">
+                                        <a class="page-link" th:href="@{/blog(page=${pageNum})}" th:text="${pageNum + 1}">1</a>
+                                    </li>
+                                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                        <a class="page-link" th:href="@{/blog(page=${currentPage + 1})}">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <!-- Empty Blog Posts State -->
+                        <div th:if="${posts == null or posts.isEmpty()}" class="text-center py-5">
+                            <div class="card border-0">
+                                <div class="card-body">
+                                    <i class="fas fa-blog fa-4x text-muted mb-4"></i>
+                                    <h4 class="text-muted mb-3">No Blog Posts Found</h4>
+                                    <p class="text-muted mb-4">We haven't published any blog posts yet. Check back soon for exciting updates!</p>
+                                    <a href="/" class="btn btn-primary">Back to Home</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

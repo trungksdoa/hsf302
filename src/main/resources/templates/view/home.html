@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{view/layout}">
+
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Home</title>
+</head>
+
+<body>
+    <div th:fragment="content">
+        <!-- Products Section -->
+        <section id="products" class="py-5">
+            <div class="container">
+                <h2 class="text-center mb-5">Our Products</h2>
+                
+                <!-- Products List -->
+                <div th:if="${products != null and !products.isEmpty()}" class="row">
+                    <div th:each="product : ${products}" class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <img th:src="${product.imageUrl ?: 'https://via.placeholder.com/300x200'}" class="card-img-top" th:alt="${product.name}">
+                            <div class="card-body">
+                                <h5 class="card-title" th:text="${product.name}">Mystery Box #1</h5>
+                                <p class="card-text" th:text="${product.description}">Contains rare collectible items</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="h5 text-primary mb-0" th:text="'$' + ${product.pricePerSpin}">$29.99</span>
+                                    <button class="btn btn-primary" th:onclick="'showPurchase(\'' + ${product.id} + '\', ' + ${product.pricePerSpin} + ')'">Buy Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empty Products State -->
+                <div th:if="${products == null or products.isEmpty()}" class="text-center py-5">
+                    <div class="card border-0">
+                        <div class="card-body">
+                            <i class="fas fa-cube fa-4x text-muted mb-4"></i>
+                            <h4 class="text-muted mb-3">No Products Available</h4>
+                            <p class="text-muted mb-4">We're working on adding new exciting blind boxes. Check back soon!</p>
+                            <a href="/contact" class="btn btn-outline-primary">Contact Us for Updates</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Blog Section -->
+        <section id="blog" class="py-5 bg-light">
+            <div class="container">
+                <h2 class="text-center mb-5">Latest Blog Posts</h2>
+                
+                <!-- Blog Posts List -->
+                <div th:if="${recentPosts != null and !recentPosts.isEmpty()}" class="row">
+                    <div th:each="post : ${recentPosts}" class="col-lg-4 mb-4">
+                        <article class="blog-card card h-100 shadow-sm">
+                            <img th:src="${post.imageUrl ?: 'https://via.placeholder.com/350x200'}" class="card-img-top" alt="Blog post">
+                            <div class="card-body">
+                                <div class="blog-tags mb-2">
+                                    <span th:each="tag : ${post.tags}" class="badge bg-primary me-1" th:text="${tag}">Tag</span>
+                                </div>
+                                <h5 class="card-title">
+                                    <a th:href="@{/blog/{id}(id=${post.id})}" class="text-decoration-none text-dark" th:text="${post.title}">Blog Title</a>
+                                </h5>
+                                <p class="card-text" th:text="${#strings.abbreviate(post.content, 100)}">Blog excerpt...</p>
+                                <div class="blog-meta text-muted small">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    <span th:text="${#temporals.format(post.createdAt, 'MMMM dd, yyyy')}">March 15, 2024</span>
+                                    <i class="fas fa-user ms-3 me-1"></i>
+                                    <span th:text="${post.author}">Admin</span>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                
+                <!-- Empty Blog Posts State -->
+                <div th:if="${recentPosts == null or recentPosts.isEmpty()}" class="text-center py-5">
+                    <div class="card border-0">
+                        <div class="card-body">
+                            <i class="fas fa-blog fa-4x text-muted mb-4"></i>
+                            <h4 class="text-muted mb-3">No Recent Posts</h4>
+                            <p class="text-muted mb-4">Stay tuned for exciting updates and news about our latest collections!</p>
+                            <a href="/blog" class="btn btn-outline-primary">View All Posts</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Blog Tags Section - Only show if posts exist -->
+                <div th:if="${popularTags != null and !popularTags.isEmpty()}" class="text-center mt-5">
+                    <h4 class="mb-3">Popular Tags</h4>
+                    <div class="blog-tags-cloud">
+                        <a th:each="tag : ${popularTags}" th:href="@{/blog/tag/{tag}(tag=${tag})}" 
+                           class="badge bg-primary me-2 mb-2 p-2 text-decoration-none" th:text="${tag}">Tag</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto text-center">
+                        <h2 class="mb-4">Get in Touch</h2>
+                        <p class="mb-4">Have questions about our products? We'd love to hear from you!</p>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
+                                <p th:text="${contactInfo?.email ?: 'info@hsfstore.com'}">info@hsfstore.com</p>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <i class="fas fa-phone fa-2x text-primary mb-2"></i>
+                                <p th:text="${contactInfo?.phone ?: '(123) 456-7890'}">(123) 456-7890</p>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <i class="fas fa-map-marker-alt fa-2x text-primary mb-2"></i>
+                                <p th:text="${contactInfo?.address ?: '123 Store Street'}">123 Store Street</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Purchase Modal -->
+        <div class="modal fade" id="purchaseModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Purchase</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="purchaseDetails"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="confirmPurchase()">Confirm Purchase</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <script>
+            function showPurchase(productId, price) {
+                document.getElementById('purchaseDetails').innerHTML = `
+                    <div class="alert alert-info">
+                        <strong>Product ID:</strong> ${productId}<br>
+                        <strong>Price:</strong> $${price}
+                    </div>
+                `;
+                
+                const modal = new bootstrap.Modal(document.getElementById('purchaseModal'));
+                modal.show();
+            }
+
+            function confirmPurchase() {
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('purchaseModal')).hide();
+                
+                // Show success message
+                showNotification('Purchase successful! Thank you for your order.', 'success');
+            }
+        </script>
+    </th:block>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+
+// ...existing head and profile header...
+
+<body>
+    <div layout:fragment="content">
+        // ...existing profile header section...
+
+        <!-- Profile Content -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row">
+                    <!-- Profile Stats -->
+                    <div class="col-lg-3 mb-4">
+                        // ...existing profile stats and quick actions...
+                    </div>
+
+                    <!-- Spin History Section -->
+                    <div class="col-lg-9">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-history me-2"></i>Spin History
+                                </h5>
+                                <div th:if="${spinHistory != null and !spinHistory.isEmpty()}">
+                                    <button class="btn btn-success btn-sm me-2" onclick="orderSelected()" id="orderBtn" disabled="disabled">
+                                        <i class="fas fa-shopping-cart me-1"></i>Order Selected (<span id="selectedCount">0</span>)
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="toggleSelectAll()">
+                                        <i class="fas fa-check-double me-1"></i>Select All
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- Spin History Table -->
+                                <div th:if="${spinHistory != null and !spinHistory.isEmpty()}" class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th width="50">
+                                                    <input type="checkbox" class="form-check-input" id="selectAllCheckbox" onchange="selectAll()">
+                                                </th>
+                                                <th>Prize</th>
+                                                <th>Rarity</th>
+                                                <th>Date</th>
+                                                <th>Value</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="spinHistoryTable">
+                                            <tr th:each="prize : ${spinHistory}">
+                                                <td>
+                                                    <input type="checkbox" class="form-check-input prize-checkbox" 
+                                                           th:data-prize-id="${prize?.id ?: '001'}" 
+                                                           th:data-value="${prize?.value ?: '150'}" 
+                                                           onchange="updateSelection()" 
+                                                           th:disabled="${prize?.status == 'ORDERED'}">
+                                                </td>
+                                                // ...existing table rows...
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Empty Spin History State -->
+                                <div th:if="${spinHistory == null or spinHistory.isEmpty()}" class="text-center py-5">
+                                    <div class="card border-0">
+                                        <div class="card-body">
+                                            <i class="fas fa-dice fa-4x text-muted mb-4"></i>
+                                            <h4 class="text-muted mb-3">No Spin History</h4>
+                                            <p class="text-muted mb-4">You haven't made any spins yet. Start spinning to win amazing prizes!</p>
+                                            <a href="/#products" class="btn btn-primary">Start Spinning</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Order Summary -->
+                                <div id="orderSummary" class="alert alert-info mt-3" style="display: none;">
+                                    // ...existing order summary...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        // ...existing modals...
+    </div>
+
+    // ...existing scripts...
+</body>
+</html>

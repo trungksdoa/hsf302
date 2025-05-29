@@ -7,13 +7,6 @@
     <!-- Header -->
     <div th:replace="~{view/fragments :: header}"></div>
 
-    <!-- Debug info - remove after fixing -->
-    <div style="background: yellow; padding: 10px; margin: 10px;">
-        DEBUG: showSidebar = <span th:text="${showSidebar}">null</span><br>
-        DEBUG: URL = <span th:if="${httpServletRequest != null}" th:text="${httpServletRequest.requestURI}">unknown</span><br>
-        DEBUG: showSidebar is false? <span th:text="${showSidebar == false}">unknown</span><br>
-        DEBUG: showSidebar is null? <span th:text="${showSidebar == null}">unknown</span>
-    </div>
 
     <!-- Main Content -->
     <div class="container-fluid" style="min-height: 100vh;">

@@ -11,8 +11,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/blindbox")
@@ -20,8 +26,9 @@ import java.util.List;
 public class BlindBoxController {
 
     private final BlindBagTypeService blindBagTypeService;
-
     private final PrizeItemService prizeItemService;
+    
+    // Directory where uploaded files will be stored
 
     @GetMapping("/ ")
     public String list(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, Model model) {
@@ -71,37 +78,4 @@ public class BlindBoxController {
         return "blindbox/purchase";
     }
 
-
-
-    @GetMapping("/create")
-    public String createBlindBagTypeForm(Model model) {
-        model.addAttribute("blindBagType", new BlindPackage());
-        return "blindBagType/create";
-    }
-
-    @PostMapping("/create")
-    public String createBlindBagType(@ModelAttribute BlindPackage blindBagType) {
-        blindBagTypeService.saveBlindBagType(blindBagType);
-        return "redirect:/blindBagTypes";
-    }
-
-    @GetMapping("/edit/{id}")
-    public String editBlindBagTypeForm(@PathVariable Integer id, Model model) {
-        BlindPackage blindBagType = blindBagTypeService.getBlindBagTypeById(id);
-        model.addAttribute("blindBagType", blindBagType);
-        return "blindBagType/edit";
-    }
-
-    @PostMapping("/edit/{id}")
-    public String updateBlindBagType(@PathVariable Integer id, @ModelAttribute BlindPackage blindBagType) {
-        blindBagType.setId(id);
-        blindBagTypeService.saveBlindBagType(blindBagType);
-        return "redirect:/blindBagTypes";
-    }
-
-    @GetMapping("/delete/{id}")
-    public String deleteBlindBagType(@PathVariable Integer id) {
-        blindBagTypeService.deleteBlindBagType(id);
-        return "redirect:/blindBagTypes";
-    }
 }

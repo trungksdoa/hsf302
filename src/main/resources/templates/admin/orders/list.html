@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Order Management - HSF Store</title>
+</head>
+
+<body>
+    <div th:fragment="content">
+        <div class="p-4">
+            <h1 class="h3 mb-4">Order Management</h1>
+            
+            <!-- Orders Table -->
+            <div class="card">
+                <div class="card-body">
+                    <!-- Table with data -->
+                    <div th:if="${orders != null and !orders.isEmpty()}" class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="order : ${orders}">
+                                    <td th:text="'#' + ${order.id}">#1001</td>
+                                    <td th:text="${order.customerName}">John Collector</td>
+                                    <td th:text="${order.itemsDescription}">Mystery Box #1, Mystery Box #2</td>
+                                    <td th:text="'$' + ${order.total}">$79.98</td>
+                                    <td>
+                                        <select class="form-select form-select-sm" th:onchange="'updateStatus(' + ${order.id} + ', this.value)'">
+                                            <option value="PENDING" th:selected="${order.status == 'PENDING'}">Pending</option>
+                                            <option value="PROCESSING" th:selected="${order.status == 'PROCESSING'}">Processing</option>
+                                            <option value="SHIPPED" th:selected="${order.status == 'SHIPPED'}">Shipped</option>
+                                            <option value="DELIVERED" th:selected="${order.status == 'DELIVERED'}">Delivered</option>
+                                        </select>
+                                    </td>
+                                    <td th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd')}">2024-03-15</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" th:onclick="'viewOrder(' + ${order.id} + ')'">View</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Empty state message -->
+                    <div th:if="${orders == null or orders.isEmpty()}" class="text-center py-5">
+                        <div class="card border-0">
+                            <div class="card-body">
+                                <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
+                                <h4 class="text-muted mb-3">No Orders Found</h4>
+                                <p class="text-muted mb-4">There are no orders in the system at the moment.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <script>
+            function viewOrder(id) {
+                window.location.href = `/admin/orders/${id}`;
+            }
+
+            function updateStatus(orderId, status) {
+                fetch(`/admin/orders/${orderId}/status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: status })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        showNotification('Order status updated successfully', 'success');
+                    } else {
+                        showNotification('Failed to update order status', 'error');
+                    }
+                });
+            }
+        </script>
+    </th:block>
+</body>
+</html>
+                });
+            }
+        </script>
+    </th:block>
+</body>
+</html>

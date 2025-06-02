@@ -23,7 +23,7 @@ public class SpinHistory {
     private User user;
 
     @ManyToOne
-    private BlindBagType blindBagId;
+    private BlindPackage blindBagId;
 
     @ManyToOne
     private PrizeItem prizeItemId; // Có thể null nếu quay lỗi

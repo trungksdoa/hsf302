@@ -1,18 +1,18 @@
 package com.product.server.hsf_301.blindBox.service;
 
-import com.product.server.hsf_301.blindBox.model.BlindBagType;
+import com.product.server.hsf_301.blindBox.model.BlindPackage;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface BlindBagTypeService {
-    Page<BlindBagType> getAllBlindBagTypes(int page, int size);
-    List<BlindBagType> getAllBlindBagTypes();
-    BlindBagType getBlindBagTypeById(Integer id);
+    Page<BlindPackage> getAllBlindBagTypes(int page, int size);
+    List<BlindPackage> getAllBlindBagTypes();
+    BlindPackage getBlindBagTypeById(Integer id);
     
-    BlindBagType saveBlindBagType(BlindBagType blindBagType);
+    BlindPackage saveBlindBagType(BlindPackage blindBagType);
     
     void deleteBlindBagType(Integer id);
     
-    List<BlindBagType> getActiveBlindBagTypes();
+    List<BlindPackage> getActiveBlindBagTypes();
 }

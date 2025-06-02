@@ -1,6 +1,6 @@
 package com.product.server.hsf_301.blindBox.service.impl;
 
-import com.product.server.hsf_301.blindBox.model.BlindBagType;
+import com.product.server.hsf_301.blindBox.model.BlindPackage;
 import com.product.server.hsf_301.blindBox.repository.BlindBoxRepository;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,24 +25,24 @@ public class BlindBagTypeServiceImpl implements BlindBagTypeService {
     }
 
     @Override
-    public Page<BlindBagType> getAllBlindBagTypes(int page, int size) {
+    public Page<BlindPackage> getAllBlindBagTypes(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return blindBagTypeRepository.findAll(pageable);
     }
 
     @Override
-    public List<BlindBagType> getAllBlindBagTypes() {
+    public List<BlindPackage> getAllBlindBagTypes() {
         return blindBagTypeRepository.findAll();
     }
 
     @Override
-    public BlindBagType getBlindBagTypeById(Integer id) {
+    public BlindPackage getBlindBagTypeById(Integer id) {
         return blindBagTypeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("BlindBagType not found with id: " + id));
     }
 
     @Override
-    public BlindBagType saveBlindBagType(BlindBagType blindBagType) {
+    public BlindPackage saveBlindBagType(BlindPackage blindBagType) {
         return blindBagTypeRepository.save(blindBagType);
     }
 
@@ -52,9 +52,9 @@ public class BlindBagTypeServiceImpl implements BlindBagTypeService {
     }
 
     @Override
-    public List<BlindBagType> getActiveBlindBagTypes() {
+    public List<BlindPackage> getActiveBlindBagTypes() {
         return blindBagTypeRepository.findAll().stream()
-                .filter(BlindBagType::isActive)
+                .filter(BlindPackage::isActive)
                 .collect(Collectors.toList());
     }
 }

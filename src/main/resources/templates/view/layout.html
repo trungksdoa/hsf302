@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{view/fragments :: common_header(${title}, ${links})}"></head>
+
+<body>
+    <!-- Header -->
+    <div th:replace="~{view/fragments :: header}"></div>
+
+
+    <!-- Main Content -->
+    <div class="container-fluid" style="min-height: 100vh;">
+        <div class="row" style="min-height: 100vh;">
+<!--            &lt;!&ndash; Sidebar (if needed for admin pages) &ndash;&gt;-->
+<!--            &lt;!&ndash; Explicitly forcing evaluation to ensure condition works properly &ndash;&gt;-->
+<!--            <div th:if="${showSidebar != null && showSidebar == true}" th:replace="~{view/fragments :: sidebar}"></div>-->
+<!--            -->
+            <!-- Main Content Area -->
+            <main th:class="${showSidebar != null && showSidebar == true} ? 'col-md-9 col-lg-10' : 'col-12'" style="min-height: 100vh;">
+                <!-- Breadcrumb -->
+                <!--/* <nav th:replace="~{view/fragments :: breadcrumb}" th:if="${breadcrumb}"></nav> */-->
+                
+                <!-- Page Content -->
+                <div th:replace="~{${content}}" style="min-height: 100vh;"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{view/fragments :: footer}"></div>
+
+    <!-- Scripts -->
+    <script th:replace="~{view/fragments :: scripts}"></script>
+</body>
+</html>

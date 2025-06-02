@@ -14,13 +14,15 @@ public class User {
     
     @Column(name = "username", nullable = false, unique = true)
     private String username;
+
+    private String phone;
+
+    private String address;
     
     @Column(name = "email", nullable = false, unique = true)
     private String email;
     
     @Column(name = "password", nullable = false)
     private String password;
-    
-    @Column(name = "is_active")
-    private Boolean isActive = true;
+
 }

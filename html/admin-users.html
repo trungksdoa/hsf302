@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ...existing head content... -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSF Store - User Management</title>
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/simple-style.css">
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <nav class="bg-dark text-white p-3" style="width: 250px; min-height: 100vh;">
+            <!-- ...existing sidebar navigation... -->
+            <h4 class="mb-4">
+                <i class="fas fa-cog me-2"></i>Admin Panel
+            </h4>
+            <ul class="nav nav-pills flex-column">
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-white" href="admin.html">
+                        <i class="fas fa-dashboard me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-white" href="admin-blog.html">
+                        <i class="fas fa-blog me-2"></i>Blog Management
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-white" href="admin-blindbox.html">
+                        <i class="fas fa-cube me-2"></i>Blind Box Management
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-white active" href="admin-users.html">
+                        <i class="fas fa-users me-2"></i>User Management
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-white" href="admin-orders.html">
+                        <i class="fas fa-shopping-cart me-2"></i>Order Management
+                    </a>
+                </li>
+                <hr class="text-white">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="test.html">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Site
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="flex-fill p-4">
+            <h1 class="h3 mb-4">User Management</h1>
+            
+            <!-- Users Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Joined</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>John Collector</td>
+                                    <td>john.collector@email.com</td>
+                                    <td><span class="badge bg-primary">User</span></td>
+                                    <td>2024-03-01</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editUser(1)">Edit</button>
+                                        <button class="btn btn-sm btn-outline-warning me-1" onclick="toggleUser(1)">Suspend</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Jane Smith</td>
+                                    <td>jane.smith@email.com</td>
+                                    <td><span class="badge bg-secondary">Admin</span></td>
+                                    <td>2024-02-15</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editUser(2)">Edit</button>
+                                        <button class="btn btn-sm btn-outline-warning me-1" onclick="toggleUser(2)">Suspend</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Mike Johnson</td>
+                                    <td>mike.johnson@email.com</td>
+                                    <td><span class="badge bg-primary">User</span></td>
+                                    <td>2024-02-28</td>
+                                    <td><span class="badge bg-warning">Suspended</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editUser(3)">Edit</button>
+                                        <button class="btn btn-sm btn-outline-success me-1" onclick="toggleUser(3)">Activate</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function editUser(id) {
+            alert('Edit user functionality would be implemented here for ID: ' + id);
+        }
+
+        function toggleUser(id) {
+            if (confirm('Are you sure you want to change this user\'s status?')) {
+                alert('Toggle user status functionality would be implemented here for ID: ' + id);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 package com.product.server.hsf_301.blindBox.service.impl;
 
 
-import com.product.server.hsf_301.blindBox.model.BlindBagType;
+import com.product.server.hsf_301.blindBox.model.BlindPackage;
 import com.product.server.hsf_301.blindBox.model.PrizeItem;
 import com.product.server.hsf_301.blindBox.model.SpinHistory;
 import com.product.server.hsf_301.blindBox.model.User;
@@ -75,7 +75,7 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
         User user = new User();
         user.setUserId(userId);
         
-        BlindBagType blindBagType = blindBagTypeService.getBlindBagTypeById(bagTypeId);
+        BlindPackage blindBagType = blindBagTypeService.getBlindBagTypeById(bagTypeId);
         PrizeItem prizeItem = prizeItemService.getRandomPrizeByBagType(bagTypeId);
         
         SpinHistory spinHistory = new SpinHistory();

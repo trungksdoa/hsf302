@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">User Management</title>
+</head>
+
+<body>
+    <div th:fragment="content">
+        <div class="p-4">
+            <h1 class="h3 mb-4">User Management</h1>
+            
+            <!-- Users Table -->
+            <div class="card">
+                <div class="card-body">
+                    <!-- Table with data -->
+                    <div th:if="${users != null and !users.isEmpty()}" class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Joined</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="user : ${users}">
+                                    <td th:text="${user.id}">1</td>
+                                    <td th:text="${user.fullName}">John Collector</td>
+                                    <td th:text="${user.email}">john.collector@email.com</td>
+                                    <td>
+                                        <span class="badge" th:classappend="${user.role == 'ADMIN'} ? 'bg-secondary' : 'bg-primary'"
+                                              th:text="${user.role}">User</span>
+                                    </td>
+                                    <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd')}">2024-03-01</td>
+                                    <td>
+                                        <span class="badge" th:classappend="${user.active} ? 'bg-success' : 'bg-warning'"
+                                              th:text="${user.active} ? 'Active' : 'Suspended'">Active</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" th:onclick="'editUser(' + ${user.id} + ')'">Edit</button>
+                                        <button class="btn btn-sm" 
+                                                th:classappend="${user.active} ? 'btn-outline-warning' : 'btn-outline-success'"
+                                                th:onclick="'toggleUser(' + ${user.id} + ')'"
+                                                th:text="${user.active} ? 'Suspend' : 'Activate'">Suspend</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Empty state message -->
+                    <div th:if="${users == null or users.isEmpty()}" class="text-center py-5">
+                        <div class="card border-0">
+                            <div class="card-body">
+                                <i class="fas fa-users fa-4x text-muted mb-4"></i>
+                                <h4 class="text-muted mb-3">No Users Found</h4>
+                                <p class="text-muted mb-4">There are no users in the system at the moment.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <script>
+            function editUser(id) {
+                window.location.href = `/admin/users/edit/${id}`;
+            }
+
+            function toggleUser(id) {
+                if (confirm('Are you sure you want to change this user\'s status?')) {
+                    fetch(`/admin/users/${id}/toggle`, { method: 'POST' })
+                        .then(response => {
+                            if (response.ok) {
+                                location.reload();
+                            }
+                        });
+                }
+            }
+        </script>
+    </th:block>
+</body>
+</html>
+                }
+            }
+        </script>
+    </th:block>
+</body>
+</html>

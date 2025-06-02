@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+
+<head th:replace="~{view/fragments :: common_header(${title}, ${links})}"></head>
+
+<body>
+    <!-- Header -->
+    <div th:replace="~{view/fragments :: header}"></div>
+
+    <!-- Admin Layout -->
+    <div class="container-fluid" style="min-height: calc(100vh - 60px); margin-top: 20px; margin-bottom: 20px;">
+        <div class="row" style="min-height: calc(100vh - 120px);">
+            <!-- Admin Sidebar - Fixed at left -->
+            <div class="col-md-3 col-lg-2 bg-dark text-white p-0" style="min-height: calc(100vh - 120px);">
+                <!-- Admin Panel Title -->
+                <div class="p-3 border-bottom border-secondary">
+                    <h4 class="mb-0">
+                        <i class="fas fa-cog me-2"></i>Admin Panel
+                    </h4>
+                </div>
+                
+                <!-- Admin Navigation -->
+                <ul class="nav nav-pills flex-column p-3">
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white" 
+                           th:classappend="${httpServletRequest != null and httpServletRequest.requestURI == '/admin'} ? 'active'"
+                           href="/admin">
+                           <i class="fas fa-dashboard me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white" 
+                           th:classappend="${httpServletRequest != null and httpServletRequest.requestURI.contains('/admin/blog')} ? 'active'"
+                           href="/admin/blogs">
+                           <i class="fas fa-blog me-2"></i>Blog Management
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white" 
+                           th:classappend="${httpServletRequest != null and httpServletRequest.requestURI.contains('/admin/blindbox')} ? 'active'" 
+                           href="/admin/blindBoxes">
+                            <i class="fas fa-cube me-2"></i>Blind Box Management
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white" 
+                           th:classappend="${httpServletRequest != null and httpServletRequest.requestURI.contains('/admin/users')} ? 'active'" 
+                           href="/admin/users">
+                            <i class="fas fa-users me-2"></i>User Management
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white" 
+                           th:classappend="${httpServletRequest != null and httpServletRequest.requestURI.contains('/admin/orders')} ? 'active'" 
+                           href="/admin/orders">
+                            <i class="fas fa-shopping-cart me-2"></i>Order Management
+                        </a>
+                    </li>
+                    <li class="nav-item mt-4">
+                        <a class="nav-link text-white" href="/">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Site
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Main Content Area -->
+            <div class="col-md-9 col-lg-10">
+                <!-- Messages -->
+                <div th:replace="~{view/fragments :: messages}"></div>
+                
+                <!-- Content Area -->
+                <div th:replace="~{${content}}" style="min-height: calc(100vh - 200px);"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{view/fragments :: footer}"></div>
+
+    <!-- Scripts -->
+    <div th:replace="~{view/fragments :: scripts}"></div>
+</body>
+</html>

@@ -28,7 +28,7 @@ public class BlindBoxController {
 
     private final PrizeItemService prizeItemService;
 
-    @GetMapping("/ ")
+    @GetMapping("/")
     public String list(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, Model model) {
         Page<BlindBagType> blindBagTypes = blindBagTypeService.getAllBlindBagTypes(page, size);
         model.addAttribute("blindBagTypes", blindBagTypes);

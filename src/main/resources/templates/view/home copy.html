@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{view/layout}">
+
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Home</title>
+</head>
+
+<body>
+    <div th:fragment="content">
+        <!-- Products Section -->
+        <section id="products" class="py-5">
+            <div class="container">
+                <h2 class="text-center mb-5">Our Products</h2>
+                
+                <!-- Products List -->
+                <div th:if="${products != null and !products.isEmpty()}" class="row">
+                    <div th:each="product : ${products}" class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <img th:src="${product.imageUrl ?: 'https://via.placeholder.com/300x200'}" class="card-img-top" th:alt="${product.name}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title mb-0" th:text="${product.name}">Mystery Box #1</h5>
+                                    <button type="button" 
+                                        class="btn btn-sm btn-outline-info prize-preview-btn" 
+                                        data-toggle="popover" 
+                                        th:data-product-id="${product.id}"
+                                        title="Possible Prizes">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                </div>
+                                <p class="card-text" th:text="${product.description}">Contains rare collectible items</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="h5 text-primary mb-0" th:text="'$' + ${product.pricePerSpin}">$29.99</span>
+                                    <button class="btn btn-primary" th:onclick="'showOpenBox(\'' + ${product.id} + '\', ' + ${product.pricePerSpin} + ')'">
+                                        <i class="fas fa-box-open me-2"></i>Open Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empty Products State -->
+                <div th:if="${products == null or products.isEmpty()}" class="text-center py-5">
+                    <div class="card border-0">
+                        <div class="card-body">
+                            <i class="fas fa-cube fa-4x text-muted mb-4"></i>
+                            <h4 class="text-muted mb-3">No Products Available</h4>
+                            <p class="text-muted mb-4">We're working on adding new exciting blind boxes. Check back soon!</p>
+                            <a href="/contact" class="btn btn-outline-primary">Contact Us for Updates</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Blog Section -->
+        <section id="blog" class="py-5 bg-light">
+            <div class="container">
+                <h2 class="text-center mb-5">Latest Blog Posts</h2>
+                
+                <!-- Blog Posts List -->
+                <div th:if="${recentPosts != null and !recentPosts.isEmpty()}" class="row">
+                    <div th:each="post : ${recentPosts}" class="col-lg-4 mb-4">
+                        <article class="blog-card card h-100 shadow-sm">
+                            <img th:src="${post.imageUrl ?: 'https://via.placeholder.com/350x200'}" class="card-img-top" alt="Blog post">
+                            <div class="card-body">
+                                <div class="blog-tags mb-2">
+                                    <span th:each="tag : ${post.tags}" class="badge bg-primary me-1" th:text="${tag}">Tag</span>
+                                </div>
+                                <h5 class="card-title">
+                                    <a th:href="@{/blog/{id}(id=${post.id})}" class="text-decoration-none text-dark" th:text="${post.title}">Blog Title</a>
+                                </h5>
+                                <p class="card-text" th:text="${#strings.abbreviate(post.content, 100)}">Blog excerpt...</p>
+                                <div class="blog-meta text-muted small">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    <span th:text="${#temporals.format(post.createdAt, 'MMMM dd, yyyy')}">March 15, 2024</span>
+                                    <i class="fas fa-user ms-3 me-1"></i>
+                                    <span th:text="${post.author}">Admin</span>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                
+                <!-- Empty Blog Posts State -->
+                <div th:if="${recentPosts == null or recentPosts.isEmpty()}" class="text-center py-5">
+                    <div class="card border-0">
+                        <div class="card-body">
+                            <i class="fas fa-blog fa-4x text-muted mb-4"></i>
+                            <h4 class="text-muted mb-3">No Recent Posts</h4>
+                            <p class="text-muted mb-4">Stay tuned for exciting updates and news about our latest collections!</p>
+                            <a href="/blog" class="btn btn-outline-primary">View All Posts</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Blog Tags Section - Only show if posts exist -->
+                <div th:if="${popularTags != null and !popularTags.isEmpty()}" class="text-center mt-5">
+                    <h4 class="mb-3">Popular Tags</h4>
+                    <div class="blog-tags-cloud">
+                        <a th:each="tag : ${popularTags}" th:href="@{/blog/tag/{tag}(tag=${tag})}" 
+                           class="badge bg-primary me-2 mb-2 p-2 text-decoration-none" th:text="${tag}">Tag</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto text-center">
+                        <h2 class="mb-4">Get in Touch</h2>
+                        <p class="mb-4">Have questions about our products? We'd love to hear from you!</p>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
+                                <p th:text="${contactInfo?.email ?: 'info@hsfstore.com'}">info@hsfstore.com</p>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <i class="fas fa-phone fa-2x text-primary mb-2"></i>
+                                <p th:text="${contactInfo?.phone ?: '(123) 456-7890'}">(123) 456-7890</p>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <i class="fas fa-map-marker-alt fa-2x text-primary mb-2"></i>
+                                <p th:text="${contactInfo?.address ?: '123 Store Street'}">123 Store Street</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Open Box Modal -->
+        <div class="modal fade" id="openBoxModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Open Mystery Box</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div id="openBoxDetails" class="mb-4"></div>
+                        
+                        <!-- Opening Animation Container -->
+                        <div id="boxOpeningContainer" class="position-relative my-4" style="height: 300px; display: none;">
+                            <!-- Box Image (Closed) -->
+                            <div id="closedBox" class="position-absolute top-50 start-50 translate-middle">
+                                <img src="/images/closed-box.png" alt="Closed Box" class="img-fluid" style="max-height: 250px;">
+                            </div>
+                            
+                            <!-- Box Opening Animation -->
+                            <div id="openingAnimation" class="position-absolute top-50 start-50 translate-middle" style="display: none;">
+                                <div class="spinner-grow text-primary" style="width: 5rem; height: 5rem;" role="status">
+                                    <span class="visually-hidden">Opening...</span>
+                                </div>
+                                <p class="mt-3 fw-bold">Opening your mystery box...</p>
+                            </div>
+                            
+                            <!-- Prize Reveal -->
+                            <div id="prizeReveal" class="position-absolute top-50 start-50 translate-middle text-center" style="display: none; width: 100%;">
+                                <div id="prizeImageContainer">
+                                    <img id="prizeImage" src="" alt="Prize" class="img-fluid mb-3" style="max-height: 180px;">
+                                </div>
+                                <h4 id="prizeName" class="mb-2">Prize Name</h4>
+                                <div id="prizeRarity" class="badge bg-primary mb-2">Common</div>
+                                <p id="prizeDescription" class="text-muted">Prize description goes here.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Buttons -->
+                        <div id="spinConfirmation">
+                            <p class="alert alert-info">
+                                Ready to try your luck? Open this box to reveal a random prize!
+                            </p>
+                            <button type="button" class="btn btn-primary" onclick="startOpeningAnimation()">
+                                <i class="fas fa-box-open me-2"></i>Open Box
+                            </button>
+                        </div>
+                        
+                        <div id="spinResult" style="display: none;">
+                            <div class="alert alert-success">
+                                <h5 class="mb-2">Congratulations!</h5>
+                                <p id="resultMessage" class="mb-0">You've won a prize!</p>
+                            </div>
+                            <div class="d-flex justify-content-center gap-2">
+                                <button type="button" class="btn btn-outline-primary" onclick="viewCollection()">
+                                    <i class="fas fa-boxes me-2"></i>View Collection
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="openAnotherBox()">
+                                    <i class="fas fa-redo me-2"></i>Open Another
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <script>
+            let currentBoxId = null;
+            
+            // Sample prize data for simulation with probabilities
+            const samplePrizes = [
+                {
+                    itemId: 1,
+                    itemName: "Rare Anime Figurine",
+                    itemImage: "https://via.placeholder.com/200x200?text=Anime+Figurine",
+                    rarity: "RARE",
+                    description: "A limited edition anime character figurine.",
+                    probability: 10.0 // 10% chance
+                },
+                {
+                    itemId: 2,
+                    itemName: "Collectible Card",
+                    itemImage: "https://via.placeholder.com/200x200?text=Collectible+Card",
+                    rarity: "UNCOMMON",
+                    description: "A special edition collectible trading card.",
+                    probability: 20.0 // 20% chance
+                },
+                {
+                    itemId: 3,
+                    itemName: "Mystery Plushie",
+                    itemImage: "https://via.placeholder.com/200x200?text=Mystery+Plushie",
+                    rarity: "COMMON",
+                    description: "A cute plushie character from popular series.",
+                    probability: 40.0 // 40% chance
+                },
+                {
+                    itemId: 4,
+                    itemName: "Legendary Action Figure",
+                    itemImage: "https://via.placeholder.com/200x200?text=Legendary+Figure",
+                    rarity: "GOOD_LUCK",
+                    description: "An extremely rare legendary action figure!",
+                    probability: 5.0 // 5% chance
+                },
+                {
+                    itemId: 5,
+                    itemName: "Special Edition Comic",
+                    itemImage: "https://via.placeholder.com/200x200?text=Special+Comic",
+                    rarity: "SPECIAL",
+                    description: "A special edition comic with exclusive cover art.",
+                    probability: 15.0 // 15% chance
+                },
+                {
+                    itemId: 6,
+                    itemName: "Chúc may mắn lần sau",
+                    itemImage: "https://via.placeholder.com/200x200?text=Special+Comic",
+                    rarity: "GOOD_LUCK",
+                    description: "CHÚC MAY MẮN",
+                    probability: 10.0 // 10% chance
+                }
+            ];
+            
+            function showOpenBox(productId, price) {
+                currentBoxId = productId;
+                
+                document.getElementById('openBoxDetails').innerHTML = `
+                    <div class="mb-3">
+                        <h5>Mystery Box #${productId}</h5>
+                        <p class="text-muted mb-0">Price: $${price}</p>
+                    </div>
+                `;
+                
+                // Reset UI state
+                document.getElementById('spinConfirmation').style.display = 'block';
+                document.getElementById('spinResult').style.display = 'none';
+                document.getElementById('boxOpeningContainer').style.display = 'none';
+                document.getElementById('closedBox').style.display = 'block';
+                document.getElementById('openingAnimation').style.display = 'none';
+                document.getElementById('prizeReveal').style.display = 'none';
+                
+                const modal = new bootstrap.Modal(document.getElementById('openBoxModal'));
+                modal.show();
+            }
+
+            function startOpeningAnimation() {
+                if (!currentBoxId) return;
+                
+                // Show animation container
+                document.getElementById('boxOpeningContainer').style.display = 'block';
+                document.getElementById('spinConfirmation').style.display = 'none';
+                
+                // Animate box opening
+                setTimeout(() => {
+                    // Hide closed box, show opening animation
+                    document.getElementById('closedBox').style.display = 'none';
+                    document.getElementById('openingAnimation').style.display = 'block';
+                    
+                    // Simulate API call with setTimeout
+                    setTimeout(() => {
+                        // Select a prize based on probability
+                        const randomPrize = getRandomPrizeByProbability();
+                        
+                        // Wait for animation to complete
+                        setTimeout(() => {
+                            // Hide opening animation
+                            document.getElementById('openingAnimation').style.display = 'none';
+                            
+                            // Show prize
+                            document.getElementById('prizeImage').src = randomPrize.itemImage;
+                            document.getElementById('prizeName').textContent = randomPrize.itemName;
+                            document.getElementById('prizeDescription').textContent = randomPrize.description;
+                            
+                            // Set rarity badge color
+                            const rarityBadge = document.getElementById('prizeRarity');
+                            rarityBadge.textContent = randomPrize.rarity;
+                            
+                            // Set badge color based on rarity
+                            rarityBadge.className = 'badge mb-2';
+                            switch(randomPrize.rarity) {
+                                case 'COMMON': rarityBadge.classList.add('bg-secondary'); break;
+                                case 'UNCOMMON': rarityBadge.classList.add('bg-success'); break;
+                                case 'RARE': rarityBadge.classList.add('bg-primary'); break;
+                                case 'SPECIAL': rarityBadge.classList.add('bg-warning'); break;
+                                case 'GOOD_LUCK': rarityBadge.classList.add('bg-danger'); break;
+                                default: rarityBadge.classList.add('bg-info');
+                            }
+                            
+                            // Add particle effects for rare items
+                            if (randomPrize.rarity !== 'COMMON' && randomPrize.rarity !== 'UNCOMMON') {
+                                addParticleEffects(randomPrize.rarity);
+                            }
+                            
+                            // Add fancy entrance animation for prize
+                            document.getElementById('prizeReveal').style.display = 'block';
+                            
+                            // Add bounce animation
+                            const prizeReveal = document.getElementById('prizeReveal');
+                            prizeReveal.style.animation = 'none';
+                            prizeReveal.offsetHeight; // Trigger reflow
+                            prizeReveal.style.animation = 'prizeBounce 1s ease-out';
+                            
+                            // Show result buttons
+                            setTimeout(() => {
+                                document.getElementById('spinResult').style.display = 'block';
+                                document.getElementById('resultMessage').textContent = 
+                                    `You've won: ${randomPrize.itemName} (${randomPrize.rarity})`;
+                            }, 1000);
+                        }, 2500); // Opening animation duration
+                    }, 1000); // Simulated API call time
+                }, 500);
+            }
+            
+            // Function to select a prize based on probability
+            function getRandomPrizeByProbability() {
+                // Calculate total probability (should sum to 100%)
+                const totalProbability = samplePrizes.reduce((sum, prize) => sum + prize.probability, 0);
+                
+                // Generate a random number between 0 and the total probability
+                const randomValue = Math.random() * totalProbability;
+                
+                // Find the prize that corresponds to the random value
+                let cumulativeProbability = 0;
+                for (const prize of samplePrizes) {
+                    cumulativeProbability += prize.probability;
+                    if (randomValue <= cumulativeProbability) {
+                        return prize;
+                    }
+                }
+                
+                // Fallback to the last prize if something goes wrong
+                return samplePrizes[samplePrizes.length - 1];
+            }
+
+            function addParticleEffects(rarity) {
+                const container = document.getElementById('boxOpeningContainer');
+                
+                // Create and add particles
+                for (let i = 0; i < 20; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'prize-particle';
+                    
+                    // Set color based on rarity
+                    switch(rarity) {
+                        case 'RARE': particle.style.backgroundColor = '#4e73df'; break;
+                        case 'SPECIAL': particle.style.backgroundColor = '#f6c23e'; break;
+                        case 'GOOD_LUCK': particle.style.backgroundColor = '#e74a3b'; break;
+                    }
+                    
+                    // Random position
+                    const x = Math.random() * 100;
+                    const y = Math.random() * 100;
+                    particle.style.left = `${x}%`;
+                    particle.style.top = `${y}%`;
+                    
+                    // Random size
+                    const size = 5 + Math.random() * 15;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    // Random animation delay
+                    particle.style.animationDelay = `${Math.random() * 2}s`;
+                    
+                    container.appendChild(particle);
+                    
+                    // Remove particles after animation
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 5000);
+                }
+            }
+
+            function viewCollection() {
+                window.location.href = '/users/profile#collection';
+            }
+            
+            function openAnotherBox() {
+                // Close current modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('openBoxModal'));
+                modal.hide();
+                
+                // Let the modal fully close before showing another one
+                setTimeout(() => {
+                    // If we have the same box ID, reopen it
+                    if (currentBoxId) {
+                        // Get a cached price (simulated)
+                        const price = 29.99; // Hardcoded for simulation
+                        showOpenBox(currentBoxId, price);
+                    }
+                }, 500);
+            }
+
+            // Add this to the scripts section of your page
+            document.addEventListener('DOMContentLoaded', function() {
+                // Initialize popovers
+                $('[data-toggle="popover"]').popover({
+                    html: true,
+                    trigger: 'hover focus',
+                    content: function() {
+                        // Get the product ID from the button using vanilla JavaScript
+                        const productId = this.getAttribute('data-product-id');
+                        
+                        // Create a loading placeholder
+                        const loadingContent = `
+                            <div class="text-center">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <p class="mb-0 mt-2">Loading prizes...</p>
+                            </div>
+                        `;
+                        
+                        // Fetch the prizes for this product
+                        fetchPrizeItems(productId, this);
+                        
+                        // Return loading content initially
+                        return loadingContent;
+                    }
+                });
+                
+                // Function to fetch prize items for a specific blind box
+                function fetchPrizeItems(blindBoxId, popoverElement) {
+                    // Use fetch API (already vanilla JS)
+                    fetch(`/prizeItems/box/${blindBoxId}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(prizeItems => {
+                            // Generate the HTML for the prize items
+                            let prizeContent = `
+                            <div style="max-height: 250px; overflow-y: auto;">
+                                <table class="table table-sm mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Prize</th>
+                                            <th>Rarity</th>
+                                            <th>Chance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            `;
+                            
+                            // Add each prize item to the table
+                            prizeItems.forEach(prize => {
+                                prizeContent += `
+                                    <tr>
+                                        <td>${prize.itemName || 'Unknown'}</td>
+                                        <td>${prize.rarityLevel || 'Standard'}</td>
+                                        <td>${prize.dropRate ? (prize.dropRate + '%') : 'N/A'}</td>
+                                    </tr>
+                                `;
+                            });
+                            
+                            // Close the table
+                            prizeContent += `
+                                    </tbody>
+                                </table>
+                            </div>
+                            `;
+                            
+                            // Update the popover content
+                            $(popoverElement).data('bs.popover').config.content = prizeContent;
+                            $(popoverElement).popover('update');
+                        })
+                        .catch(error => {
+                            console.error('Error fetching prize items:', error);
+                            // Update with error message
+                            const errorContent = `
+                                <div class="text-center text-danger">
+                                    <i class="fas fa-exclamation-circle fa-2x mb-2"></i>
+                                    <p>Failed to load prizes</p>
+                                </div>
+                            `;
+                            $(popoverElement).data('bs.popover').config.content = errorContent;
+                            $(popoverElement).popover('update');
+                        });
+                }
+            });
+            
+            // ...existing code...
+        </script>
+
+        <style>
+            /* Animation styles */
+            @keyframes prizeBounce {
+                0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+                50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+                75% { transform: translate(-50%, -50%) scale(0.95); opacity: 1; }
+                100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            }
+            
+            /* Particle effects */
+            .prize-particle {
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                opacity: 0;
+                z-index: 100;
+                animation: particleAnimation 3s ease-out infinite;
+            }
+            
+            @keyframes particleAnimation {
+                0% { transform: translate(0, 0) scale(1); opacity: 0; }
+                10% { opacity: 1; }
+                70% { opacity: 0.7; }
+                100% { transform: translate(var(--x, 100px), var(--y, 100px)) scale(0); opacity: 0; }
+            }
+            
+            /* Prize glow effect */
+            #prizeImageContainer {
+                position: relative;
+            }
+            
+            #prizeImageContainer::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border-radius: 50%;
+                animation: glowPulse 2s infinite alternate;
+                z-index: -1;
+            }
+            
+            #prizeRarity.bg-primary ~ #prizeImageContainer::after {
+                box-shadow: 0 0 20px 10px rgba(78, 115, 223, 0.4);
+            }
+            
+            #prizeRarity.bg-warning ~ #prizeImageContainer::after {
+                box-shadow: 0 0 20px 10px rgba(246, 194, 62, 0.4);
+            }
+            
+            #prizeRarity.bg-danger ~ #prizeImageContainer::after {
+                box-shadow: 0 0 20px 10px rgba(231, 74, 59, 0.4);
+            }
+            
+            @keyframes glowPulse {
+                0% { opacity: 0.5; }
+                100% { opacity: 1; }
+            }
+            
+            /* Add statistics display */
+            .prize-stats {
+                position: fixed;
+                bottom: 10px;
+                right: 10px;
+                background: rgba(0,0,0,0.7);
+                color: white;
+                padding: 10px;
+                border-radius: 5px;
+                font-size: 12px;
+                z-index: 9999;
+                display: none;
+            }
+            
+            .prize-stats table {
+                margin: 0;
+            }
+            
+            .prize-stats th, .prize-stats td {
+                padding: 2px 8px;
+                text-align: left;
+            }
+            
+            /* Debug button */
+            #showStatsBtn {
+                position: fixed;
+                bottom: 10px;
+                right: 10px;
+                z-index: 9998;
+                opacity: 0.5;
+                font-size: 12px;
+            }
+            
+            #showStatsBtn:hover {
+                opacity: 1;
+            }
+            
+            /* Prize preview styles */
+            .prize-preview-btn {
+                width: 32px;
+                height: 32px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                transition: all 0.2s ease;
+            }
+            
+            .prize-preview-btn:hover {
+                background-color: #e9ecef;
+                transform: scale(1.1);
+            }
+            
+            /* Custom popover styling */
+            .popover {
+                max-width: 300px;
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            }
+            
+            .popover-header {
+                background-color: #f8f9fa;
+                border-bottom: 1px solid #e9ecef;
+                font-weight: bold;
+            }
+            
+            /* Animate the prize items */
+            .prize-item {
+                transition: transform 0.2s ease;
+            }
+            
+            .prize-item:hover {
+                transform: translateX(5px);
+                background-color: rgba(0,0,0,0.05) !important;
+            }
+        </style>
+        
+        <!-- Add this at the bottom of the scripts block -->
+        <div class="prize-stats" id="prizeStats">
+            <h6>Prize Probabilities</h6>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Prize</th>
+                        <th>Rarity</th>
+                        <th>Chance</th>
+                    </tr>
+                </thead>
+                <tbody id="statsTableBody">
+                    <!-- Generated dynamically -->
+                </tbody>
+            </table>
+        </div>
+        
+        <button id="showStatsBtn" class="btn btn-sm btn-dark" onclick="toggleStats()">Show Stats</button>
+        
+        <script>
+            // Function to toggle statistics display
+            function toggleStats() {
+                const statsPanel = document.getElementById('prizeStats');
+                const statsBtn = document.getElementById('showStatsBtn');
+                
+                if (statsPanel.style.display === 'block') {
+                    statsPanel.style.display = 'none';
+                    statsBtn.textContent = 'Show Stats';
+                } else {
+                    // Generate stats table
+                    const tableBody = document.getElementById('statsTableBody');
+                    tableBody.innerHTML = '';
+                    
+                    samplePrizes.forEach(prize => {
+                        const row = document.createElement('tr');
+                        
+                        const nameCell = document.createElement('td');
+                        nameCell.textContent = prize.itemName;
+                        
+                        const rarityCell = document.createElement('td');
+                        rarityCell.textContent = prize.rarity;
+                        
+                        const chanceCell = document.createElement('td');
+                        chanceCell.textContent = prize.probability + '%';
+                        
+                        row.appendChild(nameCell);
+                        row.appendChild(rarityCell);
+                        row.appendChild(chanceCell);
+                        
+                        tableBody.appendChild(row);
+                    });
+                    
+                    statsPanel.style.display = 'block';
+                    statsBtn.textContent = 'Hide Stats';
+                }
+            }
+            
+            // Update the startOpeningAnimation function to track statistics
+            const openingStats = {
+                totalOpened: 0,
+                byRarity: {}
+            };
+            
+            function updateOpeningStats(prize) {
+                openingStats.totalOpened++;
+                
+                if (!openingStats.byRarity[prize.rarity]) {
+                    openingStats.byRarity[prize.rarity] = 0;
+                }
+                
+                openingStats.byRarity[prize.rarity]++;
+                
+                // Update stats in panel if visible
+                if (document.getElementById('prizeStats').style.display === 'block') {
+                    toggleStats(); // refresh
+                    toggleStats();
+                }
+            }
+            
+            // Modify startOpeningAnimation to call this function
+            const originalStartOpeningAnimation = startOpeningAnimation;
+            startOpeningAnimation = function() {
+                if (!currentBoxId) return;
+                
+                // Show animation container
+                document.getElementById('boxOpeningContainer').style.display = 'block';
+                document.getElementById('spinConfirmation').style.display = 'none';
+                
+                // Animate box opening
+                setTimeout(() => {
+                    // Hide closed box, show opening animation
+                    document.getElementById('closedBox').style.display = 'none';
+                    document.getElementById('openingAnimation').style.display = 'block';
+                    
+                    // Simulate API call with setTimeout
+                    setTimeout(() => {
+                        // Select a prize based on probability
+                        const randomPrize = getRandomPrizeByProbability();
+                        
+                        // Track statistics
+                        updateOpeningStats(randomPrize);
+                        
+                        // Wait for animation to complete
+                        setTimeout(() => {
+                            // Hide opening animation
+                            document.getElementById('openingAnimation').style.display = 'none';
+                            
+                            // Show prize
+                            document.getElementById('prizeImage').src = randomPrize.itemImage;
+                            document.getElementById('prizeName').textContent = randomPrize.itemName;
+                            document.getElementById('prizeDescription').textContent = randomPrize.description;
+                            
+                            // Set rarity badge color
+                            const rarityBadge = document.getElementById('prizeRarity');
+                            rarityBadge.textContent = randomPrize.rarity;
+                            
+                            // Set badge color based on rarity
+                            rarityBadge.className = 'badge mb-2';
+                            switch(randomPrize.rarity) {
+                                case 'COMMON': rarityBadge.classList.add('bg-secondary'); break;
+                                case 'UNCOMMON': rarityBadge.classList.add('bg-success'); break;
+                                case 'RARE': rarityBadge.classList.add('bg-primary'); break;
+                                case 'SPECIAL': rarityBadge.classList.add('bg-warning'); break;
+                                case 'GOOD_LUCK': rarityBadge.classList.add('bg-danger'); break;
+                                default: rarityBadge.classList.add('bg-info');
+                            }
+                            
+                            // Add particle effects for rare items
+                            if (randomPrize.rarity !== 'COMMON' && randomPrize.rarity !== 'UNCOMMON') {
+                                addParticleEffects(randomPrize.rarity);
+                            }
+                            
+                            // Add fancy entrance animation for prize
+                            document.getElementById('prizeReveal').style.display = 'block';
+                            
+                            // Add bounce animation
+                            const prizeReveal = document.getElementById('prizeReveal');
+                            prizeReveal.style.animation = 'none';
+                            prizeReveal.offsetHeight; // Trigger reflow
+                            prizeReveal.style.animation = 'prizeBounce 1s ease-out';
+                            
+                            // Show result buttons
+                            setTimeout(() => {
+                                document.getElementById('spinResult').style.display = 'block';
+                                document.getElementById('resultMessage').textContent = 
+                                    `You've won: ${randomPrize.itemName} (${randomPrize.rarity})`;
+                            }, 1000);
+                        }, 2500); // Opening animation duration
+                    }, 1000); // Simulated API call time
+                }, 500);
+            };
+        </script>
+    </th:block>
+</body>
+</html>

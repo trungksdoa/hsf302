@@ -84,4 +84,16 @@ public class UserController {
             return "redirect:/users/profile";
         }
     }
+
+    @GetMapping("/balance")
+    @ResponseBody
+    public String balance(Model model) {
+
+        //Will replace with user id saved in Authorization
+        User user = userService.getUserById(1);
+
+        model.addAttribute("user", user);
+
+        return user.getBalance().toString();
+    }
 }

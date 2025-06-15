@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{view/layout}">
+
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Top Up History</title>
+</head>
+
+<body>
+    <div th:fragment="content">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2><i class="fas fa-history me-2"></i>Top-up History</h2>
+                        <a th:href="@{/topup}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>New Top-up
+                        </a>
+                    </div>
+
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <div th:if="${history.isEmpty()}">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-wallet fa-3x text-muted mb-3"></i>
+                                    <h4 class="text-muted">No Top-up History</h4>
+                                    <p class="text-muted">You haven't made any top-ups yet.</p>
+                                    <a th:href="@{/topup}" class="btn btn-primary">Make Your First Top-up</a>
+                                </div>
+                            </div>
+                            
+                            <div th:if="${!history.isEmpty()}">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Transaction ID</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                                <th>Created Date</th>
+                                                <th>Updated Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="item, iterStat : ${history}">
+                                                <td th:text="${iterStat.count}"></td>
+                                                <td>
+                                                    <code th:text="${item.transaction_id}"></code>
+                                                </td>
+                                                <td class="text-success fw-bold">
+                                                    $<span th:text="${item.amount}"></span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge" 
+                                                          th:classappend="${item.status == 'approved' ? 'bg-success' : 
+                                                                         item.status == 'pending' ? 'bg-warning' : 'bg-danger'}"
+                                                          th:text="${#strings.capitalize(item.status)}"></span>
+                                                </td>
+                                                <td th:text="${#strings.substring(item.created_at, 0, 19)}"></td>
+                                                <td th:text="${#strings.substring(item.updated_at, 0, 19)}"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

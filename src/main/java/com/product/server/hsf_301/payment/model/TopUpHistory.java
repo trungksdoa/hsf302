@@ -2,8 +2,11 @@ package com.product.server.hsf_301.payment.model;
 
 
 import jakarta.persistence.*;
+import lombok.Data;
+import java.time.LocalDateTime;
 
 @Entity
+@Data
 public class TopUpHistory {
 
     @Id
@@ -14,23 +17,43 @@ public class TopUpHistory {
 
     private String amount;
 
-    private boolean status;
+    private String status;
 
-    private String created_at;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-    private String updated_at;
+    @Column(name = "updated_at") 
+    private LocalDateTime updatedAt;
 
+    // Compatibility getters/setters for existing code
+    public String getCreated_at() {
+        return createdAt != null ? createdAt.toString() : null;
+    }
+
+    public void setCreated_at(String created_at) {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public String getUpdated_at() {
+        return updatedAt != null ? updatedAt.toString() : null;
+    }
+
+    public void setUpdated_at(String updated_at) {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     @PrePersist
     public void prePersist() {
-        created_at = java.time.LocalDateTime.now().toString();
-        updated_at = java.time.LocalDateTime.now().toString();
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (updatedAt == null) {
+            updatedAt = LocalDateTime.now();
+        }
     }
 
     @PreUpdate
     public void preUpdate() {
-        updated_at = java.time.LocalDateTime.now().toString();
+        updatedAt = LocalDateTime.now();
     }
-
-
 }

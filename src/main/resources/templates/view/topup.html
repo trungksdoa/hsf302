@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{view/layout}">
+
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Top Up</title>
+</head>
+
+<body>
+    <div th:fragment="content">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0"><i class="fas fa-wallet me-2"></i>Top Up Your Account</h4>
+                        </div>
+                        <div class="card-body">
+                            <!-- Quick Amount Selection -->
+                            <div class="mb-4">
+                                <h5>Select Amount</h5>
+                                <div class="row g-2">
+                                    <div class="col-6 col-md-3">
+                                        <button class="btn btn-outline-primary w-100 amount-btn" data-amount="10">$10</button>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <button class="btn btn-outline-primary w-100 amount-btn" data-amount="25">$25</button>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <button class="btn btn-outline-primary w-100 amount-btn" data-amount="50">$50</button>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <button class="btn btn-outline-primary w-100 amount-btn" data-amount="100">$100</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Custom Amount -->
+                            <div class="mb-4">
+                                <h5>Or Enter Custom Amount</h5>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="customAmount" placeholder="Enter amount" min="1" max="1000" step="0.01">
+                                </div>
+                            </div>
+
+                            <!-- Payment Method -->
+                            <div class="mb-4">
+                                <h5>Payment Method</h5>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-warning btn-lg" id="paypalBtn">
+                                        <i class="fab fa-paypal me-2"></i>Pay with PayPal
+                                    </button>
+                                    <button class="btn btn-info btn-lg" id="momoBtn" disabled>
+                                        <i class="fas fa-mobile-alt me-2"></i>Pay with MoMo (Coming Soon)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Current Balance - Updated to fetch from API -->
+                            <div class="alert alert-info">
+                                <strong>Current Balance:</strong> $<span id="currentBalance">Loading...</span>
+                                <br>
+                                <small class="text-muted">Your balance will be updated after successful payment</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Top-up History -->
+                    <div class="card shadow mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Recent Top-up History</h5>
+                        </div>
+                        <div class="card-body">
+                            <div th:if="${topUpHistory.isEmpty()}">
+                                <p class="text-muted text-center">No top-up history found</p>
+                            </div>
+                            <div th:if="${!topUpHistory.isEmpty()}">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Transaction ID</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="history : ${topUpHistory}" th:if="${historyStat.index < 5}">
+                                                <td th:text="${#strings.abbreviate(history.transaction_id, 20)}"></td>
+                                                <td class="text-success fw-bold">$<span th:text="${history.amount}"></span></td>
+                                                <td>
+                                                    <span class="badge" 
+                                                          th:classappend="${history.status == 'approved' ? 'bg-success' : 'bg-warning'}"
+                                                          th:text="${history.status}"></span>
+                                                </td>
+                                                <td th:text="${#strings.substring(history.created_at, 0, 10)}"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="text-center">
+                                    <a th:href="@{/topup/history}" class="btn btn-outline-primary">View All History</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Fetch current balance
+                fetchCurrentBalance();
+
+                let selectedAmount = 0;
+
+                // Function to fetch current balance
+                function fetchCurrentBalance() {
+                    fetch('/users/balance')
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch balance');
+                            }
+                            return response.text();
+                        })
+                        .then(balance => {
+                            document.getElementById('currentBalance').textContent = balance;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching balance:', error);
+                            document.getElementById('currentBalance').textContent = 'Error loading balance';
+                        });
+                }
+
+                // Handle amount button clicks
+                document.querySelectorAll('.amount-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        // Remove active class from all buttons
+                        document.querySelectorAll('.amount-btn').forEach(b => {
+                            b.classList.remove('btn-primary');
+                            b.classList.add('btn-outline-primary');
+                        });
+                        
+                        // Add active class to clicked button
+                        this.classList.remove('btn-outline-primary');
+                        this.classList.add('btn-primary');
+                        
+                        selectedAmount = this.getAttribute('data-amount');
+                        document.getElementById('customAmount').value = selectedAmount;
+                    });
+                });
+
+                // Handle custom amount input
+                document.getElementById('customAmount').addEventListener('input', function() {
+                    selectedAmount = this.value;
+                    // Remove active state from amount buttons
+                    document.querySelectorAll('.amount-btn').forEach(btn => {
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-outline-primary');
+                    });
+                });
+
+                // Handle PayPal payment
+                document.getElementById('paypalBtn').addEventListener('click', function() {
+                    if (!selectedAmount || selectedAmount <= 0) {
+                        alert('Please select or enter an amount');
+                        return;
+                    }
+
+                    // Show loading state
+                    this.disabled = true;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+
+                    // Redirect to PayPal
+                    window.location.href = `/pay/create?value=${selectedAmount}`;
+                });
+            });
+        </script>
+
+        <style>
+            .amount-btn {
+                transition: all 0.2s ease;
+            }
+            
+            .amount-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+            
+            .card {
+                border: none;
+                border-radius: 15px;
+            }
+            
+            .btn-lg {
+                padding: 12px 24px;
+                font-size: 1.1rem;
+            }
+        </style>
+    </th:block>
+</body>
+</html>

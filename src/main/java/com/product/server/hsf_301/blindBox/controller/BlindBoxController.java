@@ -36,7 +36,7 @@ public class BlindBoxController {
     private final BlindBagTypeService blindBagTypeService;
     private final PrizeItemService prizeItemService;
     private final SpinHistoryService spinHistoryService;
-    private final UserService userService;
+
 
     
     // Directory where uploaded files will be stored

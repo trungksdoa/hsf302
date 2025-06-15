@@ -18,6 +18,8 @@ public class User {
     private String phone;
 
     private String address;
+
+    private Long balance;
     
     @Column(name = "email", nullable = false, unique = true)
     private String email;

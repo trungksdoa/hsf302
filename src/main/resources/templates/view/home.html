@@ -282,7 +282,7 @@
                 
                 // Show animation container
                 document.getElementById('boxOpeningContainer').style.display = 'block';
-                document.getElementById('spinConfirmation').style.display = 'none';
+                document.getElementById('spinConfirmation').style.display = 'none';openBoxModal
                 
                 // Animate box opening
                 setTimeout(() => {
@@ -463,45 +463,44 @@
                             return response.json();
                         })
                         .then(prizeItems => {
-                            // Generate the HTML for the prize items
-                            let prizeContent = `
-                            <div style="max-height: 250px; overflow-y: auto;">
-                                <table class="table table-sm mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Prize</th>
-                                            <th>Rarity</th>
-                                            <th>Chance</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                            `;
+                            // Create HTML content for the prizes
+                            let content = `<div class="prize-items-container">`;
                             
-                            // Add each prize item to the table
-                            prizeItems.forEach(prize => {
-                                prizeContent += `
-                                    <tr>
-                                        <td>${prize.itemName || 'Unknown'}</td>
-                                        <td>${prize.rarityLevel || 'Standard'}</td>
-                                        <td>${prize.dropRate ? (prize.dropRate + '%') : 'N/A'}</td>
-                                    </tr>
-                                `;
-                            });
+                            // Check if there are any prizes
+                            if (prizeItems && prizeItems.length > 0) {
+                                // Group prizes by rarity for better organization
+                                const groupedByRarity = {};
+                                
+                                prizeItems.forEach(prize => {
+                                    if (!groupedByRarity[prize.rarity]) {
+                                        groupedByRarity[prize.rarity] = [];
+                                    }
+                                    groupedByRarity[prize.rarity].push(prize);
+                                });
+                                
+                                // Add each rarity group to the content
+                                for (const [rarity, prizes] of Object.entries(groupedByRarity)) {
+                                    content += `<div class="rarity-group mb-2">
+                                        <h6 class="rarity-title ${rarity.toLowerCase()}-text">${rarity}</h6>
+                                        <ul class="prize-list">`;
+                                    
+                                    prizes.forEach(prize => {
+                                        content += `<li class="prize-item">${prize.itemName}</li>`;
+                                    });
+                                    
+                                    content += `</ul></div>`;
+                                }
+                            } else {
+                                content += `<p class="text-center">No prizes found for this box</p>`;
+                            }
                             
-                            // Close the table
-                            prizeContent += `
-                                    </tbody>
-                                </table>
-                            </div>
-                            `;
+                            content += `</div>`;
                             
                             // Update the popover content
-                            $(popoverElement).data('bs.popover').config.content = prizeContent;
+                            $(popoverElement).data('bs.popover').config.content = content;
                             $(popoverElement).popover('update');
                         })
                         .catch(error => {
-                            console.error('Error fetching prize items:', error);
-                            // Update with error message
                             const errorContent = `
                                 <div class="text-center text-danger">
                                     <i class="fas fa-exclamation-circle fa-2x mb-2"></i>
@@ -514,7 +513,6 @@
                 }
             });
             
-            // ...existing code...
         </script>
 
         <style>
@@ -644,15 +642,37 @@
                 font-weight: bold;
             }
             
-            /* Animate the prize items */
-            .prize-item {
-                transition: transform 0.2s ease;
+            /* Add styles for the prize popover content */
+            .prize-items-container {
+                max-width: 250px;
+                max-height: 300px;
+                overflow-y: auto;
+                padding: 5px;
             }
             
-            .prize-item:hover {
-                transform: translateX(5px);
-                background-color: rgba(0,0,0,0.05) !important;
+            .rarity-title {
+                font-weight: bold;
+                margin-bottom: 5px;
+                border-bottom: 1px solid #eee;
             }
+            
+            .prize-list {
+                list-style-type: none;
+                padding-left: 10px;
+                margin-bottom: 5px;
+            }
+            
+            .prize-item {
+                font-size: 0.9em;
+                margin-bottom: 2px;
+            }
+            
+            /* Rarity text colors */
+            .common-text { color: #808080; }
+            .uncommon-text { color: #4CAF50; }
+            .rare-text { color: #2196F3; }
+            .epic-text { color: #9C27B0; }
+            .legendary-text { color: #FF9800; }
         </style>
         
         <!-- Add this at the bottom of the scripts block -->

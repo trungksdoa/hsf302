@@ -68,9 +68,9 @@
             <div class="col-md-9 col-lg-10">
                 <!-- Messages -->
                 <div th:replace="~{view/fragments :: messages}"></div>
-                
+
                 <!-- Content Area -->
-                <div th:replace="~{${content}}" style="min-height: calc(100vh - 200px);"></div>
+                <div th:replace="~{${content}(blogs=${blogs})}" style="min-height: calc(100vh - 200px);"></div>
             </div>
         </div>
     </div>

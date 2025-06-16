@@ -3,6 +3,8 @@ package com.product.server.hsf_301.blindBox.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 
 import java.math.BigDecimal;
@@ -10,7 +12,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "blind_package")
-@Data
+@Getter
+@Setter
 public class BlindPackage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

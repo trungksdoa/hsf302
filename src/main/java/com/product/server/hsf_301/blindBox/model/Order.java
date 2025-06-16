@@ -1,14 +1,20 @@
 package com.product.server.hsf_301.blindBox.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity(name = "BlindBoxOrder")
 @Table(name = "blind_box_orders")
-@Data
+@Getter
+@Setter
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,4 +42,14 @@ public class Order {
     
     @Column(name = "notes")
     private String notes;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    
+    private List<OrderItem> orderItems;
+
+    @PrePersist
+    private void prePersist() {
+        orderDate = LocalDateTime.now();
+    }
 }

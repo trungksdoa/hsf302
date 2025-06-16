@@ -3,6 +3,8 @@ package com.product.server.hsf_301.payment.controller;
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
+import com.product.server.hsf_301.blindBox.model.User;
+import com.product.server.hsf_301.blindBox.service.UserService;
 import com.product.server.hsf_301.payment.TopUpService;
 import com.product.server.hsf_301.payment.model.TopUpHistory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class PayPalController {
 
     @Autowired
     private TopUpService topUpService;
+
+    @Autowired
+    private UserService userService;
 
     @Value("${paypal.success.url}")
     private String successUrl;
@@ -58,11 +63,14 @@ public class PayPalController {
 
         try {
             Payment created = payment.create(apiContext);
-            return created.getLinks().stream()
-                .filter(link -> "approval_url".equals(link.getRel()))
-                .findFirst()
-                .map(Links::getHref)
-                .orElse("No approval_url found");
+            String approvalUrl = created.getLinks().stream()
+                    .filter(link -> "approval_url".equals(link.getRel()))
+                    .findFirst()
+                    .map(Links::getHref)
+                    .orElse("No approval_url found");
+
+            return "redirect:" + approvalUrl;
+
         } catch (PayPalRESTException e) {
             throw new RuntimeException("Payment creation failed", e);
         }
@@ -82,6 +90,10 @@ public class PayPalController {
             amount = executedPayment.getTransactions().get(0).getAmount().getTotal();
         }
 
+        //get current user from spring security
+        //update to balance
+        User curr = userService.getUserById(1);
+        curr.setBalance(Long.parseLong(amount));
         TopUpHistory topUpHistory = new TopUpHistory();
         topUpHistory.setAmount(amount);
         topUpHistory.setCreated_at(LocalDate.now() + "");
@@ -89,7 +101,7 @@ public class PayPalController {
         topUpHistory.setStatus(executedPayment.getState());
         topUpService.save(topUpHistory);
 
-        return "Payment successful: " + executedPayment.getId();
+        return "redirect://";
     }
 
 

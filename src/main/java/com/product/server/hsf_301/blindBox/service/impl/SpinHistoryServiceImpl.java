@@ -10,6 +10,10 @@ import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import com.product.server.hsf_301.blindBox.service.PrizeItemService;
 import com.product.server.hsf_301.blindBox.service.SpinHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -46,8 +50,12 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
     }
 
     @Override
-    public List<SpinHistory> getSpinHistoryByUser(User user) {
-        return spinHistoryRepository.findByUser(user);
+    public Page<SpinHistory> getSpinHistoryByUser(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("spinTime").descending());
+
+        // Gọi repository kèm pageable
+        return spinHistoryRepository.findByUser(user, pageable);
+
     }
 
     @Override
@@ -61,6 +69,10 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
         
         if (spinHistory.isRedeemed()) {
             throw new RuntimeException("Prize already redeemed");
+        }
+
+        if(!spinHistory.getPrizeItemId().isClaimAble()){
+            return spinHistory;
         }
         
         spinHistory.setRedeemed(true);

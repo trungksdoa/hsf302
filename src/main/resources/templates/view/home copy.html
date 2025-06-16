@@ -31,9 +31,16 @@
                                 <p class="card-text" th:text="${product.description}">Contains rare collectible items</p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="h5 text-primary mb-0" th:text="'$' + ${product.pricePerSpin}">$29.99</span>
-                                    <button class="btn btn-primary" th:onclick="'showOpenBox(\'' + ${product.id} + '\', ' + ${product.pricePerSpin} + ')'">
-                                        <i class="fas fa-box-open me-2"></i>Open Now
-                                    </button>
+                                    <div class="btn-group">
+                                        <button class="btn btn-outline-secondary btn-sm" 
+                                                th:onclick="'addToCollection(' + ${product.id} + ')'"
+                                                title="Add to Collection">
+                                            <i class="fas fa-heart"></i>
+                                        </button>
+                                        <button class="btn btn-primary" th:onclick="'showOpenBox(\'' + ${product.id} + '\', ' + ${product.pricePerSpin} + ')'">
+                                            <i class="fas fa-box-open me-2"></i>Open Now
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -514,7 +521,53 @@
                 }
             });
             
-            // ...existing code...
+            function addToCollection(blindPackageId) {
+                // For demo purposes, using a mock user ID
+                const userId = 2; // In a real app, get this from session/auth
+                
+                fetch('/api/collection/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                        blindPackageId: blindPackageId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Added to collection successfully!', 'success');
+                    } else {
+                        showNotification(data.message || 'Failed to add to collection', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('An error occurred while adding to collection', 'error');
+                });
+            }
+            
+            function showNotification(message, type) {
+                // Simple notification function
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                const alertHtml = `
+                    <div class="alert ${alertClass} alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', alertHtml);
+                
+                // Auto-remove after 3 seconds
+                setTimeout(() => {
+                    const alert = document.querySelector('.alert:last-of-type');
+                    if (alert) {
+                        alert.remove();
+                    }
+                }, 3000);
+            }
         </script>
 
         <style>

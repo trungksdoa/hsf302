@@ -2,23 +2,29 @@ package com.product.server.hsf_301.blindBox.controller;
 
 import com.product.server.hsf_301.blindBox.model.Order;
 import com.product.server.hsf_301.blindBox.model.User;
+import com.product.server.hsf_301.blindBox.service.OrderItemService;
 import com.product.server.hsf_301.blindBox.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/orders")
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderItemService orderItemService;
 
     @Autowired
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, OrderItemService orderItemService) {
         this.orderService = orderService;
+        this.orderItemService = orderItemService;
     }
 
     @GetMapping
@@ -97,5 +103,26 @@ public class OrderController {
     public String updateOrderStatus(@PathVariable Integer id, @RequestParam String status) {
         orderService.updateOrderStatus(id, status);
         return "redirect:/orders";
+    }
+    
+    @GetMapping("/api/orders/{id}/items")
+    @ResponseBody
+    public ResponseEntity<?> getOrderItems(@PathVariable Integer id) {
+        try {
+            Order order = orderService.getOrderById(id);
+            
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "orderId", order.getOrderId(),
+                "orderItems", order.getOrderItems() != null ? order.getOrderItems() : new ArrayList<>(),
+                "notes", order.getNotes() != null ? order.getNotes() : ""
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "Order not found or error occurred",
+                "orderItems", new ArrayList<>()
+            ));
+        }
     }
 }

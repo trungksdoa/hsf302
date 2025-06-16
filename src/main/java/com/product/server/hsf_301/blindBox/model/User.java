@@ -19,7 +19,8 @@ public class User {
 
     private String address;
 
-    private Long balance;
+
+    private Long balance = 0L;
     
     @Column(name = "email", nullable = false, unique = true)
     private String email;

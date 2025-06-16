@@ -1,14 +1,12 @@
 package com.product.server.hsf_301.blindBox.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "Prize_Items")
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,4 +33,6 @@ public class PrizeItem {
     private Double probability;
 
     private boolean isActive = true;
+
+    private boolean isClaimAble = false;
 }

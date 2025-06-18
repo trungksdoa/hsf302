@@ -3,12 +3,14 @@ package com.product.server.hsf_301.dashboard;
 
 import com.product.server.hsf_301.blindBox.model.BlindPackage;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,12 +40,25 @@ public class AdminController {
         model.addAttribute("content", "admin/blindbox/list");
         return "admin/layout";
     }
+    @GetMapping("/blindBoxes/create")
+    public String createBlindBox(Model model, HttpSession session) {
+        model.addAttribute("showSidebar", true);
+        model.addAttribute("blindPackage", new BlindPackage());
+        return "admin/layout";
+    }
 
     @GetMapping("/blogs")
     public String blog(Model model) {
         model.addAttribute("showSidebar", true);
         model.addAttribute("blogPosts", new ArrayList<>());
         model.addAttribute("content", "admin/blog/list");
+        return "admin/layout";
+    }
+    @GetMapping("/update/{id}")
+    public String updateBlindBox(@PathVariable Integer id, Model model) {
+        model.addAttribute("showSidebar", true);
+        BlindPackage blindPackage = blindBagTypeService.getBlindBagTypeById(id);
+        model.addAttribute("blindPackage", blindPackage);
         return "admin/layout";
     }
 
@@ -67,44 +82,17 @@ public class AdminController {
 
     @PostMapping("/blindBoxes")
     public String createBlindBox(@ModelAttribute BlindPackage blindPackage,
-                                 @RequestParam("imageFile") MultipartFile imageFile,
-                                 Model model) {
+                                 @RequestParam("image") MultipartFile imageFile,
+                                 RedirectAttributes redirectAttributes) {
         try {
-            // Handle file upload if a file was provided
-            if (imageFile != null && !imageFile.isEmpty()) {
-                // Create directory if it doesn't exist
-                Path uploadPath = Paths.get(UPLOAD_DIR);
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
-                }
-
-                // Generate a unique filename to prevent overwriting
-                String originalFilename = imageFile.getOriginalFilename();
-                String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-                String newFilename = UUID.randomUUID().toString() + fileExtension;
-
-                // Save the file
-                Path filePath = uploadPath.resolve(newFilename);
-                Files.copy(imageFile.getInputStream(), filePath);
-
-                // Set the image URL to the uploaded file path
-                blindPackage.setImageUrl("/uploads/blindbox/" + newFilename);
-            }
-
-            // Save the blind package
-            blindBagTypeService.saveBlindBagType(blindPackage);
-
-            model.addAttribute("success", "Blind box created successfully");
-            // Refresh blind box list
-            Page<BlindPackage> blindBagTypes = blindBagTypeService.getAllBlindBagTypes(0, 10);
-            model.addAttribute("blindList", blindBagTypes);
-
+            blindBagTypeService.saveBlindBagType(blindPackage, imageFile);
+            redirectAttributes.addFlashAttribute("message", "blindPackage created successfully!");
             return "redirect:/admin/blindBoxes";
         } catch (IOException e) {
-            model.addAttribute("error", "Failed to upload image: " + e.getMessage());
+            redirectAttributes.addAttribute("error", "Failed to upload image: " + e.getMessage());
             return "redirect:/admin/blindBoxes";
         } catch (Exception e) {
-            model.addAttribute("error", "Error creating blind box: " + e.getMessage());
+            redirectAttributes.addAttribute("error", "Error creating blind box: " + e.getMessage());
             return "redirect:/admin/blindBoxes";
         }
     }
@@ -112,51 +100,18 @@ public class AdminController {
     @PostMapping("/update/{id}")
     public String updateBlindBox(@PathVariable Integer id,
                                  @ModelAttribute BlindPackage blindPackage,
-                                 @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-                                 Model model) {
+                                 @RequestParam(value = "image", required = false) MultipartFile imageFile,
+                                 RedirectAttributes redirectAttributes) {
         try {
-            // Make sure the ID is set correctly
-            blindPackage.setId(id);
-
-            // Handle file upload if a file was provided
-            if (imageFile != null && !imageFile.isEmpty()) {
-                // Create directory if it doesn't exist
-                Path uploadPath = Paths.get(UPLOAD_DIR);
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
-                }
-
-                // Generate a unique filename to prevent overwriting
-                String originalFilename = imageFile.getOriginalFilename();
-                String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-                String newFilename = UUID.randomUUID().toString() + fileExtension;
-
-                // Save the file
-                Path filePath = uploadPath.resolve(newFilename);
-                Files.copy(imageFile.getInputStream(), filePath);
-
-                // Set the image URL to the uploaded file path
-                blindPackage.setImageUrl("/uploads/blindbox/" + newFilename);
-            } else if (blindPackage.getImageUrl() == null || blindPackage.getImageUrl().isEmpty()) {
-                // If no new file and no existing URL, get the existing image URL from the database
-                BlindPackage existingBox = blindBagTypeService.getBlindBagTypeById(id);
-                blindPackage.setImageUrl(existingBox.getImageUrl());
-            }
-
-            // Save the blind package
-            blindBagTypeService.saveBlindBagType(blindPackage);
-
-            model.addAttribute("success", "Blind box updated successfully");
-            // Refresh blind box list
-            Page<BlindPackage> blindBagTypes = blindBagTypeService.getAllBlindBagTypes(0, 10);
-            model.addAttribute("blindList", blindBagTypes);
+            blindBagTypeService.updateBlindBagType(id, blindPackage, imageFile);
+            redirectAttributes.addFlashAttribute("message", "Update successully!");
 
             return "redirect:/admin/blindBoxes";
         } catch (IOException e) {
-            model.addAttribute("error", "Failed to upload image: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to upload image: " + e.getMessage());
             return "redirect:/admin/blindBoxes";
         } catch (Exception e) {
-            model.addAttribute("error", "Error updating blind box: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error updating blind box: " + e.getMessage());
             return "redirect:/admin/blindBoxes";
         }
     }

@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface SpinHistoryRepository extends JpaRepository<SpinHistory, Integer> {
     List<SpinHistory> findByUser(User user);
-    
+
     List<SpinHistory> findByUserAndRedeemed(User user, Boolean redeemed);
 }

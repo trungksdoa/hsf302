@@ -9,8 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,7 +44,11 @@ public class BlindBagTypeServiceImpl implements BlindBagTypeService {
     }
 
     @Override
-    public BlindPackage saveBlindBagType(BlindPackage blindBagType) {
+    public BlindPackage saveBlindBagType(BlindPackage blindBagType, MultipartFile imageFile) throws IOException {
+        if (imageFile != null && !imageFile.isEmpty()) {
+            blindBagType.setImageData(imageFile.getBytes());
+            blindBagType.setImageType(imageFile.getContentType());
+        }
         return blindBagTypeRepository.save(blindBagType);
     }
 
@@ -56,5 +62,32 @@ public class BlindBagTypeServiceImpl implements BlindBagTypeService {
         return blindBagTypeRepository.findAll().stream()
                 .filter(BlindPackage::isActive)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateBlindBagType(Integer id, BlindPackage updatedBlindBagType, MultipartFile imageFile) throws IOException {
+        BlindPackage existing = getBlindBagTypeById(id);
+
+        if (existing == null) {
+            throw new RuntimeException("BlindBagType not found with id: " + id);
+        }
+
+        // Cập nhật tên
+        existing.setName(updatedBlindBagType.getName());
+
+        // Cập nhật giá mỗi lượt quay
+        existing.setPricePerSpin(updatedBlindBagType.getPricePerSpin());
+
+        // Cập nhật mô tả
+        existing.setDescription(updatedBlindBagType.getDescription());
+
+        // Nếu có ảnh mới thì cập nhật ảnh
+        if (imageFile != null && !imageFile.isEmpty()) {
+            existing.setImageData(imageFile.getBytes());
+            existing.setImageType(imageFile.getContentType());
+        }
+
+        // Lưu lại object đã cập nhật
+        blindBagTypeRepository.save(existing);
     }
 }

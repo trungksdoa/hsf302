@@ -17,6 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,7 +38,7 @@ public class BlindBoxController {
     private final BlindBagTypeService blindBagTypeService;
     private final PrizeItemService prizeItemService;
     private final SpinHistoryService spinHistoryService;
-
+    private final UserService userService;
 
     
     // Directory where uploaded files will be stored
@@ -80,6 +82,61 @@ public class BlindBoxController {
                 "success", false,
                 "message", "Error: " + e.getMessage()
             ));
+        }
+    }
+    @GetMapping("/packages")
+    public String showPackages(Model model) {
+        List<BlindPackage> activePackages = blindBagTypeService.getAllBlindBagTypes();
+        model.addAttribute("packages", activePackages);
+        return "blind-box/packages";
+    }
+    @GetMapping("/spin/{id}")
+    public String showSpinPage(@PathVariable Integer id, Model model) {
+        BlindPackage blindPackage = blindBagTypeService.getBlindBagTypeById(id);
+        model.addAttribute("blindPackage", blindPackage);
+        return "blind-box/spin";
+    }
+    @PostMapping("/spin/{id}/single")
+    public String spinOnce(@PathVariable Integer id,
+                           Principal principal,
+                           RedirectAttributes redirectAttributes) {
+        try {
+            BlindPackage blindPackage = blindBagTypeService.getBlindBagTypeById(id);
+            User user = userService.findByUsername(principal.getName());
+
+            SpinHistory result = spinHistoryService.spin(user, blindPackage);
+            addSpinResultMessage(redirectAttributes, result);
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+        }
+
+        return "redirect:/blindbox/spin/" + id;
+    }
+    @PostMapping("/spin/{id}/multiple")
+    public String spinFiveTimes(@PathVariable Integer id,
+                                Principal principal,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            BlindPackage blindPackage = blindBagTypeService.getBlindBagTypeById(id);
+            User user = userService.findByUsername(principal.getName());
+
+            List<SpinHistory> results = spinHistoryService.spinMultiple(user, blindPackage, 5);
+            redirectAttributes.addFlashAttribute("spinResults", results);
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+        }
+
+        return "redirect:/blindbox/spin/" + id;
+    }
+    private void addSpinResultMessage(RedirectAttributes redirectAttributes, SpinHistory result) {
+        if (result.getSuccess()) {
+            redirectAttributes.addFlashAttribute("success",
+                    "Congratulations! You won: " + result.getPrizeItemId().getItemName());
+        } else {
+            redirectAttributes.addFlashAttribute("error",
+                    "Spin failed: " + result.getErrorMessage());
         }
     }
 

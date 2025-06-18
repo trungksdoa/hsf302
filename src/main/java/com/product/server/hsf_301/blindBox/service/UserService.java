@@ -22,4 +22,5 @@ public interface UserService {
     boolean verifyPassword(Integer userId, String password);
     
     void deleteUser(Integer userId);
+    public User findByUsername(String username);
 }

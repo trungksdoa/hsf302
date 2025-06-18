@@ -11,7 +11,8 @@ import java.util.List;
 
 @Repository
 public interface SpinHistoryRepository extends JpaRepository<SpinHistory, Integer> {
+    List<SpinHistory> findByUser(User user);
     Page<SpinHistory> findByUser(User user, Pageable pageable);
-    
+
     List<SpinHistory> findByUserAndRedeemed(User user, Boolean redeemed);
 }

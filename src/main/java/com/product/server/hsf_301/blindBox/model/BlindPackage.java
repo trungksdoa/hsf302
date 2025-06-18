@@ -24,8 +24,11 @@ public class BlindPackage {
     private String name;
 
 
-    private String imageUrl;
-    
+    @Lob
+    @Column(name = "image_data", columnDefinition = "LONGBLOB")
+    private byte[] imageData;
+    private String imageType;
+
     @Column(name = "price_per_spin", nullable = false)
     private BigDecimal pricePerSpin;
     

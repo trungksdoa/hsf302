@@ -58,13 +58,11 @@ public class UserController {
 
         // Get user's order history (filter by COMPLETED status)
         List<Order> allOrders = orderService.getOrdersByUser(user);
-        List<Order> userOrderHistory = allOrders.stream()
-                .filter(order -> "COMPLETED".equals(order.getStatus()))
-                .collect(Collectors.toList());
+
 
         // Create Map for Order and OrderItems
         Map<Order, List<OrderItem>> orderItemMap = new HashMap<>();
-        for (Order order : userOrderHistory) {
+        for (Order order : allOrders) {
             orderItemMap.put(order, order.getOrderItems() != null ? order.getOrderItems() : new ArrayList<>());
         }
 

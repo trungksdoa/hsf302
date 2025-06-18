@@ -2,6 +2,9 @@ package com.product.server.hsf_301.blindBox.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.ColumnDefault;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "Users")
@@ -19,8 +22,8 @@ public class User {
 
     private String address;
 
-
-    private Long balance = 0L;
+    @ColumnDefault(value = "100.00")
+    private BigDecimal balance;
     
     @Column(name = "email", nullable = false, unique = true)
     private String email;

@@ -2,14 +2,13 @@ package com.product.server.hsf_301.blindBox.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,4 +28,11 @@ public class OrderItem {
     private PrizeItem prizeItemId;
 
     private Double price;
+
+    public OrderItem(Order order, BlindPackage bp, PrizeItem prizeItem, Double price) {
+        this.order = order;
+        this.blindBagId = bp;
+        this.prizeItemId = prizeItem;
+        this.price = price;
+    }
 }

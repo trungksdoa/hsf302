@@ -51,5 +51,14 @@ public class Order {
     @PrePersist
     private void prePersist() {
         orderDate = LocalDateTime.now();
+        paymentStatus = "PAID";
+        paymentMethod = "PAYPAL";
+        status = "PENDING";
+        if(orderItems != null){
+            totalAmount = orderItems.stream()
+                    .map(OrderItem::getPrice)
+                    .reduce(0.0, Double::sum);
+        }
+
     }
 }

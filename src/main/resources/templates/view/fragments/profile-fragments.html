@@ -75,8 +75,8 @@
     </div>
   </div>
 
-  <!-- Spin History Fragment -->
-  <div th:fragment="spin-history" class="tab-pane fade" id="spin-history">
+  <!-- Spin History with Bulk Redeem Fragment -->
+  <div th:fragment="spin-history-with-bulk" class="tab-pane fade" id="spin-history">
     <div class="card shadow-sm">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Spin History</h5>
@@ -94,11 +94,35 @@
           </button>
         </div>
       </div>
+      
+      <!-- Bulk Action Controls -->
+      <div class="card-body border-bottom bg-light py-2" th:if="${userSpinHistory.content != null and !userSpinHistory.content.isEmpty()}">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+            <div class="form-check me-3">
+              <input class="form-check-input" type="checkbox" id="selectAllItems">
+              <label class="form-check-label" for="selectAllItems">
+                Select All
+              </label>
+            </div>
+            <small class="text-muted">
+              <span id="selectedCount">0</span> items selected
+            </small>
+          </div>
+          <button type="button" class="btn btn-sm btn-primary" id="bulkRedeemBtn" disabled>
+            <i class="fas fa-gift me-1"></i>Redeem Selected
+          </button>
+        </div>
+      </div>
+      
       <div class="card-body p-0">
         <div class="table-responsive">
           <table class="table table-hover mb-0">
             <thead class="table-light">
               <tr>
+                <th width="40">
+                  <span class="visually-hidden">Select</span>
+                </th>
                 <th>Date</th>
                 <th>Box Series</th>
                 <th>Item Received</th>
@@ -111,6 +135,18 @@
                 th:each="spin : ${userSpinHistory.content}"
                 th:if="${userSpinHistory.content != null and !userSpinHistory.content.isEmpty()}"
               >
+                <!-- Checkbox Column -->
+                <td>
+                  <div class="form-check" th:if="${!spin?.redeemed and spin?.prizeItemId != null and spin?.prizeItemId?.isClaimAble}">
+                    <input 
+                      class="form-check-input item-checkbox" 
+                      type="checkbox" 
+                      th:id="'item_' + ${spin.historyId}"
+                      th:value="${spin.historyId}"
+                    >
+                  </div>
+                </td>
+                
                 <td>
                   <div th:text="${#temporals.format(spin?.spinTime, 'MMM dd, yyyy')}">Mar 15, 2024</div>
                   <small class="text-muted" th:text="${#temporals.format(spin?.spinTime, 'HH:mm')}">14:30</small>
@@ -144,21 +180,21 @@
                   >
                 </td>
                 <td>
-                  <!-- Nút Redeem -->
+                  <!-- Individual Redeem Button -->
                   <button
                     th:if="${!spin?.redeemed and spin?.prizeItemId != null and spin?.prizeItemId?.isClaimAble}"
-                    class="btn btn-sm btn-outline-primary redeem-prize-btn"
+                    class="btn btn-sm btn-outline-primary redeem-prize-btn me-1"
                     th:data-spin-id="${spin.historyId}"
                   >
                     <i class="fas fa-gift me-1"></i>Redeem
                   </button>
 
-                  <!-- Đã redeem -->
+                  <!-- Already redeemed -->
                   <span th:if="${spin?.redeemed}" class="text-muted small">
                     <i class="fas fa-check-circle text-success me-1"></i>Redeemed
                   </span>
 
-                  <!-- Không thể claim (GOOD_LUCK items) -->
+                  <!-- Special Prize (not claimable) -->
                   <span
                     th:if="${!spin?.redeemed and spin?.prizeItemId != null and !spin?.prizeItemId?.isClaimAble}"
                     class="text-warning small"
@@ -167,7 +203,7 @@
                     <i class="fas fa-star me-1"></i>Special Prize
                   </span>
 
-                  <!-- Không có prize -->
+                  <!-- No prize -->
                   <span th:if="${spin?.prizeItemId == null}" class="text-muted small">
                     <i class="fas fa-times-circle me-1"></i>No Prize
                   </span>
@@ -175,7 +211,7 @@
               </tr>
               <!-- Empty state -->
               <tr th:if="${userSpinHistory == null or userSpinHistory.isEmpty()}">
-                <td colspan="5" class="text-center py-4">
+                <td colspan="6" class="text-center py-4">
                   <p class="text-muted mb-0">No spin history found.</p>
                 </td>
               </tr>
@@ -183,51 +219,50 @@
           </table>
         </div>
       </div>
+      
       <!-- Pagination -->
-      <span th:text="${userSpinHistory.totalPages}">0</span>
-
-      <div class="card-footer bg-white" th:if="${userSpinHistory.totalPages >= 0}">
-            <nav aria-label="Spin history pagination">
-                <ul class="pagination pagination-sm justify-content-center mb-0">
-                    <!-- Previous -->
-                    <li class="page-item" th:classappend="${userSpinHistory.first} ? 'disabled'">
-                        <a class="page-link" 
-                           th:href="@{/users/profile(page=${userSpinHistory.number - 1}, size=${userSpinHistory.size})}"
-                           aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    
-                    <!-- Page Numbers -->
-                    <li class="page-item" 
-                        th:each="pageNum : ${#numbers.sequence(0, userSpinHistory.totalPages - 1)}"
-                        th:classappend="${pageNum == userSpinHistory.number} ? 'active'">
-                        <a class="page-link" 
-                           th:href="@{/users/profile(page=${pageNum}, size=${userSpinHistory.size})}"
-                           th:text="${pageNum + 1}">1</a>
-                    </li>
-                    
-                    <!-- Next -->
-                    <li class="page-item" th:classappend="${userSpinHistory.last} ? 'disabled'">
-                        <a class="page-link" 
-                           th:href="@{/users/profile(page=${userSpinHistory.number + 1}, size=${userSpinHistory.size})}"
-                           aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+      <div class="card-footer bg-white" th:if="${userSpinHistory.totalPages > 0}">
+        <nav aria-label="Spin history pagination">
+          <ul class="pagination pagination-sm justify-content-center mb-0">
+            <!-- Previous -->
+            <li class="page-item" th:classappend="${userSpinHistory.first} ? 'disabled'">
+              <a class="page-link" 
+                 th:href="@{/users/profile(page=${userSpinHistory.number - 1}, size=${userSpinHistory.size})}"
+                 aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
             
-            <!-- Page Info -->
-            <div class="text-center mt-2">
-                <small class="text-muted">
-                    Showing <span th:text="${userSpinHistory.numberOfElements}">10</span> of
-                    <span th:text="${userSpinHistory.totalElements}">50</span> results
-                    (Page <span th:text="${userSpinHistory.number + 1}">1</span> of
-                    <span th:text="${userSpinHistory.totalPages}">5</span>)
-                </small>
-            </div>
+            <!-- Page Numbers -->
+            <li class="page-item" 
+                th:each="pageNum : ${#numbers.sequence(0, userSpinHistory.totalPages - 1)}"
+                th:classappend="${pageNum == userSpinHistory.number} ? 'active'">
+              <a class="page-link" 
+                 th:href="@{/users/profile(page=${pageNum}, size=${userSpinHistory.size})}"
+                 th:text="${pageNum + 1}">1</a>
+            </li>
+            
+            <!-- Next -->
+            <li class="page-item" th:classappend="${userSpinHistory.last} ? 'disabled'">
+              <a class="page-link" 
+                 th:href="@{/users/profile(page=${userSpinHistory.number + 1}, size=${userSpinHistory.size})}"
+                 aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        
+        <!-- Page Info -->
+        <div class="text-center mt-2">
+          <small class="text-muted">
+            Showing <span th:text="${userSpinHistory.numberOfElements}">10</span> of
+            <span th:text="${userSpinHistory.totalElements}">50</span> results
+            (Page <span th:text="${userSpinHistory.number + 1}">1</span> of
+            <span th:text="${userSpinHistory.totalPages}">5</span>)
+          </small>
         </div>
+      </div>
     </div>
   </div>
 
@@ -572,6 +607,9 @@
 
         // Event Listeners for buttons
         setupEventListeners();
+        
+        // Initialize bulk redeem functionality
+        initializeBulkRedeem();
       });
 
       function setupEventListeners() {
@@ -764,6 +802,156 @@
             return "bg-danger";
           default:
             return "bg-secondary";
+        }
+      }
+
+      function removeFromCollection(collectionId) {
+        if (!collectionId) {
+          console.error("Collection ID is missing");
+          return;
+        }
+
+        if (confirm("Are you sure you want to remove this item from your collection?")) {
+          fetch(`/collection/remove/${collectionId}`, {
+            method: "DELETE",
+          })
+            .then((response) => {
+              if (response.ok) {
+                location.reload();
+              } else {
+                alert("Failed to remove item from collection");
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("An error occurred while removing item from collection");
+            });
+        }
+      }
+
+      // Initialize bulk redeem functionality
+      function initializeBulkRedeem() {
+        console.log("Initializing bulk redeem functionality...");
+        
+        // Select All checkbox event listener
+        const selectAllCheckbox = document.getElementById('selectAllItems');
+        if (selectAllCheckbox) {
+          console.log("Select All checkbox found");
+          selectAllCheckbox.addEventListener('change', handleSelectAll);
+        } else {
+          console.log("Select All checkbox not found");
+        }
+        
+        // Bulk redeem button event listener
+        const bulkRedeemBtn = document.getElementById('bulkRedeemBtn');
+        if (bulkRedeemBtn) {
+          console.log("Bulk redeem button found");
+          bulkRedeemBtn.addEventListener('click', handleBulkRedeem);
+        } else {
+          console.log("Bulk redeem button not found");
+        }
+        
+        // Individual checkbox event listeners
+        const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+        console.log(`Found ${itemCheckboxes.length} item checkboxes`);
+        itemCheckboxes.forEach(checkbox => {
+          checkbox.addEventListener('change', handleCheckboxChange);
+        });
+        
+        // Initialize button state
+        updateBulkRedeemButton();
+      }
+      
+      function handleSelectAll() {
+        console.log("Select All clicked");
+        const selectAllCheckbox = document.getElementById('selectAllItems');
+        const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+        
+        itemCheckboxes.forEach(checkbox => {
+          checkbox.checked = selectAllCheckbox.checked;
+        });
+        
+        updateBulkRedeemButton();
+      }
+      
+      function updateBulkRedeemButton() {
+        const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+        const bulkRedeemBtn = document.getElementById('bulkRedeemBtn');
+        const selectedCount = document.getElementById('selectedCount');
+        
+        console.log(`${checkedBoxes.length} items selected`);
+        
+        if (bulkRedeemBtn && selectedCount) {
+          if (checkedBoxes.length > 0) {
+            bulkRedeemBtn.disabled = false;
+            bulkRedeemBtn.innerHTML = `<i class="fas fa-gift me-1"></i>Redeem Selected (${checkedBoxes.length})`;
+            selectedCount.textContent = checkedBoxes.length;
+          } else {
+            bulkRedeemBtn.disabled = true;
+            bulkRedeemBtn.innerHTML = '<i class="fas fa-gift me-1"></i>Redeem Selected';
+            selectedCount.textContent = '0';
+          }
+        }
+      }
+      
+      function handleCheckboxChange() {
+        console.log("Individual checkbox changed");
+        const totalCheckboxes = document.querySelectorAll('.item-checkbox').length;
+        const checkedBoxes = document.querySelectorAll('.item-checkbox:checked').length;
+        const selectAllCheckbox = document.getElementById('selectAllItems');
+        
+        if (selectAllCheckbox) {
+          if (checkedBoxes === totalCheckboxes && totalCheckboxes > 0) {
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+          } else if (checkedBoxes > 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = true;
+          } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+          }
+        }
+        
+        updateBulkRedeemButton();
+      }
+      
+      function handleBulkRedeem() {
+        console.log("Bulk redeem clicked");
+        const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+        const itemIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+        
+        console.log("Selected item IDs:", itemIds);
+        
+        if (itemIds.length === 0) {
+          alert('Please select items to redeem');
+          return;
+        }
+        
+        if (confirm(`Are you sure you want to redeem ${itemIds.length} items?`)) {
+          console.log("Sending bulk redeem request...");
+          // Send POST request with JSON payload
+          fetch('/spinHistory/redeem', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify(itemIds)
+          })
+          .then(response => {
+            console.log("Response status:", response.status);
+            if (response.ok) {
+              // Redirect to profile page
+              window.location.href = '/users/profile#spin-history';
+            } else {
+              throw new Error('Failed to redeem items');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while redeeming items. Please try again.');
+          });
         }
       }
     </script>

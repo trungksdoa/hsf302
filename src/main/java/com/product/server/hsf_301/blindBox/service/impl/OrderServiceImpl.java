@@ -1,14 +1,15 @@
 package com.product.server.hsf_301.blindBox.service.impl;
 
-import com.product.server.hsf_301.blindBox.model.Order;
-import com.product.server.hsf_301.blindBox.model.User;
+import com.product.server.hsf_301.blindBox.model.*;
 import com.product.server.hsf_301.blindBox.repository.OrderRepository;
 import com.product.server.hsf_301.blindBox.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -42,10 +43,35 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order saveOrder(Order order) {
-        if (order.getOrderDate() == null) {
-            order.setOrderDate(LocalDateTime.now());
-        }
+    public Order saveOrder(SpinHistory spinHistory) {
+        Order order = new Order();
+        List<OrderItem>  orderItems= new ArrayList<>();
+        orderItems.add(new OrderItem(order,spinHistory.getPrizeItemId().getBlindBagType(),spinHistory.getPrizeItemId(),spinHistory.getPrice()));
+        order.setOrderItems(orderItems);
+
+        User user = new User();
+        user.setUserId(2);
+        order.setUser(user);
+        return orderRepository.save(order);
+    }
+
+    @Override
+    public Order saveOrder(List<SpinHistory> spinHistories) {
+        Order order = new Order();
+
+        // Sử dụng stream để tạo OrderItems từ SpinHistory list
+        List<OrderItem> orderItems = spinHistories.stream()
+                .map(spinHistory -> new OrderItem(
+                        order,
+                        spinHistory.getBlindBagId(),
+                        spinHistory.getPrizeItemId(),
+                        spinHistory.getPrice()
+                ))
+                .collect(Collectors.toList());
+        User user = new User();
+        user.setUserId(2);
+        order.setUser(user);
+        order.setOrderItems(orderItems);
         return orderRepository.save(order);
     }
 

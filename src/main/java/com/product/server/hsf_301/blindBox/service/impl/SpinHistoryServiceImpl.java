@@ -1,15 +1,13 @@
 package com.product.server.hsf_301.blindBox.service.impl;
 
 
-import com.product.server.hsf_301.blindBox.model.BlindPackage;
-import com.product.server.hsf_301.blindBox.model.PrizeItem;
-import com.product.server.hsf_301.blindBox.model.SpinHistory;
-import com.product.server.hsf_301.blindBox.model.User;
+import com.product.server.hsf_301.blindBox.model.*;
 import com.product.server.hsf_301.blindBox.repository.SpinHistoryRepository;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
+import com.product.server.hsf_301.blindBox.service.OrderService;
 import com.product.server.hsf_301.blindBox.service.PrizeItemService;
 import com.product.server.hsf_301.blindBox.service.SpinHistoryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,26 +15,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class SpinHistoryServiceImpl implements SpinHistoryService {
 
     private final SpinHistoryRepository spinHistoryRepository;
     private final BlindBagTypeService blindBagTypeService;
     private final PrizeItemService prizeItemService;
-    
+    private final OrderService orderService;
     // In a real app, you would inject a UserService here
     
-    @Autowired
-    public SpinHistoryServiceImpl(
-            SpinHistoryRepository spinHistoryRepository,
-            BlindBagTypeService blindBagTypeService,
-            PrizeItemService prizeItemService) {
-        this.spinHistoryRepository = spinHistoryRepository;
-        this.blindBagTypeService = blindBagTypeService;
-        this.prizeItemService = prizeItemService;
-    }
+
 
     @Override
     public List<SpinHistory> getAllSpinHistory() {
@@ -74,11 +66,51 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
         if(!spinHistory.getPrizeItemId().isClaimAble()){
             return spinHistory;
         }
+
+        orderService.saveOrder(spinHistory );
         
         spinHistory.setRedeemed(true);
         spinHistory.setRedeemedAt(LocalDateTime.now());
         
         return spinHistoryRepository.save(spinHistory);
+    }
+
+
+    @Override
+    public List<SpinHistory> redeemPrizes(List<Integer> spinIds) {
+        List<SpinHistory> redeemedSpinHistories = new ArrayList<>();
+        List<SpinHistory> claimableSpinHistories = new ArrayList<>();
+
+        // Lọc và validate tất cả SpinHistory trước
+        for (Integer spinId : spinIds) {
+            SpinHistory spinHistory = getSpinHistoryById(spinId);
+
+            if (spinHistory.isRedeemed()) {
+                throw new RuntimeException("Prize with ID " + spinId + " already redeemed");
+            }
+
+            if (spinHistory.getPrizeItemId().isClaimAble()) {
+                claimableSpinHistories.add(spinHistory);
+            }
+
+            redeemedSpinHistories.add(spinHistory);
+        }
+
+        // Tạo order cho tất cả claimable items
+        if (!claimableSpinHistories.isEmpty()) {
+            orderService.saveOrder(claimableSpinHistories);
+        }
+
+        // Cập nhật trạng thái redeemed cho tất cả
+        for (SpinHistory spinHistory : redeemedSpinHistories) {
+            if (spinHistory.getPrizeItemId().isClaimAble()) {
+                spinHistory.setRedeemed(true);
+                spinHistory.setRedeemedAt(LocalDateTime.now());
+                spinHistoryRepository.save(spinHistory);
+            }
+        }
+
+        return redeemedSpinHistories;
     }
 
     @Override

@@ -16,6 +16,8 @@ public interface SpinHistoryService {
     SpinHistory saveSpinHistory(SpinHistory spinHistory);
     
     SpinHistory redeemPrize(Integer spinId);
-    
+
+    List<SpinHistory> redeemPrizes(List<Integer> spins);
+
     SpinHistory spin(Integer userId, Integer bagTypeId);
 }

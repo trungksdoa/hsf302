@@ -3,8 +3,10 @@ package com.product.server.hsf_301.dashboard;
 
 import com.product.server.hsf_301.blindBox.model.BlindPackage;
 import com.product.server.hsf_301.blindBox.model.Blog;
+import com.product.server.hsf_301.blindBox.model.Order;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import com.product.server.hsf_301.blindBox.service.BlogService;
+import com.product.server.hsf_301.blindBox.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.hibernate.Hibernate.size;
@@ -29,6 +32,7 @@ import static org.hibernate.Hibernate.size;
 public class AdminController {
     private final BlindBagTypeService blindBagTypeService;
     private final BlogService blogService;
+    private final OrderService orderService; // Add OrderService
     private final String UPLOAD_DIR = "src/main/resources/static/uploads/blindbox/";
 
     // Trang Dashboard
@@ -55,13 +59,36 @@ public class AdminController {
 
     @GetMapping("/orders")
     public String orders(Model model) {
+        List<Order> orders = orderService.getAllOrders(); // Fetch actual orders
         model.addAttribute("showSidebar", true);
-        model.addAttribute("orders", new ArrayList<>());
+        model.addAttribute("orders", orders);
         model.addAttribute("content", "admin/orders/list");
         return "admin/layout";
     }
 
+    // Add order status update endpoint
+    @PostMapping("/orders/{orderId}/status")
+    @ResponseBody
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Integer orderId,
+                                              @RequestBody Map<String, String> request) {
+        try {
+            String status = request.get("status");
+            orderService.updateOrderStatus(orderId, status);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 
+    // Add view order details endpoint
+    @GetMapping("/orders/{orderId}")
+    public String viewOrderDetails(@PathVariable Integer orderId, Model model) {
+        Order order = orderService.getOrderById(orderId);
+        model.addAttribute("showSidebar", true);
+        model.addAttribute("order", order);
+        model.addAttribute("content", "admin/orders/details");
+        return "admin/layout";
+    }
 
     // --- CRUD BlindBox ---
     @PostMapping("/blindBoxes")

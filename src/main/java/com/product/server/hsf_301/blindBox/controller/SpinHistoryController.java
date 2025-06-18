@@ -49,10 +49,19 @@ public class SpinHistoryController {
 //    }
 //
     @GetMapping("/redeem/{id}")
+    @ResponseBody
     public String redeemPrize(@PathVariable Integer id) {
         spinHistoryService.redeemPrize(id);
-        return "redirect:/spinHistory";
+        return "success";
     }
+
+    @PostMapping("/redeem")
+    @ResponseBody
+    public String redeemPrizes(@RequestBody List<Integer> ids) {
+        spinHistoryService.redeemPrizes(ids);
+        return "success";
+    }
+
     
     @GetMapping("/spin/{userId}/{bagTypeId}")
     public String spin(@PathVariable Integer userId, @PathVariable Integer bagTypeId, Model model) {

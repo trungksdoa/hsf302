@@ -47,11 +47,11 @@ public class OrderController {
         return "order/create";
     }
 
-    @PostMapping("/create")
-    public String createOrder(@ModelAttribute Order order) {
-        orderService.saveOrder(order);
-        return "redirect:/orders";
-    }
+//    @PostMapping("/create")
+//    public String createOrder(@ModelAttribute Order order) {
+//        orderService.saveOrder(order);
+//        return "redirect:/orders";
+//    }
 
     @GetMapping("/edit/{id}")
     public String editOrderForm(@PathVariable Integer id, Model model) {
@@ -60,12 +60,12 @@ public class OrderController {
         return "order/edit";
     }
 
-    @PostMapping("/edit/{id}")
-    public String updateOrder(@PathVariable Integer id, @ModelAttribute Order order) {
-        order.setOrderId(id);
-        orderService.saveOrder(order);
-        return "redirect:/orders";
-    }
+//    @PostMapping("/edit/{id}")
+//    public String updateOrder(@PathVariable Integer id, @ModelAttribute Order order) {
+//        order.setOrderId(id);
+//        orderService.saveOrder(order);
+//        return "redirect:/orders";
+//    }
     
     @GetMapping("/delete/{id}")
     public String deleteOrder(@PathVariable Integer id) {

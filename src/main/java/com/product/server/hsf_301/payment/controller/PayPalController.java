@@ -3,7 +3,7 @@ package com.product.server.hsf_301.payment.controller;
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
-import com.product.server.hsf_301.blindBox.model.User;
+import com.product.server.hsf_301.blindBox.model.AppUser;
 import com.product.server.hsf_301.blindBox.service.UserService;
 import com.product.server.hsf_301.payment.TopUpService;
 import com.product.server.hsf_301.payment.model.TopUpHistory;
@@ -105,7 +105,7 @@ public class PayPalController {
 
         //get current user from spring security
         //update to balance
-        User curr = userService.getUserById(1);
+        AppUser curr = userService.getUserById(1);
 
         BigDecimal currentBalance = curr.getBalance() != null ? curr.getBalance() : new BigDecimal("0");
         curr.setBalance(currentBalance.add(paymentAmount));

@@ -1,6 +1,6 @@
 package com.product.server.hsf_301.blindBox.service;
 
-import com.product.server.hsf_301.blindBox.model.BlindPackage;
+import com.product.server.hsf_301.blindBox.model.PackagesBox;
 import com.product.server.hsf_301.blindBox.model.PrizeItem;
 
 import java.util.List;
@@ -14,8 +14,8 @@ public interface PrizeItemService {
     
     void deletePrizeItem(Integer id);
     
-    List<PrizeItem> getPrizeItemsByBlindBagType(BlindPackage blindBagType);
-    List<PrizeItem> getPrizeItemByBlindBoxAndActive(BlindPackage blindBagType);
+    List<PrizeItem> getPrizeItemsByBlindBagType(PackagesBox blindBagType);
+    List<PrizeItem> getPrizeItemByBlindBoxAndActive(PackagesBox blindBagType);
     List<PrizeItem> getActivePrizeItems();
     
     PrizeItem getRandomPrizeByBagType(Integer bagTypeId);

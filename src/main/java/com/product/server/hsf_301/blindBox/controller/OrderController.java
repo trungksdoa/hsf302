@@ -1,7 +1,7 @@
 package com.product.server.hsf_301.blindBox.controller;
 
 import com.product.server.hsf_301.blindBox.model.Order;
-import com.product.server.hsf_301.blindBox.model.User;
+import com.product.server.hsf_301.blindBox.model.AppUser;
 import com.product.server.hsf_301.blindBox.service.OrderItemService;
 import com.product.server.hsf_301.blindBox.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +75,7 @@ public class OrderController {
     
     @GetMapping("/user/{userId}")
     public String getOrdersByUser(@PathVariable Integer userId, Model model) {
-        User user = new User();
+        AppUser user = new AppUser();
         user.setUserId(userId);
         
         List<Order> orders = orderService.getOrdersByUser(user);

@@ -1,13 +1,11 @@
 package com.product.server.hsf_301.dashboard;
 
 
-import com.product.server.hsf_301.blindBox.model.BlindPackage;
-import com.product.server.hsf_301.blindBox.model.Blog;
-import com.product.server.hsf_301.blindBox.model.Order;
+import com.product.server.hsf_301.blindBox.model.*;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import com.product.server.hsf_301.blindBox.service.BlogService;
 import com.product.server.hsf_301.blindBox.service.OrderService;
-import jakarta.servlet.http.HttpSession;
+import com.product.server.hsf_301.blindBox.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
-import static org.hibernate.Hibernate.size;
 
 @Controller
 @RequiredArgsConstructor
@@ -35,6 +26,7 @@ public class AdminController {
     private final BlindBagTypeService blindBagTypeService;
     private final BlogService blogService;
     private final OrderService orderService; // Add OrderService
+    private final UserService userService;
     private final String UPLOAD_DIR = "src/main/resources/static/uploads/blindbox/";
 
     // Trang Dashboard
@@ -59,27 +51,51 @@ public class AdminController {
     @GetMapping("/update/{id}")
     public String updateBlindBox(@PathVariable Integer id, Model model) {
         model.addAttribute("showSidebar", true);
-        BlindPackage blindPackage = blindBagTypeService.getBlindBagTypeById(id);
+        PackagesBox blindPackage = blindBagTypeService.getBlindBagTypeById(id);
         model.addAttribute("blindPackage", blindPackage);
         return "admin/layout";
     }
 
-//    @GetMapping("/blindBoxes/create")
-//    public String createBlindBox(Model model, HttpSession session) {
-//        model.addAttribute("showSidebar", true);
-//        model.addAttribute("blindPackage", new BlindPackage());
-//        return "admin/layout";
-//    }
-    // Trang quản lý blog
+    @GetMapping("/users")
+    public String users(Model model, @RequestParam(value="page", defaultValue = "0") int page, @RequestParam(value="size", defaultValue = "10") int size ) {
+        Page<AppUser> users = userService.getAllUsers(page, size); // Fetch actual orders
+        model.addAttribute("showSidebar", true);
+        model.addAttribute("users", users);
+        model.addAttribute("content", "admin/users/list");
+        return "admin/layout";
+    }
+
 
 
     @GetMapping("/orders")
     public String orders(Model model) {
         List<Order> orders = orderService.getAllOrders(); // Fetch actual orders
         model.addAttribute("showSidebar", true);
+
+
+        orders.forEach(order -> {
+            if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+                double calculatedTotal = order.getOrderItems().stream()
+                        .mapToDouble(OrderItem::getPrice)
+                        .sum();
+                order.setTotalAmount(calculatedTotal);
+            }
+        });
+
+        double totalRevenue = orders.stream()
+                .mapToDouble(Order::getTotalAmount)
+                .sum();
+
         model.addAttribute("orders", orders);
+        model.addAttribute("totalRevenue", totalRevenue);
         model.addAttribute("content", "admin/orders/list");
         return "admin/layout";
+    }
+
+    @GetMapping("/orders/updateStatus/{status}/{id}")
+    public String updateStatus (@PathVariable("status") String status, @PathVariable("id") String id){
+        orderService.updateOrderStatus(Integer.parseInt(id), status);
+        return "redirect:/admin/orders"; // ← SỬA: Chỉ 1 dấu /
     }
 
     // Add order status update endpoint
@@ -108,7 +124,7 @@ public class AdminController {
 
     // --- CRUD BlindBox ---
     @PostMapping("/blindBoxes")
-    public String createBlindBox(@ModelAttribute BlindPackage blindPackage,
+    public String createBlindBox(@ModelAttribute PackagesBox blindPackage,
                                  @RequestParam("image") MultipartFile imageFile,
                                  RedirectAttributes redirectAttributes) {
         try {
@@ -127,7 +143,7 @@ public class AdminController {
 
     @PostMapping("/update/{id}")
     public String updateBlindBox(@PathVariable Integer id,
-                                 @ModelAttribute BlindPackage blindPackage,
+                                 @ModelAttribute PackagesBox blindPackage,
                                  @RequestParam(value = "image", required = false) MultipartFile imageFile,
                                  RedirectAttributes redirectAttributes) {
         try {
@@ -155,9 +171,8 @@ public class AdminController {
     // --- CRUD Blogs ---
 
     @GetMapping("/blogs")
-    public String blog(Model model) {
-        List<Blog> blogs = blogService.getAllBlogs();
-        System.out.println(size(blogService.getAllBlogs()));
+    public String blog(Model model, @RequestParam(value = "page",defaultValue = "0") int page,  @RequestParam(value="size",defaultValue = "10") int size) {
+        Page<Blog> blogs = blogService.getAllBlogs(page , size);
         model.addAttribute("blogs", blogs); // Đảm bảo đúng tên biến
         model.addAttribute("content", "admin/blog/list"); // Không có .html ở đây
         return "admin/layout";

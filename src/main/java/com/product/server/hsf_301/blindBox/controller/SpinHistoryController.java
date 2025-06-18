@@ -1,7 +1,7 @@
 package com.product.server.hsf_301.blindBox.controller;
 
 import com.product.server.hsf_301.blindBox.model.SpinHistory;
-import com.product.server.hsf_301.blindBox.model.User;
+import com.product.server.hsf_301.blindBox.model.AppUser;
 import com.product.server.hsf_301.blindBox.service.SpinHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

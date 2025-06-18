@@ -1,31 +1,23 @@
 package com.product.server.hsf_301.blindBox.controller;
 
-import com.product.server.hsf_301.blindBox.model.BlindPackage;
+import com.product.server.hsf_301.blindBox.model.AppUser;
+import com.product.server.hsf_301.blindBox.model.PackagesBox;
 import com.product.server.hsf_301.blindBox.model.PrizeItem;
 import com.product.server.hsf_301.blindBox.model.SpinHistory;
-import com.product.server.hsf_301.blindBox.model.User;
 import com.product.server.hsf_301.blindBox.service.*;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/blindbox")
@@ -42,7 +34,7 @@ public class BlindBoxController {
 
     @GetMapping("/ ")
     public String list(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, Model model) {
-        Page<BlindPackage> blindBagTypes = blindBagTypeService.getAllBlindBagTypes(page, size);
+        Page<PackagesBox> blindBagTypes = blindBagTypeService.getAllBlindBagTypes(page, size);
         model.addAttribute("blindBagTypes", blindBagTypes);
 
         System.out.println("OK");
@@ -51,7 +43,7 @@ public class BlindBoxController {
 
     @GetMapping("/{id}")
     public String detail(@PathVariable Integer id, Model model) {
-        BlindPackage blindBagType = blindBagTypeService.getBlindBagTypeById(id);
+        PackagesBox blindBagType = blindBagTypeService.getBlindBagTypeById(id);
         model.addAttribute("blindBagType", blindBagType);
         return "blindBagType/details";
     }
@@ -83,7 +75,7 @@ public class BlindBoxController {
     }
     @GetMapping("/packages")
     public String showPackages(Model model) {
-        List<BlindPackage> activePackages = blindBagTypeService.getAllBlindBagTypes();
+        List<PackagesBox> activePackages = blindBagTypeService.getAllBlindBagTypes();
         model.addAttribute("packages", activePackages);
         return "blind-box/packages";
     }
@@ -91,7 +83,7 @@ public class BlindBoxController {
     @ResponseBody
     public ResponseEntity<?> getSpinPageData(@PathVariable Integer id) {
         try {
-            BlindPackage blindPackage = blindBagTypeService.getBlindBagTypeById(id);
+            PackagesBox blindPackage = blindBagTypeService.getBlindBagTypeById(id);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -110,8 +102,8 @@ public class BlindBoxController {
     @ResponseBody
     public ResponseEntity<?> spinOnce(@PathVariable Integer id) {
         try {
-            BlindPackage blindPackage = blindBagTypeService.getBlindBagTypeById(id);
-            User user = userService.findByUsername("john_doe");
+            PackagesBox blindPackage = blindBagTypeService.getBlindBagTypeById(id);
+            AppUser user = userService.findByUsername("john_doe");
 
             SpinHistory result = spin.spinItem(user, blindPackage);
             
@@ -147,8 +139,8 @@ public class BlindBoxController {
                                 Principal principal,
                                 RedirectAttributes redirectAttributes) {
         try {
-            BlindPackage blindPackage = blindBagTypeService.getBlindBagTypeById(id);
-            User user = userService.findByUsername(principal.getName());
+            PackagesBox blindPackage = blindBagTypeService.getBlindBagTypeById(id);
+            AppUser user = userService.findByUsername(principal.getName());
 
             List<SpinHistory> results = spin.spinItems(user, blindPackage, 5);
             redirectAttributes.addFlashAttribute("spinResults", results);

@@ -1,14 +1,9 @@
 package com.product.server.hsf_301.config;
 
 import com.product.server.hsf_301.blindBox.model.*;
-import com.product.server.hsf_301.blindBox.repository.BlindBoxRepository;
-import com.product.server.hsf_301.blindBox.repository.OrderItemRepository;
-import com.product.server.hsf_301.blindBox.repository.OrderRepository;
-import com.product.server.hsf_301.blindBox.repository.PrizeItemRepository;
-import com.product.server.hsf_301.blindBox.repository.UserRepository;
+import com.product.server.hsf_301.blindBox.repository.*;
 import com.product.server.hsf_301.payment.TopUpRepository;
 import com.product.server.hsf_301.payment.model.TopUpHistory;
-import com.product.server.hsf_301.blindBox.repository.SpinHistoryRepository;
 import com.product.server.hsf_301.blindBox.model.SpinHistory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -45,6 +40,9 @@ public class DataSeeder implements CommandLineRunner {
     @Autowired
     private SpinHistoryRepository spinHistoryRepository;
 
+    @Autowired
+    private BlogRepository blogRepository;
+
     private final Random random = new Random();
 
     @Override
@@ -73,7 +71,7 @@ public class DataSeeder implements CommandLineRunner {
             return;
         }
 
-        List<User> users = Arrays.asList(
+        List<AppUser> users = Arrays.asList(
                 createUser("admin", "admin@example.com", "Admin", "User", "ADMIN", "password123"),
                 createUser("john_doe", "john@example.com", "John", "Doe", "USER", "password123"),
                 createUser("jane_smith", "jane@example.com", "Jane", "Smith", "USER", "password123"),
@@ -91,7 +89,7 @@ public class DataSeeder implements CommandLineRunner {
         System.out.println("Seeding Blogs...");
 
         // Example blog seeding
-        /*
+
         if (blogRepository.count() > 0) {
             System.out.println("Blog data already exists, skipping...");
             return;
@@ -101,32 +99,32 @@ public class DataSeeder implements CommandLineRunner {
             createBlog("Welcome to Our Platform",
                 "We're excited to introduce our new mystery box platform where you can discover amazing prizes!",
                 "This is the full content of our welcome blog post. Here you can learn about all the exciting features...",
-                "PUBLISHED", 1L),
+                "PUBLISHED", 2),
 
             createBlog("How to Open Your First Mystery Box",
                 "Learn the basics of opening mystery boxes and maximizing your chances of getting rare items.",
                 "Step 1: Choose your mystery box carefully... Step 2: Cross your fingers... Step 3: Open and enjoy!",
-                "PUBLISHED", 1L),
+                "PUBLISHED", 1),
 
             createBlog("Rare Items Showcase",
                 "Check out some of the rarest items you can win from our premium mystery boxes.",
                 "Our premium boxes contain incredible items including golden weapons, legendary armor, and exclusive cosmetics...",
-                "PUBLISHED", 1L),
+                "PUBLISHED", 1),
 
             createBlog("Tips for New Collectors",
                 "Essential tips for beginners who want to start their collection journey.",
                 "Starting your collection can be overwhelming, but with these tips you'll be on your way to success...",
-                "DRAFT", 2L),
+                "DRAFT", 2),
 
             createBlog("Community Highlights",
                 "Featuring amazing collections from our community members.",
                 "This month we're showcasing some incredible collections from our most dedicated users...",
-                "PUBLISHED", 1L)
+                "PUBLISHED", 1)
         );
 
         blogRepository.saveAll(blogs);
         System.out.println("Seeded " + blogs.size() + " blogs");
-        */
+
     }
 
     private void seedBlindBoxes() {
@@ -139,7 +137,7 @@ public class DataSeeder implements CommandLineRunner {
             return;
         }
 
-        List<BlindPackage> blindBoxes = Arrays.asList(
+        List<PackagesBox> blindBoxes = Arrays.asList(
                 createBlindBox("Starter Mystery Box",
                         "Perfect for beginners! Contains common to rare items.",
                         "starter-box.jpg", 9.99, true),
@@ -179,7 +177,7 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         // Lấy blind boxes đã được lưu từ database
-        List<BlindPackage> blindBoxes = blindBoxRepository.findAll();
+        List<PackagesBox> blindBoxes = blindBoxRepository.findAll();
         if (blindBoxes.isEmpty()) {
             System.out.println("No blind boxes found, skipping prize items seeding...");
             return;
@@ -236,7 +234,7 @@ public class DataSeeder implements CommandLineRunner {
         System.out.println("\n=== PROBABILITY DISTRIBUTION SUMMARY ===");
         System.out.println("New Distribution Logic: GOOD_LUCK (highest) > COMMON > UNCOMMON > RARE > SPECIAL (lowest)");
         for (int i = 0; i < blindBoxes.size(); i++) {
-            BlindPackage box = blindBoxes.get(i);
+            PackagesBox box = blindBoxes.get(i);
             System.out.println("\n" + box.getName() + ":");
             
             // Calculate probabilities for this box
@@ -275,7 +273,7 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         // Lấy users thực tế từ database
-        List<User> users = userRepository.findAll();
+        List<AppUser> users = userRepository.findAll();
         if (users.size() < 6) {
             System.out.println("Not enough users found, skipping orders seeding...");
             return;
@@ -305,7 +303,7 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         // Lấy dữ liệu thực tế từ database
-        List<BlindPackage> blindBoxes = blindBoxRepository.findAll();
+        List<PackagesBox> blindBoxes = blindBoxRepository.findAll();
         List<PrizeItem> prizeItems = prizeItemRepository.findAll();
         List<Order> orders = orderRepository.findAll();
 
@@ -405,8 +403,8 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         // Lấy dữ liệu thực tế từ database
-        List<User> users = userRepository.findAll();
-        List<BlindPackage> blindBoxes = blindBoxRepository.findAll();
+        List<AppUser> users = userRepository.findAll();
+        List<PackagesBox> blindBoxes = blindBoxRepository.findAll();
         List<PrizeItem> prizeItems = prizeItemRepository.findAll();
 
         if (users.size() < 2 || blindBoxes.isEmpty() || prizeItems.isEmpty()) {
@@ -439,8 +437,8 @@ public class DataSeeder implements CommandLineRunner {
 
     // Helper methods for creating entities
 
-    private User createUser(String username, String email, String firstName, String lastName, String role, String password) {
-        User user = new User();
+    private AppUser createUser(String username, String email, String firstName, String lastName, String role, String password) {
+        AppUser user = new AppUser();
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(password); // In real app, this should be encoded
@@ -448,20 +446,21 @@ public class DataSeeder implements CommandLineRunner {
         return user;
     }
 
-//    private Blog createBlog(String title, String summary, String content, String status, Long authorId) {
-//        Blog blog = new Blog();
-//        blog.setTitle(title);
-//        blog.setSummary(summary);
-//        blog.setContent(content);
-//        blog.setStatus(status);
-//        blog.setAuthorId(authorId);
-//        blog.setCreatedAt(LocalDateTime.now());
-//        blog.setUpdatedAt(LocalDateTime.now());
-//        return blog;
-//    }
+    private Blog createBlog(String title, String summary, String content, String status, int authorId) {
+        Blog blog = new Blog();
+        blog.setTitle(title);
+        blog.setContent(content);
+        blog.setStatus(status);
+        AppUser user = new AppUser();
+        user.setUserId(authorId);
+        blog.setAuthor(user);
+        blog.setCreatedAt(LocalDateTime.now());
+        blog.setCreatedAt(LocalDateTime.now());
+        return blog;
+    }
 
-    private BlindPackage createBlindBox(String name, String description, String image, double price, boolean status) {
-        BlindPackage blindBox = new BlindPackage();
+    private PackagesBox createBlindBox(String name, String description, String image, double price, boolean status) {
+        PackagesBox blindBox = new PackagesBox();
         blindBox.setName(name);
         blindBox.setDescription(description);
         blindBox.setPricePerSpin(BigDecimal.valueOf(price));
@@ -473,7 +472,7 @@ public class DataSeeder implements CommandLineRunner {
         PrizeItem prizeItem = new PrizeItem();
         prizeItem.setItemName(name);
         prizeItem.setRarity(rarity);
-        BlindPackage bl = new BlindPackage();
+        PackagesBox bl = new PackagesBox();
         bl.setId(Integer.valueOf(blindBoxId+""));
         prizeItem.setBlindBagType(bl);
         prizeItem.setProbability(probability);
@@ -481,7 +480,7 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private Order createOrder(String orderNumber, int userId, double totalAmount, String status, String paymentStatus) {
-        User user = new User();
+        AppUser user = new AppUser();
         user.setUserId(userId);
         Order order = new Order();
         order.setUser(user);
@@ -492,7 +491,7 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private OrderItem createOrderItem(int orderId, int blindBoxId, PrizeItem prizeItem, int quantity, double price) {
-        BlindPackage bp = new BlindPackage();
+        PackagesBox bp = new PackagesBox();
         bp.setId(blindBoxId);
         Order order = new Order();
         order.setOrderId(orderId);
@@ -517,7 +516,7 @@ public class DataSeeder implements CommandLineRunner {
         return topUp;
     }
 
-    private SpinHistory createSpinHistoryWithRealData(User user, BlindPackage blindBox, PrizeItem prizeItem,
+    private SpinHistory createSpinHistoryWithRealData(AppUser user, PackagesBox blindBox, PrizeItem prizeItem,
                                                       Double price, Boolean success, Boolean redeemed) {
         SpinHistory spinHistory = new SpinHistory();
 
@@ -539,8 +538,8 @@ public class DataSeeder implements CommandLineRunner {
     private SpinHistory createSpinHistory(Integer userId, Integer blindBoxId, Integer prizeItemId, Double price, Boolean success, Boolean redeemed) {
         SpinHistory spinHistory = new SpinHistory();
 
-        User user = userRepository.findById(userId).orElse(null);
-        BlindPackage blindBox = blindBoxRepository.findById(blindBoxId).orElse(null);
+        AppUser user = userRepository.findById(userId).orElse(null);
+        PackagesBox blindBox = blindBoxRepository.findById(blindBoxId).orElse(null);
         PrizeItem prizeItem = prizeItemRepository.findById(prizeItemId).orElse(null);
 
         spinHistory.setUser(user);
@@ -560,7 +559,7 @@ public class DataSeeder implements CommandLineRunner {
 
     // Helper methods for creating entities with real database entities
 
-    private PrizeItem createPrizeItemWithEntity(String itemName, RareEnum rarity, BlindPackage blindBox,
+    private PrizeItem createPrizeItemWithEntity(String itemName, RareEnum rarity, PackagesBox blindBox,
                                                 double dropRate, String imageUrl, boolean claimable) {
         PrizeItem item = new PrizeItem();
         item.setItemName(itemName);
@@ -572,7 +571,7 @@ public class DataSeeder implements CommandLineRunner {
         return item;
     }
 
-    private Order createOrderWithUser(User user, double totalAmount, String status, String paymentStatus) {
+    private Order createOrderWithUser(AppUser user, double totalAmount, String status, String paymentStatus) {
         Order order = new Order();
         order.setUser(user); // Sử dụng user entity thực tế
         order.setTotalAmount(totalAmount);
@@ -581,7 +580,7 @@ public class DataSeeder implements CommandLineRunner {
         return order;
     }
 
-    private OrderItem createOrderItemWithEntities(Order order, BlindPackage blindBox, PrizeItem prizeItem, double price) {
+    private OrderItem createOrderItemWithEntities(Order order, PackagesBox blindBox, PrizeItem prizeItem, double price) {
         OrderItem orderItem = new OrderItem();
         orderItem.setOrder(order); // Sử dụng order entity thực tế
         orderItem.setBlindBagId(blindBox); // Sử dụng blindBox entity thực tế

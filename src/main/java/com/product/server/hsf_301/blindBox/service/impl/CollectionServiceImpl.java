@@ -1,8 +1,8 @@
 package com.product.server.hsf_301.blindBox.service.impl;
 
-import com.product.server.hsf_301.blindBox.model.BlindPackage;
+import com.product.server.hsf_301.blindBox.model.PackagesBox;
 import com.product.server.hsf_301.blindBox.model.Collection;
-import com.product.server.hsf_301.blindBox.model.User;
+import com.product.server.hsf_301.blindBox.model.AppUser;
 import com.product.server.hsf_301.blindBox.repository.CollectionRepository;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import com.product.server.hsf_301.blindBox.service.CollectionService;
@@ -24,8 +24,8 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     public Collection addToCollection(Integer userId, Integer blindPackageId) {
-        User user = userService.getUserById(userId);
-        BlindPackage blindPackage = blindBagTypeService.getBlindBagTypeById(blindPackageId);
+        AppUser user = userService.getUserById(userId);
+        PackagesBox blindPackage = blindBagTypeService.getBlindBagTypeById(blindPackageId);
         
         // Check if already in collection
         if (collectionRepository.existsByUserAndBlindPackage(user, blindPackage)) {
@@ -40,26 +40,26 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
-    public List<Collection> getUserCollection(User user) {
+    public List<Collection> getUserCollection(AppUser user) {
         return collectionRepository.findByUser(user);
     }
 
     @Override
-    public Page<Collection> getUserCollection(User user, Pageable pageable) {
+    public Page<Collection> getUserCollection(AppUser user, Pageable pageable) {
         return collectionRepository.findByUser(user, pageable);
     }
 
     @Override
     public boolean isInCollection(Integer userId, Integer blindPackageId) {
-        User user = userService.getUserById(userId);
-        BlindPackage blindPackage = blindBagTypeService.getBlindBagTypeById(blindPackageId);
+        AppUser user = userService.getUserById(userId);
+        PackagesBox blindPackage = blindBagTypeService.getBlindBagTypeById(blindPackageId);
         return collectionRepository.existsByUserAndBlindPackage(user, blindPackage);
     }
 
     @Override
     public void removeFromCollection(Integer userId, Integer blindPackageId) {
-        User user = userService.getUserById(userId);
-        BlindPackage blindPackage = blindBagTypeService.getBlindBagTypeById(blindPackageId);
+        AppUser user = userService.getUserById(userId);
+        PackagesBox blindPackage = blindBagTypeService.getBlindBagTypeById(blindPackageId);
         
         collectionRepository.findByUserAndBlindPackage(user, blindPackage)
             .ifPresent(collectionRepository::delete);

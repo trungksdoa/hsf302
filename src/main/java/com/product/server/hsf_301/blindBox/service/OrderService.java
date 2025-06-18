@@ -3,7 +3,7 @@ package com.product.server.hsf_301.blindBox.service;
 import com.product.server.hsf_301.blindBox.model.Order;
 import com.product.server.hsf_301.blindBox.model.PrizeItem;
 import com.product.server.hsf_301.blindBox.model.SpinHistory;
-import com.product.server.hsf_301.blindBox.model.User;
+import com.product.server.hsf_301.blindBox.model.AppUser;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public interface OrderService {
     
     Order getOrderById(Integer id);
     
-    List<Order> getOrdersByUser(User user);
+    List<Order> getOrdersByUser(AppUser user);
     
     List<Order> getOrdersByStatus(String status);
     

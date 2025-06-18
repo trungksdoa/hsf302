@@ -66,14 +66,14 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="fw-bold text-success" th:text="'$' + ${#numbers.formatDecimal(order.totalAmount, 1, 2)}">
+                                        <span class="fw-bold text-success"  th:text="${order.totalAmount}">
                                             $99.99
                                         </span>
                                     </td>
                                     <td>
-                                        <select class="form-select form-select-sm status-select" 
+                                        <select class="form-select form-select-sm status-select"
                                                 th:data-order-id="${order.orderId}"
-                                                th:onchange="'updateStatus(' + ${order.orderId} + ', this.value)'">
+                                                onchange="updateStatusMVC(this)">
                                             <option value="PENDING" th:selected="${order.status == 'PENDING'}">Pending</option>
                                             <option value="PROCESSING" th:selected="${order.status == 'PROCESSING'}">Processing</option>
                                             <option value="COMPLETED" th:selected="${order.status == 'COMPLETED'}">Completed</option>
@@ -114,7 +114,7 @@
                                         Total Orders: <span th:text="${orders.size()}">0</span>
                                     </small>
                                     <small class="text-muted">
-                                        Total Revenue: $<span th:text="${#numbers.formatDecimal(orders.stream().mapToDouble(order -> order.totalAmount).sum(), 1, 2)}">0.00</span>
+                                        Total Revenue: $<span th:text="${totalRevenue}">0.00</span>
                                     </small>
                                 </div>
                             </div>
@@ -143,67 +143,9 @@
                 window.location.href = `/admin/orders/${orderId}`;
             }
 
-            function updateStatus(orderId, status) {
-                if (!confirm(`Are you sure you want to change the order status to ${status}?`)) {
-                    // Reset the select if user cancels
-                    location.reload();
-                    return;
-                }
 
-                fetch(`/admin/orders/${orderId}/status`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ status: status })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        showNotification('Order status updated successfully', 'success');
-                        // Update the badge color based on status
-                        updateStatusBadge(orderId, status);
-                    } else {
-                        showNotification('Failed to update order status', 'error');
-                        location.reload(); // Reset the form
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showNotification('An error occurred', 'error');
-                    location.reload();
-                });
-            }
 
-            function updateStatusBadge(orderId, status) {
-                const select = document.querySelector(`[data-order-id="${orderId}"]`);
-                if (select) {
-                    // Remove existing classes
-                    select.className = 'form-select form-select-sm status-select';
-                    
-                    // Add color based on status
-                    switch(status) {
-                        case 'PENDING':
-                            select.classList.add('text-warning');
-                            break;
-                        case 'PROCESSING':
-                            select.classList.add('text-info');
-                            break;
-                        case 'COMPLETED':
-                        case 'DELIVERED':
-                            select.classList.add('text-success');
-                            break;
-                        case 'CANCELLED':
-                            select.classList.add('text-danger');
-                            break;
-                        default:
-                            select.classList.add('text-secondary');
-                    }
-                }
-            }
 
-            function printOrder(orderId) {
-                window.open(`/admin/orders/${orderId}/print`, '_blank');
-            }
 
             function filterOrders() {
                 const statusFilter = document.getElementById('statusFilter').value;
@@ -246,12 +188,19 @@
                 }, 3000);
             }
 
-            // Initialize status colors on page load
-            document.addEventListener('DOMContentLoaded', function() {
-                document.querySelectorAll('.status-select').forEach(select => {
-                    updateStatusBadge(select.dataset.orderId, select.value);
-                });
-            });
+            function updateStatusMVC(selectElement) {
+                const orderId = selectElement.getAttribute('data-order-id');
+                const status = selectElement.value;
+
+                if (!confirm(`Bạn có chắc chắn muốn thay đổi trạng thái order #${orderId} thành ${status}?`)) {
+                    location.reload();
+                    return;
+                }
+
+                // Gọi trực tiếp vào MVC endpoint
+                window.location.href = `/admin/orders/updateStatus/${status}/${orderId}`;
+            }
+
         </script>
     </th:block>
 </body>

@@ -186,42 +186,84 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         List<PrizeItem> prizeItems = Arrays.asList(
-                // Starter Box Items (5 items total)
-                // 2 COMMON items
-                createPrizeItemWithEntity("Basic Sword", RareEnum.COMMON, blindBoxes.get(0), 0.35, "basic-sword.jpg", true),
-                createPrizeItemWithEntity("Health Potion", RareEnum.COMMON, blindBoxes.get(0), 0.30, "health-potion.jpg", true),
-                // 1 UNCOMMON item
-                createPrizeItemWithEntity("Magic Ring", RareEnum.UNCOMMON, blindBoxes.get(0), 0.20, "magic-ring.jpg", true),
-                // 1 RARE item
-                createPrizeItemWithEntity("Silver Shield", RareEnum.RARE, blindBoxes.get(0), 0.13, "silver-shield.jpg", true),
-                // 1 GOOD_LUCK item (not claimable)
-                createPrizeItemWithEntity("Dragon Blade", RareEnum.GOOD_LUCK, blindBoxes.get(0), 0.02, "dragon-blade.jpg", false),
+                // Starter Box Items (5 items - GOOD_LUCK highest, then COMMON/UNCOMMON, then RARE/SPECIAL)
+                createPrizeItemWithEntity("Basic Sword", RareEnum.COMMON, blindBoxes.get(0), 0.25, "basic-sword.jpg", true),
+                createPrizeItemWithEntity("Health Potion", RareEnum.UNCOMMON, blindBoxes.get(0), 0.20, "health-potion.jpg", true),
+                createPrizeItemWithEntity("Magic Ring", RareEnum.RARE, blindBoxes.get(0), 0.15, "magic-ring.jpg", true),
+                createPrizeItemWithEntity("Silver Shield", RareEnum.SPECIAL, blindBoxes.get(0), 0.10, "silver-shield.jpg", true),
+                createPrizeItemWithEntity("Better Luck Next Time", RareEnum.GOOD_LUCK, blindBoxes.get(0), 0.30, "good-luck.jpg", false),
 
-                // Premium Box Items (5 items total)
-                // 2 COMMON items
-                createPrizeItemWithEntity("Iron Sword", RareEnum.COMMON, blindBoxes.get(1), 0.30, "iron-sword.jpg", true),
-                createPrizeItemWithEntity("Mana Potion", RareEnum.COMMON, blindBoxes.get(1), 0.25, "mana-potion.jpg", true),
-                // 1 UNCOMMON item
-                createPrizeItemWithEntity("Crystal Wand", RareEnum.UNCOMMON, blindBoxes.get(1), 0.22, "crystal-wand.jpg", true),
-                // 1 RARE/SPECIAL item
-                createPrizeItemWithEntity("Enchanted Armor", RareEnum.SPECIAL, blindBoxes.get(1), 0.18, "enchanted-armor.jpg", true),
-                // 1 GOOD_LUCK item (not claimable)
-                createPrizeItemWithEntity("Phoenix Feather", RareEnum.GOOD_LUCK, blindBoxes.get(1), 0.05, "phoenix-feather.jpg", false),
+                // Premium Box Items (5 items - slightly better chances for real items)
+                createPrizeItemWithEntity("Iron Sword", RareEnum.COMMON, blindBoxes.get(1), 0.28, "iron-sword.jpg", true),
+                createPrizeItemWithEntity("Mana Potion", RareEnum.UNCOMMON, blindBoxes.get(1), 0.25, "mana-potion.jpg", true),
+                createPrizeItemWithEntity("Crystal Wand", RareEnum.RARE, blindBoxes.get(1), 0.20, "crystal-wand.jpg", true),
+                createPrizeItemWithEntity("Enchanted Armor", RareEnum.SPECIAL, blindBoxes.get(1), 0.15, "enchanted-armor.jpg", true),
+                createPrizeItemWithEntity("Better Luck Next Time", RareEnum.GOOD_LUCK, blindBoxes.get(1), 0.12, "good-luck.jpg", false),
 
-                // Legendary Box Items (5 items total)
-                // 2 COMMON items
-                createPrizeItemWithEntity("Steel Blade", RareEnum.COMMON, blindBoxes.get(2), 0.25, "steel-blade.jpg", true),
-                createPrizeItemWithEntity("Divine Potion", RareEnum.COMMON, blindBoxes.get(2), 0.25, "divine-potion.jpg", true),
-                // 1 UNCOMMON item
-                createPrizeItemWithEntity("Mythril Ring", RareEnum.UNCOMMON, blindBoxes.get(2), 0.20, "mythril-ring.jpg", true),
-                // 1 RARE/SPECIAL item
-                createPrizeItemWithEntity("Crown of Kings", RareEnum.SPECIAL, blindBoxes.get(2), 0.15, "crown-kings.jpg", true),
-                // 1 GOOD_LUCK item (not claimable)
-                createPrizeItemWithEntity("Excalibur", RareEnum.GOOD_LUCK, blindBoxes.get(2), 0.15, "excalibur.jpg", false)
+                // Legendary Box Items (5 items - best chances for rare items, lowest GOOD_LUCK)
+                createPrizeItemWithEntity("Steel Blade", RareEnum.COMMON, blindBoxes.get(2), 0.30, "steel-blade.jpg", true),
+                createPrizeItemWithEntity("Divine Potion", RareEnum.UNCOMMON, blindBoxes.get(2), 0.28, "divine-potion.jpg", true),
+                createPrizeItemWithEntity("Mythril Ring", RareEnum.RARE, blindBoxes.get(2), 0.25, "mythril-ring.jpg", true),
+                createPrizeItemWithEntity("Crown of Kings", RareEnum.SPECIAL, blindBoxes.get(2), 0.20, "crown-kings.jpg", true),
+                createPrizeItemWithEntity("Better Luck Next Time", RareEnum.GOOD_LUCK, blindBoxes.get(2), 0.05, "good-luck.jpg", false),
+
+                // Halloween Box Items (5 items - spooky theme with high GOOD_LUCK)
+                createPrizeItemWithEntity("Pumpkin Mask", RareEnum.COMMON, blindBoxes.get(3), 0.22, "pumpkin-mask.jpg", true),
+                createPrizeItemWithEntity("Witch Hat", RareEnum.UNCOMMON, blindBoxes.get(3), 0.18, "witch-hat.jpg", true),
+                createPrizeItemWithEntity("Ghost Cloak", RareEnum.RARE, blindBoxes.get(3), 0.12, "ghost-cloak.jpg", true),
+                createPrizeItemWithEntity("Vampire Fangs", RareEnum.SPECIAL, blindBoxes.get(3), 0.08, "vampire-fangs.jpg", true),
+                createPrizeItemWithEntity("Cursed - No Prize", RareEnum.GOOD_LUCK, blindBoxes.get(3), 0.40, "cursed.jpg", false),
+
+                // Christmas Box Items (5 items - festive theme with moderate GOOD_LUCK)
+                createPrizeItemWithEntity("Santa Hat", RareEnum.COMMON, blindBoxes.get(4), 0.26, "santa-hat.jpg", true),
+                createPrizeItemWithEntity("Reindeer Antlers", RareEnum.UNCOMMON, blindBoxes.get(4), 0.24, "reindeer-antlers.jpg", true),
+                createPrizeItemWithEntity("Christmas Bell", RareEnum.RARE, blindBoxes.get(4), 0.18, "christmas-bell.jpg", true),
+                createPrizeItemWithEntity("Golden Star", RareEnum.SPECIAL, blindBoxes.get(4), 0.12, "golden-star.jpg", true),
+                createPrizeItemWithEntity("Coal - No Prize", RareEnum.GOOD_LUCK, blindBoxes.get(4), 0.20, "coal.jpg", false),
+
+                // Gaming Box Items (5 items - balanced distribution)
+                createPrizeItemWithEntity("Gaming Mouse", RareEnum.COMMON, blindBoxes.get(5), 0.27, "gaming-mouse.jpg", true),
+                createPrizeItemWithEntity("RGB Keyboard", RareEnum.UNCOMMON, blindBoxes.get(5), 0.23, "rgb-keyboard.jpg", true),
+                createPrizeItemWithEntity("Gaming Headset", RareEnum.RARE, blindBoxes.get(5), 0.18, "gaming-headset.jpg", true),
+                createPrizeItemWithEntity("Pro Controller", RareEnum.SPECIAL, blindBoxes.get(5), 0.15, "pro-controller.jpg", true),
+                createPrizeItemWithEntity("Connection Lost", RareEnum.GOOD_LUCK, blindBoxes.get(5), 0.17, "no-connection.jpg", false)
         );
 
         prizeItemRepository.saveAll(prizeItems);
         System.out.println("Prize Items seeded successfully: " + prizeItems.size() + " items");
+        
+        // Print probability summary for verification
+        System.out.println("\n=== PROBABILITY DISTRIBUTION SUMMARY ===");
+        System.out.println("New Distribution Logic: GOOD_LUCK (highest) > COMMON > UNCOMMON > RARE > SPECIAL (lowest)");
+        for (int i = 0; i < blindBoxes.size(); i++) {
+            BlindPackage box = blindBoxes.get(i);
+            System.out.println("\n" + box.getName() + ":");
+            
+            // Calculate probabilities for this box
+            List<PrizeItem> boxItems = prizeItems.subList(i * 5, (i + 1) * 5);
+            double totalProb = 0;
+            
+            // Sort by probability for better display
+            boxItems.sort((a, b) -> Double.compare(b.getProbability(), a.getProbability()));
+            
+            for (PrizeItem item : boxItems) {
+                String status = item.isClaimAble() ? "✅ Claimable" : "❌ No Prize";
+                System.out.printf("  %-25s | %-10s | %5.1f%% | %s\n", 
+                    item.getItemName(), 
+                    item.getRarity().getValue(), 
+                    item.getProbability() * 100,
+                    status);
+                totalProb += item.getProbability();
+            }
+            System.out.printf("  Total Probability: %.1f%%\n", totalProb * 100);
+            
+            if (Math.abs(totalProb - 1.0) > 0.001) {
+                System.out.println("  ⚠️  WARNING: Probabilities don't sum to 100%!");
+            } else {
+                System.out.println("  ✅ Probabilities sum correctly to 100%");
+            }
+        }
+        System.out.println("==========================================\n");
     }
 
     private void seedOrders() {
@@ -402,6 +444,7 @@ public class DataSeeder implements CommandLineRunner {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(password); // In real app, this should be encoded
+        user.setBalance(BigDecimal.valueOf(9999999999L));
         return user;
     }
 

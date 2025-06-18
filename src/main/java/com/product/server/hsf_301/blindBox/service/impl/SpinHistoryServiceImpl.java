@@ -2,12 +2,14 @@ package com.product.server.hsf_301.blindBox.service.impl;
 
 
 import com.product.server.hsf_301.blindBox.model.*;
+import com.product.server.hsf_301.blindBox.repository.PrizeItemRepository;
 import com.product.server.hsf_301.blindBox.repository.SpinHistoryRepository;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import com.product.server.hsf_301.blindBox.service.OrderService;
 import com.product.server.hsf_301.blindBox.service.PrizeItemService;
 import com.product.server.hsf_301.blindBox.service.SpinHistoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,17 +34,6 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
 
     // In a real app, you would inject a UserService here
     
-    @Autowired
-    public SpinHistoryServiceImpl(
-            SpinHistoryRepository spinHistoryRepository,
-            BlindBagTypeService blindBagTypeService,
-            PrizeItemService prizeItemService, PrizeItemRepository prizeItemRepository) {
-        this.spinHistoryRepository = spinHistoryRepository;
-        this.blindBagTypeService = blindBagTypeService;
-        this.prizeItemService = prizeItemService;
-        this.prizeItemRepository = prizeItemRepository;
-    }
-
     @Override
     public List<SpinHistory> getAllSpinHistory() {
         return spinHistoryRepository.findAll();
@@ -143,6 +134,7 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
         
         return spinHistoryRepository.save(spinHistory);
     }
+
     @Override
     public SpinHistory spin(User user, BlindPackage blindPackage) {
         try {
@@ -151,8 +143,7 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
                     .findByBlindBagTypeAndIsActiveTrue(blindPackage);
 
             if (availableItems.isEmpty()) {
-                return saveSpinHistory(user, blindPackage, null, false,
-                        "No available items in this blind package");
+                throw new RuntimeException("No available items in this blind package");
             }
 
             // Validate probabilities sum to 1
@@ -161,23 +152,29 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
                     .sum();
 
             if (Math.abs(totalProbability - 1.0) > 0.0001) {
-                return saveSpinHistory(user, blindPackage, null, false,
-                        "Invalid probability distribution");
+                throw new RuntimeException("Invalid probability distribution");
             }
 
             // Select prize based on probability
             PrizeItem selectedPrize = selectRandomPrize(availableItems);
 
-            if (selectedPrize != null) {
-                return saveSpinHistory(user, blindPackage, selectedPrize, true, null);
+            if(selectedPrize == null ){
+                throw new RuntimeException("selected item is not available");
             }
 
-            return saveSpinHistory(user, blindPackage, null, false,
-                    "Failed to select prize item");
+            // Check if it's GOOD_LUCK (no prize)
+            if (selectedPrize.getRarity() == RareEnum.GOOD_LUCK) {
+                // GOOD_LUCK means "better luck next time" - no actual prize
+                return saveSpinHistory(user, blindPackage, null, false, "Better luck next time!");
+            }
+
+            // Deactivate selected prize and redistribute probabilities
+            deactivateAndRedistribute(selectedPrize, availableItems);
+
+            return saveSpinHistory(user, blindPackage, selectedPrize, true, null);
 
         } catch (Exception e) {
-            return saveSpinHistory(user, blindPackage, null, false,
-                    "System error: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
     @Override
@@ -197,7 +194,7 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
 
         for (PrizeItem item : availableItems) {
             cumulativeProbability += item.getProbability();
-            if (randomValue <= cumulativeProbability) {
+            if (item.isActive() && randomValue <= cumulativeProbability) {
                 return item;
             }
         }
@@ -210,14 +207,56 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
         SpinHistory history = new SpinHistory();
         history.setUser(user);
         history.setBlindBagId(blindPackage);
-        history.setPrizeItemId(prizeItem);
+        history.setPrizeItemId(prizeItem); // null for GOOD_LUCK
         history.setPrice(blindPackage.getPricePerSpin().doubleValue());
         history.setSuccess(success);
         history.setRedeemed(false);
         history.setSpinTime(LocalDateTime.now());
-        history.setErrorMessage(errorMessage);
+
 
         return spinHistoryRepository.save(history);
+    }
+
+    private void deactivateAndRedistribute(PrizeItem selectedPrize, List<PrizeItem> availableItems) {
+        try {
+            // Get selected prize probability
+            double selectedProbability = selectedPrize.getProbability();
+            
+            // Deactivate selected prize
+            selectedPrize.setActive(false);
+            prizeItemRepository.save(selectedPrize);
+            
+            // Get remaining active items (excluding selected one)
+            List<PrizeItem> remainingItems = availableItems.stream()
+                    .filter(item -> !item.getItemId().equals(selectedPrize.getItemId()))
+                    .toList();
+            
+            if (remainingItems.isEmpty()) {
+                return;
+            }
+            
+            // Calculate total probability of remaining items  
+            double totalRemaining = remainingItems.stream()
+                    .mapToDouble(PrizeItem::getProbability)
+                    .sum();
+            
+            // Redistribute selected prize's probability proportionally
+            for (PrizeItem item : remainingItems) {
+                double proportion = item.getProbability() / totalRemaining;
+                double additionalProbability = selectedProbability * proportion;
+                double newProbability = item.getProbability() + additionalProbability;
+                
+                item.setProbability(newProbability);
+                prizeItemRepository.save(item);
+            }
+            
+            System.out.println("Deactivated: " + selectedPrize.getItemName() + 
+                    " (" + (selectedProbability * 100) + "%)");
+            System.out.println("Redistributed to " + remainingItems.size() + " remaining items");
+            
+        } catch (Exception e) {
+            System.err.println("Error redistributing probabilities: " + e.getMessage());
+        }
     }
 
 }

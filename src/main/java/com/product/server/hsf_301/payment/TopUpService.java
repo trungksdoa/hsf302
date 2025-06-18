@@ -16,7 +16,7 @@ public class TopUpService  {
     }
 
     public List<TopUpHistory> getAllTopUp() {
-        return topUpRepository.findAll();
+        return topUpRepository.findAllByUser_UserId(2);
     }
 
 

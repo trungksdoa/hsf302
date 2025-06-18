@@ -131,7 +131,7 @@ public class UserController {
     public String balance(Model model) {
 
         // Will replace with user id saved in Authorization
-        User user = userService.getUserById(1);
+        User user = userService.getUserById(2);
 
         model.addAttribute("user", user);
 

@@ -3,12 +3,19 @@ package com.product.server.hsf_301.payment.controller;
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
+import com.product.server.hsf_301.blindBox.model.User;
+import com.product.server.hsf_301.blindBox.service.UserService;
 import com.product.server.hsf_301.payment.TopUpService;
 import com.product.server.hsf_301.payment.model.TopUpHistory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +30,9 @@ public class PayPalController {
     @Autowired
     private TopUpService topUpService;
 
+    @Autowired
+    private UserService userService;
+
     @Value("${paypal.success.url}")
     private String successUrl;
 
@@ -32,10 +42,10 @@ public class PayPalController {
 
 
     @GetMapping("/create")
-    public String pay(@RequestParam("value") String money) {
+    public ResponseEntity<Void> pay(@RequestParam("value") String money) {
         Amount amount = new Amount();
         amount.setCurrency("USD");
-        amount.setTotal(money); // 10 USD
+        amount.setTotal(money);
 
         Transaction transaction = new Transaction();
         transaction.setDescription("Test Payment");
@@ -58,15 +68,21 @@ public class PayPalController {
 
         try {
             Payment created = payment.create(apiContext);
-            return created.getLinks().stream()
-                .filter(link -> "approval_url".equals(link.getRel()))
-                .findFirst()
-                .map(Links::getHref)
-                .orElse("No approval_url found");
+            String approvalUrl = created.getLinks().stream()
+                    .filter(link -> "approval_url".equals(link.getRel()))
+                    .findFirst()
+                    .map(Links::getHref)
+                    .orElse("No approval_url found");
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(URI.create(approvalUrl));
+            return new ResponseEntity<>(headers, HttpStatus.FOUND);
+
         } catch (PayPalRESTException e) {
             throw new RuntimeException("Payment creation failed", e);
         }
     }
+
 
     @GetMapping("/success")
     public String success(@RequestParam String paymentId, @RequestParam String PayerID) throws PayPalRESTException {
@@ -82,6 +98,19 @@ public class PayPalController {
             amount = executedPayment.getTransactions().get(0).getAmount().getTotal();
         }
 
+
+        // Convert string to BigDecimal
+        BigDecimal paymentAmount = new BigDecimal(amount);
+
+
+        //get current user from spring security
+        //update to balance
+        User curr = userService.getUserById(1);
+
+        BigDecimal currentBalance = curr.getBalance() != null ? curr.getBalance() : new BigDecimal("0");
+        curr.setBalance(currentBalance.add(paymentAmount));
+        userService.updateProfile(curr); // Đảm bảo save user
+
         TopUpHistory topUpHistory = new TopUpHistory();
         topUpHistory.setAmount(amount);
         topUpHistory.setCreated_at(LocalDate.now() + "");
@@ -89,7 +118,7 @@ public class PayPalController {
         topUpHistory.setStatus(executedPayment.getState());
         topUpService.save(topUpHistory);
 
-        return "Payment successful: " + executedPayment.getId();
+        return "redirect://";
     }
 
 

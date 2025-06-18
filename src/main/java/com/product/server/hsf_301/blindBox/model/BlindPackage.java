@@ -2,15 +2,18 @@ package com.product.server.hsf_301.blindBox.model;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Table(name = "blind_package")
-@Data
+@Table
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class BlindPackage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,9 +23,10 @@ public class BlindPackage {
     @Column(name = "type_name", nullable = false, length = 50)
     private String name;
 
+    private String imageUrl;
 
     @Lob
-    @Column(name = "image_data", columnDefinition = "LONGBLOB")
+    @Column(name = "image_data")
     private byte[] imageData;
     private String imageType;
 
@@ -38,3 +42,5 @@ public class BlindPackage {
     @OneToMany(mappedBy = "blindBagType")
     private List<PrizeItem> prizeItems;
 }
+
+

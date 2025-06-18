@@ -1,6 +1,7 @@
 package com.product.server.hsf_301.payment.model;
 
 
+import com.product.server.hsf_301.blindBox.model.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -12,6 +13,9 @@ public class TopUpHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @ManyToOne
+    private User user;
 
     private String transaction_id;
 

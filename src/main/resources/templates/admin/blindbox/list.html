@@ -353,13 +353,12 @@
             }
             
             function addNewPrizeItemRow(itemData = null) {
-                if(remainingDropRate == 100) return;
+                // Remove the incorrect condition that prevents adding items when drop rate is 100%
                 
                 // Clone the template
                 const template = document.getElementById('prizeItemTemplate');
                 const clone = template.querySelector('.prize-item-row').cloneNode(true);
                 
-            
                 // Update index
                 const currentIndex = newPrizeItemIndex++;
                 const inputs = clone.querySelectorAll('input, select');
@@ -371,10 +370,21 @@
                 });
                 
                 // Calculate suggested drop rate value
-                let suggestedRate = remainingDropRate;
-                if (document.querySelectorAll('#newPrizeItemsContainer .prize-item-row').length > 0) {
-                    // If there are already other items, suggest an even distribution of the remaining rate
-                    suggestedRate = Math.floor(remainingDropRate / (document.querySelectorAll('#newPrizeItemsContainer .prize-item-row').length + 1));
+                let suggestedRate = 0;
+                const existingItems = document.querySelectorAll('#newPrizeItemsContainer .prize-item-row').length;
+                
+                if (existingItems === 0) {
+                    // First item, suggest 100% or reasonable default
+                    suggestedRate = 20; // Default suggestion for first item
+                } else {
+                    // Calculate remaining rate after existing items
+                    const usedRate = Array.from(document.querySelectorAll('#newPrizeItemsContainer .item-droprate'))
+                        .reduce((sum, input) => sum + parseFloat(input.value || 0), 0);
+                    const remaining = 100 - usedRate;
+                    
+                    if (remaining > 0) {
+                        suggestedRate = Math.min(remaining, 10); // Suggest 10% or remaining, whichever is smaller
+                    }
                 }
                 
                 // If itemData is provided, fill the fields
@@ -591,4 +601,3 @@
     </th:block>
 </body>
 </html>
-  

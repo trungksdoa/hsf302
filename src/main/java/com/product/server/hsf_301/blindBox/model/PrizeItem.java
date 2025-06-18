@@ -1,14 +1,14 @@
 package com.product.server.hsf_301.blindBox.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "Prize_Items")
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,10 +29,29 @@ public class PrizeItem {
     
     @ManyToOne
     @JoinColumn(name = "bag_type_id")
+    @JsonIgnore
     private BlindPackage blindBagType;
     
     @Column(name = "probability", nullable = false)
     private Double probability;
 
     private boolean isActive = true;
+
+    @Column(name = "is_claim_able")
+    private boolean isClaimAble = false;
+    
+    // Add description field if needed
+    @Column(name = "description")
+    private String description;
+    
+    // Add getter methods for consistency
+    public String getImageUrl() {
+        return this.itemImage;
+    }
+    
+    public Integer getId() {
+        return this.itemId;
+    }
+    
+
 }

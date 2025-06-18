@@ -37,5 +37,13 @@ public class SpinHistory {
 
     private LocalDateTime spinTime;
 
-    private String errorMessage; // Có thể null nếu thành công
+    // Add getter method for consistency
+    public Integer getId() {
+        return this.historyId;
+    }
+
+    // Fix Boolean to boolean for consistent naming
+    public Boolean getSuccess() {
+        return this.success;
+    }
 }

@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <!-- Profile Overview Fragment -->
+  <div th:fragment="profile-overview" class="tab-pane fade show active" id="profile-overview">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Account Overview</h5>
+      </div>
+      <div class="card-body">
+        <!-- Statistics cards -->
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <div class="stats-card text-center p-3 bg-light rounded">
+              <div class="stats-icon mb-2">
+                <i class="fas fa-box-open fa-2x text-primary"></i>
+              </div>
+              <h3 class="stats-number" th:text="${userCollection?.size() ?: 0}">0</h3>
+              <p class="stats-title text-muted mb-0">Boxes Collected</p>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="stats-card text-center p-3 bg-light rounded">
+              <div class="stats-icon mb-2">
+                <i class="fas fa-trophy fa-2x text-warning"></i>
+              </div>
+              <h3 class="stats-number" th:text="${userSpinHistory?.getTotalElements ?: 0}">0</h3>
+              <p class="stats-title text-muted mb-0">Total Spins</p>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="stats-card text-center p-3 bg-light rounded">
+              <div class="stats-icon mb-2">
+                <i class="fas fa-shopping-cart fa-2x text-success"></i>
+              </div>
+              <h3 class="stats-number" th:text="${orderItemMap?.size ?: 0}">0</h3>
+              <p class="stats-title text-muted mb-0">Completed Orders</p>
+            </div>
+          </div>
+        </div>
+
+        <h6 class="mt-3 mb-3">Account Information</h6>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <p class="text-muted mb-1">Username</p>
+            <p class="mb-0" th:text="${user.username}">Username</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <p class="text-muted mb-1">Email</p>
+            <p class="mb-0" th:text="${user.email}">user@example.com</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <p class="text-muted mb-1">User ID</p>
+            <p class="mb-0" th:text="${user.userId}">123</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <p class="text-muted mb-1">Balance</p>
+            <p class="mb-0 text-success fw-bold" th:text="'$' + ${user.balance ?: '0.00'}">$0.00</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Recent Activities</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+          <div class="list-group-item py-3 text-center">
+            <p class="text-muted mb-0">No recent activities found.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spin History with Bulk Redeem Fragment -->
+  <div th:fragment="spin-history-with-bulk" class="tab-pane fade" id="spin-history">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Spin History</h5>
+        <div class="d-flex gap-2">
+          <select class="form-select form-select-sm" id="spinRarityFilter">
+            <option value="">All Rarities</option>
+            <option value="COMMON">Common</option>
+            <option value="UNCOMMON">Uncommon</option>
+            <option value="RARE">Rare</option>
+            <option value="SPECIAL">Special</option>
+            <option value="GOOD_LUCK">Good Luck</option>
+          </select>
+          <button class="btn btn-sm btn-outline-primary" id="filterSpinHistoryBtn">
+            <i class="fas fa-filter"></i> Filter
+          </button>
+        </div>
+      </div>
+      
+      <!-- Bulk Action Controls -->
+      <div class="card-body border-bottom bg-light py-2" th:if="${userSpinHistory.content != null and !userSpinHistory.content.isEmpty()}">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+            <div class="form-check me-3">
+              <input class="form-check-input" type="checkbox" id="selectAllItems">
+              <label class="form-check-label" for="selectAllItems">
+                Select All
+              </label>
+            </div>
+            <small class="text-muted">
+              <span id="selectedCount">0</span> items selected
+            </small>
+          </div>
+          <button type="button" class="btn btn-sm btn-primary" id="bulkRedeemBtn" disabled>
+            <i class="fas fa-gift me-1"></i>Redeem Selected
+          </button>
+        </div>
+      </div>
+      
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th width="40">
+                  <span class="visually-hidden">Select</span>
+                </th>
+                <th>Date</th>
+                <th>Box Series</th>
+                <th>Item Received</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                th:each="spin : ${userSpinHistory.content}"
+                th:if="${userSpinHistory.content != null and !userSpinHistory.content.isEmpty()}"
+              >
+                <!-- Checkbox Column -->
+                <td>
+                  <div class="form-check" th:if="${!spin?.redeemed and spin?.prizeItemId != null and spin?.prizeItemId?.isClaimAble}">
+                    <input 
+                      class="form-check-input item-checkbox" 
+                      type="checkbox" 
+                      th:id="'item_' + ${spin.historyId}"
+                      th:value="${spin.historyId}"
+                    >
+                  </div>
+                </td>
+                
+                <td>
+                  <div th:text="${#temporals.format(spin?.spinTime, 'MMM dd, yyyy')}">Mar 15, 2024</div>
+                  <small class="text-muted" th:text="${#temporals.format(spin?.spinTime, 'HH:mm')}">14:30</small>
+                </td>
+                <td>
+                  <div class="fw-bold" th:text="${spin?.blindBagId?.name ?: 'Unknown Box'}">Mystery Box</div>
+                  <small class="text-muted" th:text="'$' + ${spin.price}">$9.99</small>
+                </td>
+                <td>
+                  <div th:if="${spin?.prizeItemId?.itemId}" class="d-flex align-items-center">
+                    <img
+                      src="https://via.placeholder.com/40x40"
+                      class="me-2 rounded"
+                      alt="Prize"
+                      style="width: 40px; height: 40px"
+                    />
+                    <div>
+                      <div class="fw-bold" th:text="${spin?.prizeItemId?.itemName}">Prize Name</div>
+                    </div>
+                  </div>
+                  <div th:unless="${spin?.prizeItemId?.itemId}">
+                    <span class="text-muted">No Prize</span>
+                  </div>
+                </td>
+                <td>
+                  <span
+                    class="badge"
+                    th:classappend="${spin?.redeemed} ? 'bg-success' : 'bg-warning'"
+                    th:text="${spin?.redeemed} ? 'Redeemed' : 'Available'"
+                    >Available</span
+                  >
+                </td>
+                <td>
+                  <!-- Individual Redeem Button -->
+                  <button
+                    th:if="${!spin?.redeemed and spin?.prizeItemId != null and spin?.prizeItemId?.isClaimAble}"
+                    class="btn btn-sm btn-outline-primary redeem-prize-btn me-1"
+                    th:data-spin-id="${spin.historyId}"
+                  >
+                    <i class="fas fa-gift me-1"></i>Redeem
+                  </button>
+
+                  <!-- Already redeemed -->
+                  <span th:if="${spin?.redeemed}" class="text-muted small">
+                    <i class="fas fa-check-circle text-success me-1"></i>Redeemed
+                  </span>
+
+                  <!-- Special Prize (not claimable) -->
+                  <span
+                    th:if="${!spin?.redeemed and spin?.prizeItemId != null and !spin?.prizeItemId?.isClaimAble}"
+                    class="text-warning small"
+                    title="This special prize cannot be redeemed but adds to your collection"
+                  >
+                    <i class="fas fa-star me-1"></i>Special Prize
+                  </span>
+
+                  <!-- No prize -->
+                  <span th:if="${spin?.prizeItemId == null}" class="text-muted small">
+                    <i class="fas fa-times-circle me-1"></i>No Prize
+                  </span>
+                </td>
+              </tr>
+              <!-- Empty state -->
+              <tr th:if="${userSpinHistory == null or userSpinHistory.isEmpty()}">
+                <td colspan="6" class="text-center py-4">
+                  <p class="text-muted mb-0">No spin history found.</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Pagination -->
+      <div class="card-footer bg-white" th:if="${userSpinHistory.totalPages > 0}">
+        <nav aria-label="Spin history pagination">
+          <ul class="pagination pagination-sm justify-content-center mb-0">
+            <!-- Previous -->
+            <li class="page-item" th:classappend="${userSpinHistory.first} ? 'disabled'">
+              <a class="page-link" 
+                 th:href="@{/users/profile(page=${userSpinHistory.number - 1}, size=${userSpinHistory.size})}"
+                 aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            
+            <!-- Page Numbers -->
+            <li class="page-item" 
+                th:each="pageNum : ${#numbers.sequence(0, userSpinHistory.totalPages - 1)}"
+                th:classappend="${pageNum == userSpinHistory.number} ? 'active'">
+              <a class="page-link" 
+                 th:href="@{/users/profile(page=${pageNum}, size=${userSpinHistory.size})}"
+                 th:text="${pageNum + 1}">1</a>
+            </li>
+            
+            <!-- Next -->
+            <li class="page-item" th:classappend="${userSpinHistory.last} ? 'disabled'">
+              <a class="page-link" 
+                 th:href="@{/users/profile(page=${userSpinHistory.number + 1}, size=${userSpinHistory.size})}"
+                 aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        
+        <!-- Page Info -->
+        <div class="text-center mt-2">
+          <small class="text-muted">
+            Showing <span th:text="${userSpinHistory.numberOfElements}">10</span> of
+            <span th:text="${userSpinHistory.totalElements}">50</span> results
+            (Page <span th:text="${userSpinHistory.number + 1}">1</span> of
+            <span th:text="${userSpinHistory.totalPages}">5</span>)
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order History Fragment -->
+  <div th:fragment="order-history" class="tab-pane fade" id="order-history">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Order History</h5>
+        <div class="d-flex gap-2">
+          <select class="form-select form-select-sm" id="orderStatusFilter">
+            <option value="">All Orders</option>
+            <option value="COMPLETED" selected>Completed</option>
+            <option value="PENDING">Pending</option>
+            <option value="PROCESSING">Processing</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+          <button class="btn btn-sm btn-outline-primary" id="filterOrderHistoryBtn">
+            <i class="fas fa-filter"></i> Filter
+          </button>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="orderEntry : ${orderItemMap}" th:if="${orderItemMap != null and !orderItemMap.isEmpty()}">
+                <td>
+                  <div class="fw-bold" th:text="${orderEntry.key.orderId}">ORD-001</div>
+                </td>
+                <td>
+                  <div th:text="${#temporals.format(orderEntry.key.orderDate, 'MMM dd, yyyy')}">Mar 15, 2024</div>
+                  <small class="text-muted" th:text="${#temporals.format(orderEntry.key.orderDate, 'HH:mm')}"
+                    >14:30</small
+                  >
+                </td>
+                <td>
+                  <!-- List OrderItems ra luôn -->
+                  <div th:if="${orderEntry.value != null and !orderEntry.value.isEmpty()}">
+                    <div th:each="item : ${orderEntry.value}">
+                      <small
+                        class="text-truncate d-inline-block"
+                        style="max-width: 150px"
+                        th:text="${item.prizeItemId?.itemName ?: 'Unknown'}"
+                        th:title="${item.prizeItemId?.itemName ?: 'Unknown'}"
+                      >
+                        Item name
+                      </small>
+                    </div>
+                  </div>
+                  <div th:if="${orderEntry.value == null or orderEntry.value.isEmpty()}">
+                    <small class="text-muted">No items</small>
+                  </div>
+                </td>
+                <td class="fw-bold text-success" th:text="'$' + ${orderEntry.key.totalAmount}">$99.99</td>
+                <td>
+                  <span th:switch="${orderEntry.key.status}" class="badge">
+                    <span th:case="'COMPLETED'" class="badge bg-success">Completed</span>
+                    <span th:case="'PENDING'" class="badge bg-warning">Pending</span>
+                    <span th:case="*" class="badge bg-secondary" th:text="${orderEntry.key.status}">Unknown</span>
+                  </span>
+                </td>
+              </tr>
+              <!-- Empty state -->
+              <tr th:if="${orderItemMap == null and orderItemMap.isEmpty()}">
+                <td colspan="6" class="text-center py-4">
+                  <div class="text-muted">
+                    <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                    <p class="mb-0">No completed orders found.</p>
+                    <small>Orders you complete will appear here.</small>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div
+      class="modal fade"
+      id="orderDetailsModal"
+      tabindex="-1"
+      aria-labelledby="orderDetailsModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="orderDetailsModalLabel"><i class="fas fa-receipt me-2"></i>Order Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Order Info -->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <h6 class="text-muted mb-2">Order Information</h6>
+                <p class="mb-1"><strong>Order ID:</strong> <span id="modalOrderId">-</span></p>
+                <p class="mb-1"><strong>Date:</strong> <span id="modalOrderDate">-</span></p>
+                <p class="mb-1"><strong>Status:</strong> <span id="modalOrderStatus">-</span></p>
+              </div>
+              <div class="col-md-6">
+                <h6 class="text-muted mb-2">Payment Information</h6>
+                <p class="mb-1">
+                  <strong>Total Amount:</strong> <span id="modalTotalAmount" class="text-success fw-bold">-</span>
+                </p>
+                <p class="mb-1"><strong>Payment Method:</strong> <span id="modalPaymentMethod">-</span></p>
+                <p class="mb-1"><strong>Payment Status:</strong> <span id="modalPaymentStatus">-</span></p>
+              </div>
+            </div>
+
+            <!-- Order Items -->
+            <h6 class="text-muted mb-3">Order Items</h6>
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead class="table-light">
+                  <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody id="modalOrderItems">
+                  <!-- Dynamic content will be loaded here -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Notes -->
+            <div id="modalNotesSection" style="display: none">
+              <h6 class="text-muted mb-2 mt-3">Notes</h6>
+              <p id="modalNotes" class="text-muted">-</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <!--                    <button type="button" class="btn btn-primary" onclick="printOrderDetails()">-->
+            <!--                        <i class="fas fa-print me-2"></i>Print Receipt-->
+            <!--                    </button>-->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Collection Fragment -->
+  <div th:fragment="collection" class="tab-pane fade" id="collection">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">My Collection</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 col-sm-6 mb-4" th:each="item : ${userCollection}">
+            <div class="collection-item card h-100">
+              <img
+                th:src="${item.blindPackage?.imageUrl ?: 'https://via.placeholder.com/300x200'}"
+                class="card-img-top"
+                alt="Collection Item"
+              />
+              <div class="card-body">
+                <h6 class="card-title" th:text="${item.blindPackage?.name ?: 'Unknown Box'}">Mystery Box</h6>
+                <p class="card-text small text-muted" th:text="${item.blindPackage?.description ?: 'No description'}">
+                  Box description
+                </p>
+                <div class="d-flex align-items-center justify-content-between">
+                  <span class="text-primary fw-bold" th:text="'$' + ${item.blindPackage?.pricePerSpin ?: '0.00'}"
+                    >$29.99</span
+                  >
+                  <small class="text-muted" th:text="${'Added: ' + #temporals.format(item.addedAt, 'MMM dd, yyyy')}">
+                    Added: Jan 1, 2023
+                  </small>
+                </div>
+                <div class="mt-2">
+                  <button
+                    class="btn btn-sm btn-outline-danger w-100 remove-collection-btn"
+                    th:data-collection-id="${item.id}"
+                  >
+                    <i class="fas fa-trash me-1"></i>Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div class="col-12 text-center py-4" th:if="${userCollection == null or userCollection.isEmpty()}">
+            <div class="empty-collection">
+              <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+              <h5>Your collection is empty</h5>
+              <p class="text-muted">Start adding blind boxes to build your collection!</p>
+              <a href="/#products" class="btn btn-primary mt-2">Explore Blind Boxes</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Fragment -->
+  <div th:fragment="settings" class="tab-pane fade" id="settings">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Account Settings</h5>
+      </div>
+      <div class="card-body">
+        <form th:action="@{/users/update}" method="post">
+          <input type="hidden" name="userId" th:value="${user.userId}" />
+
+          <h6 class="mb-3">Account Information</h6>
+          <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+              <label for="username" class="form-label">Username</label>
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                name="username"
+                th:value="${user.username}"
+                required
+              />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" th:value="${user.email}" required />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="phone" class="form-label">Phone</label>
+              <input type="tel" class="form-control" id="phone" name="phone" th:value="${user.phone}" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="address" class="form-label">Address</label>
+              <input type="text" class="form-control" id="address" name="address" th:value="${user.address}" />
+            </div>
+          </div>
+
+          <h6 class="mb-3">Change Password</h6>
+          <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+              <label for="currentPassword" class="form-label">Current Password</label>
+              <input type="password" class="form-control" id="currentPassword" name="currentPassword" />
+            </div>
+            <div class="col-md-6 mb-3"></div>
+            <div class="col-md-6 mb-3">
+              <label for="newPassword" class="form-label">New Password</label>
+              <input type="password" class="form-control" id="newPassword" name="newPassword" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="confirmPassword" class="form-label">Confirm New Password</label>
+              <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" />
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="reset" class="btn btn-secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Sidebar Fragment -->
+  <div th:fragment="profile-sidebar" class="profile-sidebar bg-white rounded shadow-sm overflow-hidden">
+    <!-- User Info -->
+    <div class="user-info p-4 text-center border-bottom">
+      <h4 class="mb-1" th:text="${user.username}">Username</h4>
+      <p class="text-muted mb-2" th:text="${user.email}">user@example.com</p>
+      <div class="user-level bg-primary text-white py-1 px-3 rounded-pill d-inline-block">
+        <small>Member</small>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="profile-nav">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <a href="#" class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">
+            <i class="fas fa-user me-2"></i> Account Overview
+          </a>
+        </li>
+        <li class="list-group-item">
+          <a href="#" class="nav-link" data-bs-toggle="tab" data-bs-target="#spin-history">
+            <i class="fas fa-history me-2"></i> Spin History
+          </a>
+        </li>
+        <li class="list-group-item">
+          <a href="#" class="nav-link" data-bs-toggle="tab" data-bs-target="#order-history">
+            <i class="fas fa-shopping-bag me-2"></i> Order History
+          </a>
+        </li>
+        <li class="list-group-item">
+          <a href="#" class="nav-link" data-bs-toggle="tab" data-bs-target="#collection">
+            <i class="fas fa-box-open me-2"></i> My Collection
+          </a>
+        </li>
+        <li class="list-group-item">
+          <a href="#" class="nav-link" data-bs-toggle="tab" data-bs-target="#settings">
+            <i class="fas fa-cog me-2"></i> Settings
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Profile Scripts Fragment -->
+  <div th:fragment="profile-scripts">
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Activate tabs based on URL hash
+        const hash = window.location.hash;
+        if (hash) {
+          const tab = document.querySelector(`.profile-nav a[data-bs-target="${hash}"]`);
+          if (tab) {
+            new bootstrap.Tab(tab).show();
+          }
+        }
+
+        // Update URL when tabs change
+        const tabLinks = document.querySelectorAll('.profile-nav a[data-bs-toggle="tab"]');
+        tabLinks.forEach((link) => {
+          link.addEventListener("shown.bs.tab", function (e) {
+            const target = e.target.getAttribute("data-bs-target");
+            history.replaceState(null, null, target);
+
+            // Remove active class from all links
+            tabLinks.forEach((link) => link.classList.remove("active"));
+            // Add active class to current link
+            e.target.classList.add("active");
+          });
+        });
+
+        // Event Listeners for buttons
+        setupEventListeners();
+        
+        // Initialize bulk redeem functionality
+        initializeBulkRedeem();
+      });
+
+      function setupEventListeners() {
+        // Filter buttons
+        const filterSpinBtn = document.getElementById("filterSpinHistoryBtn");
+        if (filterSpinBtn) {
+          filterSpinBtn.addEventListener("click", filterSpinHistory);
+        }
+
+        const filterOrderBtn = document.getElementById("filterOrderHistoryBtn");
+        if (filterOrderBtn) {
+          filterOrderBtn.addEventListener("click", filterOrderHistory);
+        }
+
+        // Redeem prize buttons
+        const redeemBtns = document.querySelectorAll(".redeem-prize-btn");
+        redeemBtns.forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const spinId = this.getAttribute("data-spin-id");
+            redeemPrize(spinId);
+          });
+        });
+
+        // View order details buttons
+        const viewOrderBtns = document.querySelectorAll(".view-order-details-btn");
+        viewOrderBtns.forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const orderId = this.getAttribute("data-order-list");
+            showOrderDetails(orderId);
+          });
+        });
+
+        // Remove collection buttons
+        const removeCollectionBtns = document.querySelectorAll(".remove-collection-btn");
+        removeCollectionBtns.forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const collectionId = this.getAttribute("data-collection-id");
+            removeFromCollection(collectionId);
+          });
+        });
+      }
+
+      function filterSpinHistory() {
+        const rarity = document.getElementById("spinRarityFilter").value;
+        const rows = document.querySelectorAll("#spin-history tbody tr");
+
+        rows.forEach((row) => {
+          if (row.querySelector("td[colspan]")) return; // Skip empty state row
+          row.style.display = "";
+        });
+      }
+
+      function filterOrderHistory() {
+        const status = document.getElementById("orderStatusFilter").value;
+        const rows = document.querySelectorAll("#order-history tbody tr");
+
+        rows.forEach((row) => {
+          if (row.querySelector("td[colspan]")) return; // Skip empty state row
+
+          const statusCell = row.querySelector("td:nth-child(5) .badge");
+          if (!status || (statusCell && statusCell.textContent.trim() === status)) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+
+      function redeemPrize(spinId) {
+        if (!spinId) {
+          console.error("Spin ID is missing");
+          return;
+        }
+
+        fetch(`/spinHistory/redeem/${spinId}`, {
+          method: "GET",
+        })
+          .then((response) => {
+            if (response.ok) {
+              location.reload();
+            } else {
+              alert("Failed to redeem prize");
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("An error occurred while redeeming prize");
+          });
+      }
+
+      function showOrderDetails(orderId) {
+        console.log("showOrderDetails called with orderId:", orderId);
+
+        try {
+          // Set orderId in modal
+          document.getElementById("modalOrderId").textContent = orderId;
+
+          // Fetch complete order details via API
+          fetchOrderDetails(orderId);
+        } catch (error) {
+          console.error("Error showing order details:", error);
+          alert("Error loading order details. Please try again.");
+        }
+      }
+
+      function fetchOrderDetails(orderId) {
+        fetch(`/api/orders/${orderId}/items`)
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              // Populate order items
+              populateOrderItems(data.orderItems || []);
+
+              // Handle notes
+              if (data.notes && data.notes.trim()) {
+                document.getElementById("modalNotes").textContent = data.notes;
+                document.getElementById("modalNotesSection").style.display = "block";
+              } else {
+                document.getElementById("modalNotesSection").style.display = "none";
+              }
+
+              // Set default values for fields not returned by API
+              document.getElementById("modalPaymentMethod").textContent = "Credit Card";
+              document.getElementById("modalPaymentStatus").textContent = "Paid";
+            } else {
+              console.error("API Error:", data.message);
+              populateOrderItems([]);
+              alert("Error loading order details: " + data.message);
+            }
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById("orderDetailsModal"));
+            modal.show();
+          })
+          .catch((error) => {
+            console.error("Error fetching order details:", error);
+            alert("Error loading order details. Please try again.");
+          });
+      }
+
+      function populateOrderItems(orderItems) {
+        const tbody = document.getElementById("modalOrderItems");
+
+        if (!orderItems || orderItems.length === 0) {
+          tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-3">
+                            <i class="fas fa-box-open fa-2x mb-2"></i>
+                            <p class="mb-0">No items found for this order</p>
+                        </td>
+                    </tr>
+                `;
+          return;
+        }
+
+        tbody.innerHTML = orderItems
+          .map(
+            (item) => `
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="${item.prizeItemId?.imageUrl || "https://via.placeholder.com/40x40"}" 
+                                 class="me-2 rounded" alt="Item" style="width: 40px; height: 40px;">
+                            <div>
+                                <div class="fw-bold">${
+                                  item.prizeItemId?.itemName || item.blindBagId?.name || "Unknown Item"
+                                }</div>
+                                <small class="text-muted">Box: ${item.blindBagId?.name || "Unknown"}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>1</td>
+                    <td>$${(item.price || 0).toFixed(2)}</td>
+                    <td class="fw-bold">$${(item.price || 0).toFixed(2)}</td>
+                </tr>
+            `
+          )
+          .join("");
+      }
+
+      function getStatusBadgeClass(status) {
+        switch (status.replace(/\s+/g, "").toUpperCase()) {
+          case "COMPLETED":
+            return "bg-success";
+          case "PENDING":
+            return "bg-warning text-dark";
+          case "PROCESSING":
+            return "bg-info";
+          case "CANCELLED":
+            return "bg-danger";
+          default:
+            return "bg-secondary";
+        }
+      }
+
+      function removeFromCollection(collectionId) {
+        if (!collectionId) {
+          console.error("Collection ID is missing");
+          return;
+        }
+
+        if (confirm("Are you sure you want to remove this item from your collection?")) {
+          fetch(`/collection/remove/${collectionId}`, {
+            method: "DELETE",
+          })
+            .then((response) => {
+              if (response.ok) {
+                location.reload();
+              } else {
+                alert("Failed to remove item from collection");
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("An error occurred while removing item from collection");
+            });
+        }
+      }
+
+      // Initialize bulk redeem functionality
+      function initializeBulkRedeem() {
+        console.log("Initializing bulk redeem functionality...");
+        
+        // Select All checkbox event listener
+        const selectAllCheckbox = document.getElementById('selectAllItems');
+        if (selectAllCheckbox) {
+          console.log("Select All checkbox found");
+          selectAllCheckbox.addEventListener('change', handleSelectAll);
+        } else {
+          console.log("Select All checkbox not found");
+        }
+        
+        // Bulk redeem button event listener
+        const bulkRedeemBtn = document.getElementById('bulkRedeemBtn');
+        if (bulkRedeemBtn) {
+          console.log("Bulk redeem button found");
+          bulkRedeemBtn.addEventListener('click', handleBulkRedeem);
+        } else {
+          console.log("Bulk redeem button not found");
+        }
+        
+        // Individual checkbox event listeners
+        const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+        console.log(`Found ${itemCheckboxes.length} item checkboxes`);
+        itemCheckboxes.forEach(checkbox => {
+          checkbox.addEventListener('change', handleCheckboxChange);
+        });
+        
+        // Initialize button state
+        updateBulkRedeemButton();
+      }
+      
+      function handleSelectAll() {
+        console.log("Select All clicked");
+        const selectAllCheckbox = document.getElementById('selectAllItems');
+        const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+        
+        itemCheckboxes.forEach(checkbox => {
+          checkbox.checked = selectAllCheckbox.checked;
+        });
+        
+        updateBulkRedeemButton();
+      }
+      
+      function updateBulkRedeemButton() {
+        const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+        const bulkRedeemBtn = document.getElementById('bulkRedeemBtn');
+        const selectedCount = document.getElementById('selectedCount');
+        
+        console.log(`${checkedBoxes.length} items selected`);
+        
+        if (bulkRedeemBtn && selectedCount) {
+          if (checkedBoxes.length > 0) {
+            bulkRedeemBtn.disabled = false;
+            bulkRedeemBtn.innerHTML = `<i class="fas fa-gift me-1"></i>Redeem Selected (${checkedBoxes.length})`;
+            selectedCount.textContent = checkedBoxes.length;
+          } else {
+            bulkRedeemBtn.disabled = true;
+            bulkRedeemBtn.innerHTML = '<i class="fas fa-gift me-1"></i>Redeem Selected';
+            selectedCount.textContent = '0';
+          }
+        }
+      }
+      
+      function handleCheckboxChange() {
+        console.log("Individual checkbox changed");
+        const totalCheckboxes = document.querySelectorAll('.item-checkbox').length;
+        const checkedBoxes = document.querySelectorAll('.item-checkbox:checked').length;
+        const selectAllCheckbox = document.getElementById('selectAllItems');
+        
+        if (selectAllCheckbox) {
+          if (checkedBoxes === totalCheckboxes && totalCheckboxes > 0) {
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+          } else if (checkedBoxes > 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = true;
+          } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+          }
+        }
+        
+        updateBulkRedeemButton();
+      }
+      
+      function handleBulkRedeem() {
+        console.log("Bulk redeem clicked");
+        const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+        const itemIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+        
+        console.log("Selected item IDs:", itemIds);
+        
+        if (itemIds.length === 0) {
+          alert('Please select items to redeem');
+          return;
+        }
+        
+        if (confirm(`Are you sure you want to redeem ${itemIds.length} items?`)) {
+          console.log("Sending bulk redeem request...");
+          // Send POST request with JSON payload
+          fetch('/spinHistory/redeem', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify(itemIds)
+          })
+          .then(response => {
+            console.log("Response status:", response.status);
+            if (response.ok) {
+              // Redirect to profile page
+              window.location.href = '/users/profile#spin-history';
+            } else {
+              throw new Error('Failed to redeem items');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while redeeming items. Please try again.');
+          });
+        }
+      }
+    </script>
+  </div>
+</html>

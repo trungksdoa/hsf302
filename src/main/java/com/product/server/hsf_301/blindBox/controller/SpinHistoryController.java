@@ -37,22 +37,31 @@ public class SpinHistoryController {
         return "spinHistory/details";
     }
     
-    @GetMapping("/user/{userId}")
-    public String getSpinHistoryByUser(@PathVariable Integer userId, Model model) {
-        User user = new User(); // In a real app, you'd get this from a user service
-        user.setUserId(userId);
-        
-        List<SpinHistory> spinHistories = spinHistoryService.getSpinHistoryByUser(user);
-        model.addAttribute("spinHistories", spinHistories);
-        model.addAttribute("userId", userId);
-        return "spinHistory/userHistory";
-    }
-    
+//    @GetMapping("/user/{userId}")
+//    public String getSpinHistoryByUser(@PathVariable Integer userId, Model model) {
+//        User user = new User(); // In a real app, you'd get this from a user service
+//        user.setUserId(userId);
+//
+//        List<SpinHistory> spinHistories = spinHistoryService.getSpinHistoryByUser(user);
+//        model.addAttribute("spinHistories", spinHistories);
+//        model.addAttribute("userId", userId);
+//        return "spinHistory/userHistory";
+//    }
+//
     @GetMapping("/redeem/{id}")
+    @ResponseBody
     public String redeemPrize(@PathVariable Integer id) {
         spinHistoryService.redeemPrize(id);
-        return "redirect:/spinHistory";
+        return "success";
     }
+
+    @PostMapping("/redeem")
+    @ResponseBody
+    public String redeemPrizes(@RequestBody List<Integer> ids) {
+        spinHistoryService.redeemPrizes(ids);
+        return "success";
+    }
+
     
     @GetMapping("/spin/{userId}/{bagTypeId}")
     public String spin(@PathVariable Integer userId, @PathVariable Integer bagTypeId, Model model) {

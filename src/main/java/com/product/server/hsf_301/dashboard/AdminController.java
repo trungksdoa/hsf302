@@ -64,12 +64,12 @@ public class AdminController {
         return "admin/layout";
     }
 
-    @GetMapping("/blindBoxes/create")
-    public String createBlindBox(Model model, HttpSession session) {
-        model.addAttribute("showSidebar", true);
-        model.addAttribute("blindPackage", new BlindPackage());
-        return "admin/layout";
-    }
+//    @GetMapping("/blindBoxes/create")
+//    public String createBlindBox(Model model, HttpSession session) {
+//        model.addAttribute("showSidebar", true);
+//        model.addAttribute("blindPackage", new BlindPackage());
+//        return "admin/layout";
+//    }
     // Trang quản lý blog
 
 

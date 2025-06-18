@@ -34,7 +34,7 @@
                         <tr th:each="post : ${blogs}">
                             <td th:text="${post.id}">1</td>
                             <td th:text="${post.title}">Blog Title</td>
-                            <td th:text="${post.author}">Admin</td>
+                            <td th:text="${post.author.username}">Admin</td>
                             <td>
                                         <span class="badge" th:classappend="${post.status == 'PUBLISHED'} ? 'bg-success' : 'bg-warning'"
                                               th:text="${post.status}">Published</span>

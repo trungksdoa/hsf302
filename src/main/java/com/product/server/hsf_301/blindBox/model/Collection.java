@@ -21,11 +21,11 @@ public class Collection {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private AppUser user;
 
     @ManyToOne
     @JoinColumn(name = "blind_package_id")
-    private BlindPackage blindPackage;
+    private PackagesBox blindPackage;
 
     @Column(name = "added_at")
     private LocalDateTime addedAt;

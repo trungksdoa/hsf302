@@ -33,7 +33,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getOrdersByUser(User user) {
+    public List<Order> getOrdersByUser(AppUser user) {
         return orderRepository.findByUser(user);
     }
     
@@ -49,7 +49,7 @@ public class OrderServiceImpl implements OrderService {
         orderItems.add(new OrderItem(order,spinHistory.getPrizeItemId().getBlindBagType(),spinHistory.getPrizeItemId(),spinHistory.getPrice()));
         order.setOrderItems(orderItems);
 
-        User user = new User();
+        AppUser user = new AppUser();
         user.setUserId(2);
         order.setUser(user);
         return orderRepository.save(order);
@@ -68,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
                         spinHistory.getPrice()
                 ))
                 .collect(Collectors.toList());
-        User user = new User();
+        AppUser user = new AppUser();
         user.setUserId(2);
         order.setUser(user);
         order.setOrderItems(orderItems);

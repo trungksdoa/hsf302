@@ -1,8 +1,5 @@
 package com.product.server.hsf_301.blindBox.model;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -14,7 +11,9 @@ public class Blog {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id ;
     private  String title ;
-    private String author ;
+
+    @ManyToOne
+    private AppUser author ;
     private String content ;
     private String status ;
     private LocalDateTime createdAt ;

@@ -1,7 +1,7 @@
 package com.product.server.hsf_301.blindBox.repository;
 
+import com.product.server.hsf_301.blindBox.model.AppUser;
 import com.product.server.hsf_301.blindBox.model.SpinHistory;
-import com.product.server.hsf_301.blindBox.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,8 +11,8 @@ import java.util.List;
 
 @Repository
 public interface SpinHistoryRepository extends JpaRepository<SpinHistory, Integer> {
-    List<SpinHistory> findByUser(User user);
-    Page<SpinHistory> findByUser(User user, Pageable pageable);
+    List<SpinHistory> findByUser(AppUser user);
+    Page<SpinHistory> findByUser(AppUser user, Pageable pageable);
 
-    List<SpinHistory> findByUserAndRedeemed(User user, Boolean redeemed);
+    List<SpinHistory> findByUserAndRedeemed(AppUser user, Boolean redeemed);
 }

@@ -1,7 +1,7 @@
 package com.product.server.hsf_301.home;
 
 
-import com.product.server.hsf_301.blindBox.model.BlindPackage;
+import com.product.server.hsf_301.blindBox.model.PackagesBox;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import com.product.server.hsf_301.blindBox.service.PrizeItemService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,7 +38,7 @@ public class HomeController {
             model.addAttribute("httpServletRequest", request);
         }
 
-        Page<BlindPackage> blindBagTypes = blindBagTypeService.getAllBlindBagTypes(page, size);
+        Page<PackagesBox> blindBagTypes = blindBagTypeService.getAllBlindBagTypes(page, size);
         model.addAttribute("products", blindBagTypes);
         model.addAttribute("content", "view/home");
         return "view/layout";

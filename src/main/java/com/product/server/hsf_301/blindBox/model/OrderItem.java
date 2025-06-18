@@ -21,7 +21,7 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "blind_bag_id")
-    private BlindPackage blindBagId;
+    private PackagesBox blindBagId;
 
     @ManyToOne
     @JoinColumn(name = "prize_item_id")
@@ -29,7 +29,7 @@ public class OrderItem {
 
     private Double price;
 
-    public OrderItem(Order order, BlindPackage bp, PrizeItem prizeItem, Double price) {
+    public OrderItem(Order order, PackagesBox bp, PrizeItem prizeItem, Double price) {
         this.order = order;
         this.blindBagId = bp;
         this.prizeItemId = prizeItem;

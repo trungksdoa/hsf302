@@ -9,7 +9,6 @@ import com.product.server.hsf_301.blindBox.service.OrderService;
 import com.product.server.hsf_301.blindBox.service.PrizeItemService;
 import com.product.server.hsf_301.blindBox.service.SpinHistoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +45,7 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
     }
 
     @Override
-    public Page<SpinHistory> getSpinHistoryByUser(User user, int page, int size) {
+    public Page<SpinHistory> getSpinHistoryByUser(AppUser user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("spinTime").descending());
 
         // Gọi repository kèm pageable
@@ -120,10 +119,10 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
     @Override
     public SpinHistory spin(Integer userId, Integer bagTypeId) {
         // In a real app, you would get the user from a UserService
-        User user = new User();
+        AppUser user = new AppUser();
         user.setUserId(userId);
         
-        BlindPackage blindBagType = blindBagTypeService.getBlindBagTypeById(bagTypeId);
+        PackagesBox blindBagType = blindBagTypeService.getBlindBagTypeById(bagTypeId);
         PrizeItem prizeItem = prizeItemService.getRandomPrizeByBagType(bagTypeId);
         
         SpinHistory spinHistory = new SpinHistory();
@@ -136,7 +135,7 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
     }
 
     @Override
-    public SpinHistory spin(User user, BlindPackage blindPackage) {
+    public SpinHistory spin(AppUser user, PackagesBox blindPackage) {
         try {
             // Get active prize items for the blind package
             List<PrizeItem> availableItems = prizeItemRepository
@@ -178,7 +177,7 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
         }
     }
     @Override
-    public List<SpinHistory> spinMultiple(User user, BlindPackage blindPackage, int count) {
+    public List<SpinHistory> spinMultiple(AppUser user, PackagesBox blindPackage, int count) {
         List<SpinHistory> results = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
@@ -202,7 +201,7 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
         return null;
     }
 
-    private SpinHistory saveSpinHistory(User user, BlindPackage blindPackage,
+    private SpinHistory saveSpinHistory(AppUser user, PackagesBox blindPackage,
                                         PrizeItem prizeItem, boolean success, String errorMessage) {
         SpinHistory history = new SpinHistory();
         history.setUser(user);

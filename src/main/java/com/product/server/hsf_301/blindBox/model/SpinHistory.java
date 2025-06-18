@@ -20,10 +20,10 @@ public class SpinHistory {
     private Integer historyId;
 
     @ManyToOne
-    private User user;
+    private AppUser user;
 
     @ManyToOne
-    private BlindPackage blindBagId;
+    private PackagesBox blindBagId;
 
     @ManyToOne
     private PrizeItem prizeItemId; // Có thể null nếu quay lỗi

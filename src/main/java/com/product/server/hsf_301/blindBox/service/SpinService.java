@@ -1,9 +1,9 @@
 package com.product.server.hsf_301.blindBox.service;
 
 
-import com.product.server.hsf_301.blindBox.model.BlindPackage;
+import com.product.server.hsf_301.blindBox.model.PackagesBox;
 import com.product.server.hsf_301.blindBox.model.SpinHistory;
-import com.product.server.hsf_301.blindBox.model.User;
+import com.product.server.hsf_301.blindBox.model.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ public class SpinService {
     private final UserService userService;
 
 
-    public SpinHistory spinItem(User user, BlindPackage blindPackage){
+    public SpinHistory spinItem(AppUser user, PackagesBox blindPackage){
         try{
             SpinHistory spinHistory = spinHistoryService.spin(user,blindPackage);
             user.setBalance(
@@ -31,7 +31,7 @@ public class SpinService {
         }
     }
 
-    public List<SpinHistory> spinItems(User user, BlindPackage blindPackage, int number){
+    public List<SpinHistory> spinItems(AppUser user, PackagesBox blindPackage, int number){
         try{
             List<SpinHistory> spinHistory = spinHistoryService.spinMultiple(user,blindPackage,number);
 

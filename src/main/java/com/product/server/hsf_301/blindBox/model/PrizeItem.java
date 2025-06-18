@@ -1,7 +1,6 @@
 package com.product.server.hsf_301.blindBox.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,7 +29,7 @@ public class PrizeItem {
     @ManyToOne
     @JoinColumn(name = "bag_type_id")
     @JsonIgnore
-    private BlindPackage blindBagType;
+    private PackagesBox blindBagType;
     
     @Column(name = "probability", nullable = false)
     private Double probability;

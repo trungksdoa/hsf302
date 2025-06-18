@@ -1,11 +1,10 @@
 package com.product.server.hsf_301.blindBox.controller;
 
-import com.product.server.hsf_301.blindBox.model.BlindPackage;
+import com.product.server.hsf_301.blindBox.model.PackagesBox;
 import com.product.server.hsf_301.blindBox.model.PrizeItem;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import com.product.server.hsf_301.blindBox.service.PrizeItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -54,7 +53,7 @@ public class PrizeItemController {
 
     @GetMapping("/create")
     public String createPrizeItemForm(Model model) {
-        List<BlindPackage> blindBagTypes = blindBagTypeService.getAllBlindBagTypes();
+        List<PackagesBox> blindBagTypes = blindBagTypeService.getAllBlindBagTypes();
         model.addAttribute("prizeItem", new PrizeItem());
         model.addAttribute("blindBagTypes", blindBagTypes);
         return "prizeItem/create";
@@ -69,7 +68,7 @@ public class PrizeItemController {
     @GetMapping("/edit/{id}")
     public String editPrizeItemForm(@PathVariable Integer id, Model model) {
         PrizeItem prizeItem = prizeItemService.getPrizeItemById(id);
-        List<BlindPackage> blindBagTypes = blindBagTypeService.getAllBlindBagTypes();
+        List<PackagesBox> blindBagTypes = blindBagTypeService.getAllBlindBagTypes();
         model.addAttribute("prizeItem", prizeItem);
         model.addAttribute("blindBagTypes", blindBagTypes);
         return "prizeItem/edit";
@@ -90,7 +89,7 @@ public class PrizeItemController {
     
     @GetMapping("/byBagType/{bagTypeId}")
     public String getPrizeItemsByBagType(@PathVariable Integer bagTypeId, Model model) {
-        BlindPackage blindBagType = blindBagTypeService.getBlindBagTypeById(bagTypeId);
+        PackagesBox blindBagType = blindBagTypeService.getBlindBagTypeById(bagTypeId);
         List<PrizeItem> prizeItems = prizeItemService.getPrizeItemsByBlindBagType(blindBagType);
         model.addAttribute("prizeItems", prizeItems);
         model.addAttribute("blindBagType", blindBagType);

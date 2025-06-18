@@ -55,6 +55,19 @@ public class PrizeItemServiceImpl implements PrizeItemService {
     public List<PrizeItem> getPrizeItemsByBlindBagType(BlindPackage blindBagType) {
         return prizeItemRepository.findByBlindBagType(blindBagType);
     }
+    @Override
+    public PrizeItem updateItem(Integer id, PrizeItem updatedItem) {
+        return prizeItemRepository.findById(id).map(existingItem -> {
+            existingItem.setItemName(updatedItem.getItemName());
+            existingItem.setImageData(updatedItem.getImageData());
+            existingItem.setImageType(updatedItem.getImageType());
+            existingItem.setRarity(updatedItem.getRarity());
+            existingItem.setBlindBagType(updatedItem.getBlindBagType());
+            existingItem.setProbability(updatedItem.getProbability());
+            existingItem.setActive(updatedItem.isActive());
+            return prizeItemRepository.save(existingItem);
+        }).orElseThrow(() -> new RuntimeException("PrizeItem not found"));
+    }
 
     @Override
     public List<PrizeItem> getPrizeItemByBlindBoxAndActive(BlindPackage blindBagType) {
@@ -70,11 +83,11 @@ public class PrizeItemServiceImpl implements PrizeItemService {
     public PrizeItem getRandomPrizeByBagType(Integer bagTypeId) {
         BlindPackage blindBagType = blindBagTypeService.getBlindBagTypeById(bagTypeId);
         List<PrizeItem> activePrizes = prizeItemRepository.findByBlindBagTypeAndIsActiveTrue(blindBagType);
-        
+
         if (activePrizes.isEmpty()) {
             throw new RuntimeException("No active prizes found for this bag type");
         }
-        
+
         // Create weighted probability list
         List<PrizeItem> weightedPrizes = new ArrayList<>();
         for (PrizeItem prize : activePrizes) {
@@ -84,7 +97,7 @@ public class PrizeItemServiceImpl implements PrizeItemService {
                 weightedPrizes.add(prize);
             }
         }
-        
+
         // Get random prize
         int randomIndex = random.nextInt(weightedPrizes.size());
         return weightedPrizes.get(randomIndex);

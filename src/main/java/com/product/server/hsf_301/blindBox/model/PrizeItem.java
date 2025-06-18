@@ -20,9 +20,12 @@ public class PrizeItem {
     
     @Column(name = "item_name", nullable = false, length = 100)
     private String itemName;
-    
-    @Column(name = "item_image")
-    private String itemImage;
+
+    @Lob
+    @Column(name = "image_data", columnDefinition = "LONGBLOB")
+    private byte[] imageData;
+
+    private String imageType;
     
     @Column(name = "rarity", nullable = false, length = 20)
     private RareEnum rarity;

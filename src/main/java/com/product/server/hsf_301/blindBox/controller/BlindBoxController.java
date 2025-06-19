@@ -1,14 +1,15 @@
 package com.product.server.hsf_301.blindBox.controller;
 
-import com.product.server.hsf_301.blindBox.model.AppUser;
 import com.product.server.hsf_301.blindBox.model.PackagesBox;
 import com.product.server.hsf_301.blindBox.model.PrizeItem;
 import com.product.server.hsf_301.blindBox.model.SpinHistory;
 import com.product.server.hsf_301.blindBox.service.*;
 
+import com.product.server.hsf_301.user.model.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,16 +31,7 @@ public class BlindBoxController {
     private final UserService userService;
     private final SpinService spin;
     
-    // Directory where uploaded files will be stored
 
-    @GetMapping("/ ")
-    public String list(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, Model model) {
-        Page<PackagesBox> blindBagTypes = blindBagTypeService.getAllBlindBagTypes(page, size);
-        model.addAttribute("blindBagTypes", blindBagTypes);
-
-        System.out.println("OK");
-        return "blindbox/list";
-    }
 
     @GetMapping("/{id}")
     public String detail(@PathVariable Integer id, Model model) {
@@ -103,7 +95,7 @@ public class BlindBoxController {
     public ResponseEntity<?> spinOnce(@PathVariable Integer id) {
         try {
             PackagesBox blindPackage = blindBagTypeService.getBlindBagTypeById(id);
-            AppUser user = userService.findByUsername("john_doe");
+            AppUser user = userService.getCurrentUser();
 
             SpinHistory result = spin.spinItem(user, blindPackage);
             
@@ -116,14 +108,13 @@ public class BlindBoxController {
                 response.put("spinId", result.getHistoryId());
                 response.put("itemId", prizeItem.getItemId());
                 response.put("itemName", prizeItem.getItemName());
-                response.put("itemImage", prizeItem.getItemImage());
+                response.put("itemImage", prizeItem.getImageUrl());
                 response.put("rarity", prizeItem.getRarity());
                 response.put("description", "Congratulations on your prize!");
                 response.put("timestamp", result.getSpinTime());
             } else {
                 // GOOD_LUCK or error case
-//                response.put("message", result.getErrorMessage() != null ?
-//                    result.getErrorMessage() : "Better luck next time!");
+                response.put("message", "Better luck next time!");
             }
             
             return ResponseEntity.ok(response);
@@ -135,21 +126,25 @@ public class BlindBoxController {
         }
     }
     @PostMapping("/spin/{id}/multiple")
-    public String spinFiveTimes(@PathVariable Integer id,
-                                Principal principal,
-                                RedirectAttributes redirectAttributes) {
+    public ResponseEntity<?> spinFiveTimes(@PathVariable Integer id) {
         try {
             PackagesBox blindPackage = blindBagTypeService.getBlindBagTypeById(id);
-            AppUser user = userService.findByUsername(principal.getName());
+            AppUser user = userService.getCurrentUser();
 
             List<SpinHistory> results = spin.spinItems(user, blindPackage, 5);
-            redirectAttributes.addFlashAttribute("spinResults", results);
+//            redirectAttributes.addFlashAttribute("spinResults", results);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", "OK nhớ");
+            response.put("items", results);
 
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Error: " + e.getMessage()
+            ));
         }
 
-        return "redirect:/blindbox/spin/" + id;
     }
     private void addSpinResultMessage(RedirectAttributes redirectAttributes, SpinHistory result) {
         if (result.getSuccess()) {

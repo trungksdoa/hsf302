@@ -3,6 +3,7 @@ package com.product.server.hsf_301.home;
 
 import com.product.server.hsf_301.blindBox.model.PackagesBox;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
+import com.product.server.hsf_301.blindBox.service.BlogService;
 import com.product.server.hsf_301.blindBox.service.PrizeItemService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ import java.util.Map;
 @RequestMapping("/")
 public class HomeController {
     private final BlindBagTypeService blindBagTypeService;
-
+    private final BlogService blogService;
     private final PrizeItemService prizeItemService;
     @GetMapping
     public String home(Model model, HttpServletRequest request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
@@ -40,6 +41,7 @@ public class HomeController {
 
         Page<PackagesBox> blindBagTypes = blindBagTypeService.getAllBlindBagTypes(page, size);
         model.addAttribute("products", blindBagTypes);
+        model.addAttribute("recentPosts",blogService.getAllBlogs(0, 5));
         model.addAttribute("content", "view/home");
         return "view/layout";
     }

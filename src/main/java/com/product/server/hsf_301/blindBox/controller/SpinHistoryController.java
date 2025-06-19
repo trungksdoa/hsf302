@@ -1,7 +1,6 @@
 package com.product.server.hsf_301.blindBox.controller;
 
 import com.product.server.hsf_301.blindBox.model.SpinHistory;
-import com.product.server.hsf_301.blindBox.model.AppUser;
 import com.product.server.hsf_301.blindBox.service.SpinHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -48,19 +47,19 @@ public class SpinHistoryController {
 //        return "spinHistory/userHistory";
 //    }
 //
-    @GetMapping("/redeem/{id}")
-    @ResponseBody
-    public String redeemPrize(@PathVariable Integer id) {
-        spinHistoryService.redeemPrize(id);
-        return "success";
-    }
+//    @GetMapping("/redeem/{id}")
+//    @ResponseBody
+//    public String redeemPrize(@PathVariable Integer id) {
+//        spinHistoryService.redeemPrize(id);
+//        return "success";
+//    }
 
-    @PostMapping("/redeem")
-    @ResponseBody
-    public String redeemPrizes(@RequestBody List<Integer> ids) {
-        spinHistoryService.redeemPrizes(ids);
-        return "success";
-    }
+//    @PostMapping("/redeem")
+//    @ResponseBody
+//    public String redeemPrizes(@RequestBody List<Integer> prizeIds) {
+//        spinHistoryService.redeemPrizes(prizeIds);
+//        return "success";
+//    }
 
     
     @GetMapping("/spin/{userId}/{bagTypeId}")

@@ -1,9 +1,9 @@
 package com.product.server.hsf_301.blindBox.controller;
 
 import com.product.server.hsf_301.blindBox.model.Order;
-import com.product.server.hsf_301.blindBox.model.AppUser;
 import com.product.server.hsf_301.blindBox.service.OrderItemService;
 import com.product.server.hsf_301.blindBox.service.OrderService;
+import com.product.server.hsf_301.user.model.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

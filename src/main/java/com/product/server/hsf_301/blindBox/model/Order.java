@@ -1,6 +1,7 @@
 package com.product.server.hsf_301.blindBox.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.product.server.hsf_301.user.model.AppUser;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;

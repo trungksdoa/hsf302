@@ -3,7 +3,8 @@ package com.product.server.hsf_301.blindBox.service;
 
 import com.product.server.hsf_301.blindBox.model.PackagesBox;
 import com.product.server.hsf_301.blindBox.model.SpinHistory;
-import com.product.server.hsf_301.blindBox.model.AppUser;
+import com.product.server.hsf_301.blindBox.model.UserPrizeItem;
+import com.product.server.hsf_301.user.model.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,8 @@ import java.util.List;
 public class SpinService {
     private final SpinHistoryService spinHistoryService;
     private final UserService userService;
-
+    private final OrderService orderService;
+    private final UserPrizeItemService userPrizeItemService;
 
     public SpinHistory spinItem(AppUser user, PackagesBox blindPackage){
         try{
@@ -23,7 +25,14 @@ public class SpinService {
             user.setBalance(
                     user.getBalance().subtract(BigDecimal.valueOf(spinHistory.getPrice()))
             );
+            UserPrizeItem item = new UserPrizeItem();
+            item.setUser(user);
+            item.setClaimed(false);
+            item.setActive(true);
+            item.setSpin(spinHistory);
+            userPrizeItemService.save(item);
             userService.updateProfile(user);
+
 
             return spinHistory;
         }catch (Exception e){

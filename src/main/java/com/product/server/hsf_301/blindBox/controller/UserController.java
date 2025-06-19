@@ -1,20 +1,15 @@
 package com.product.server.hsf_301.blindBox.controller;
 
-import com.product.server.hsf_301.blindBox.model.AppUser;
-import com.product.server.hsf_301.blindBox.model.SpinHistory;
-import com.product.server.hsf_301.blindBox.model.Order;
-import com.product.server.hsf_301.blindBox.model.OrderItem;
-import com.product.server.hsf_301.blindBox.model.Collection;
-import com.product.server.hsf_301.blindBox.service.UserService;
-import com.product.server.hsf_301.blindBox.service.SpinHistoryService;
-import com.product.server.hsf_301.blindBox.service.OrderService;
-import com.product.server.hsf_301.blindBox.service.CollectionService;
+import com.product.server.hsf_301.blindBox.model.*;
+import com.product.server.hsf_301.blindBox.service.*;
+import com.product.server.hsf_301.user.model.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.security.core.Authentication;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,8 +25,9 @@ public class UserController {
     private final UserService userService;
     // Add these services
     private final SpinHistoryService spinHistoryService;
+    private final UserPrizeItemService userPrizeItemService;
     private final OrderService orderService;
-    private final CollectionService collectionService;
+//    private final CollectionService collectionService;
 
     @GetMapping("/test")
     @ResponseBody
@@ -44,18 +40,22 @@ public class UserController {
 
         return userSpinHistory;
     }
+
     @GetMapping("/profile")
-    public String profile(Model model, @RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="10") int size) {
+    public String profile(Model model,
+                          @RequestParam(defaultValue="0") int page,
+                          @RequestParam(defaultValue="10") int size) {
+
         // For demonstration, we'll get a user by ID 2 (matching the seeded data)
         // In a real application, this would come from the authenticated user
-        AppUser user = userService.getUserById(2);
+        AppUser user = userService.getCurrentUser();
         if (user == null) {
             user = new AppUser(); // Fallback to empty user if not found
         }
 
         // Get user's spin history
-        Page<SpinHistory> userSpinHistory = spinHistoryService.getSpinHistoryByUser(user,page, size);
-
+//        Page<SpinHistory> userSpinHistory = spinHistoryService.getSpinHistoryByUser(user,page, size);
+        Page<UserPrizeItem> userSpinHistory = userPrizeItemService.getByUserId(user.getUserId(),page,size);
         // Get user's order history (filter by COMPLETED status)
         List<Order> allOrders = orderService.getOrdersByUser(user);
 
@@ -66,13 +66,11 @@ public class UserController {
             orderItemMap.put(order, order.getOrderItems() != null ? order.getOrderItems() : new ArrayList<>());
         }
 
-        // Get user's collection
-        List<Collection> userCollection = collectionService.getUserCollection(user);
+
 
         model.addAttribute("user", user);
         model.addAttribute("userSpinHistory", userSpinHistory);
         model.addAttribute("orderItemMap", orderItemMap); // Add this
-        model.addAttribute("userCollection", userCollection);
         model.addAttribute("content", "view/profile");
         return "view/layout";
     }
@@ -129,11 +127,10 @@ public class UserController {
     @GetMapping("/balance")
     @ResponseBody
     public String balance(Model model) {
-
         // Will replace with user id saved in Authorization
-        AppUser user = userService.getUserById(2);
+        AppUser user = userService.getCurrentUser();
 
-        model.addAttribute("user", user);
+        model.addAttribute("user", userService.getCurrentUser().getBalance());
 
         return user.getBalance().toString();
     }

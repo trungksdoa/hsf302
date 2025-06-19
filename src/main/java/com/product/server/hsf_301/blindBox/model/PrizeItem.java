@@ -20,8 +20,10 @@ public class PrizeItem {
     @Column(name = "item_name", nullable = false, length = 100)
     private String itemName;
 
+    private String imageUrl;
+
     @Lob
-    @Column(name = "image_data", columnDefinition = "LONGBLOB")
+    @Column(name = "image_data")
     private byte[] imageData;
 
     private String imageType;
@@ -46,14 +48,7 @@ public class PrizeItem {
     @Column(name = "description")
     private String description;
     
-    // Add getter methods for consistency
-    public String getImageUrl() {
-        return this.itemImage;
-    }
-    
-    public Integer getId() {
-        return this.itemId;
-    }
+
     
 
 }

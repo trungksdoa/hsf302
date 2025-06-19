@@ -53,19 +53,16 @@
                     <div class="col-lg-9">
                         <div class="tab-content">
                             <!-- Profile Overview -->
-                            <div th:replace="~{view/fragments/profile-fragments :: profile-overview}"></div>
+                            <div th:replace="~{view/fragments/profile/profile-overview :: profile-overview}"></div>
                             
                             <!-- Spin History with Bulk Redeem -->
-                            <div th:replace="~{view/fragments/profile-fragments :: spin-history-with-bulk}"></div>
+                            <div th:replace="~{view/fragments/profile/spin-history :: spin-history-with-bulk}"></div>
                             
                          <!-- Order History -->
-                            <div th:replace="~{view/fragments/profile-fragments :: order-history}"></div>
-
-                            <!-- My Collection -->
-                            <div th:replace="~{view/fragments/profile-fragments :: collection}"></div>
+                            <div th:replace="~{view/fragments/profile/order-history :: order-history}"></div>
                             
                             <!-- Settings -->
-                            <div th:replace="~{view/fragments/profile-fragments :: settings}"></div>
+                            <div th:replace="~{view/fragments/profile/settings :: settings}"></div>
                         </div>
                     </div>
                 </div>

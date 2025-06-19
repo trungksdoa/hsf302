@@ -8,6 +8,7 @@ import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import com.product.server.hsf_301.blindBox.service.OrderService;
 import com.product.server.hsf_301.blindBox.service.PrizeItemService;
 import com.product.server.hsf_301.blindBox.service.SpinHistoryService;
+import com.product.server.hsf_301.user.model.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,9 +26,6 @@ import java.util.Random;
 public class SpinHistoryServiceImpl implements SpinHistoryService {
 
     private final SpinHistoryRepository spinHistoryRepository;
-    private final BlindBagTypeService blindBagTypeService;
-    private final PrizeItemService prizeItemService;
-    private final OrderService orderService;
     private final PrizeItemRepository prizeItemRepository;
     private final Random random = new Random();
 
@@ -61,19 +59,11 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
     @Override
     public SpinHistory redeemPrize(Integer spinId) {
         SpinHistory spinHistory = getSpinHistoryById(spinId);
-        
-        if (spinHistory.isRedeemed()) {
-            throw new RuntimeException("Prize already redeemed");
-        }
 
         if(!spinHistory.getPrizeItemId().isClaimAble()){
             return spinHistory;
         }
 
-        orderService.saveOrder(spinHistory );
-
-        spinHistory.setRedeemed(true);
-        spinHistory.setRedeemedAt(LocalDateTime.now());
         
         return spinHistoryRepository.save(spinHistory);
     }
@@ -82,33 +72,17 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
     @Override
     public List<SpinHistory> redeemPrizes(List<Integer> spinIds) {
         List<SpinHistory> redeemedSpinHistories = new ArrayList<>();
-        List<SpinHistory> claimableSpinHistories = new ArrayList<>();
 
         // Lọc và validate tất cả SpinHistory trước
         for (Integer spinId : spinIds) {
             SpinHistory spinHistory = getSpinHistoryById(spinId);
-
-            if (spinHistory.isRedeemed()) {
-                throw new RuntimeException("Prize with ID " + spinId + " already redeemed");
-            }
-
-            if (spinHistory.getPrizeItemId().isClaimAble()) {
-                claimableSpinHistories.add(spinHistory);
-            }
-
             redeemedSpinHistories.add(spinHistory);
         }
 
-        // Tạo order cho tất cả claimable items
-        if (!claimableSpinHistories.isEmpty()) {
-            orderService.saveOrder(claimableSpinHistories);
-        }
 
         // Cập nhật trạng thái redeemed cho tất cả
         for (SpinHistory spinHistory : redeemedSpinHistories) {
             if (spinHistory.getPrizeItemId().isClaimAble()) {
-                spinHistory.setRedeemed(true);
-                spinHistory.setRedeemedAt(LocalDateTime.now());
                 spinHistoryRepository.save(spinHistory);
             }
         }
@@ -118,20 +92,21 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
 
     @Override
     public SpinHistory spin(Integer userId, Integer bagTypeId) {
-        // In a real app, you would get the user from a UserService
-        AppUser user = new AppUser();
-        user.setUserId(userId);
-        
-        PackagesBox blindBagType = blindBagTypeService.getBlindBagTypeById(bagTypeId);
-        PrizeItem prizeItem = prizeItemService.getRandomPrizeByBagType(bagTypeId);
-        
-        SpinHistory spinHistory = new SpinHistory();
-        spinHistory.setUser(user);
-        spinHistory.setBlindBagId(blindBagType);
-        spinHistory.setPrizeItemId(prizeItem);
-        spinHistory.setSpinTime(LocalDateTime.now());
-        
-        return spinHistoryRepository.save(spinHistory);
+//        // In a real app, you would get the user from a UserService
+//        AppUser user = new AppUser();
+//        user.setUserId(userId);
+//
+//        PackagesBox blindBagType = blindBagTypeService.getBlindBagTypeById(bagTypeId);
+//        PrizeItem prizeItem = prizeItemService.getRandomPrizeByBagType(bagTypeId);
+//
+//        SpinHistory spinHistory = new SpinHistory();
+//        spinHistory.setUser(user);
+//        spinHistory.setBlindBagId(blindBagType);
+//        spinHistory.setPrizeItemId(prizeItem);
+//        spinHistory.setSpinTime(LocalDateTime.now());
+//
+//        return spinHistoryRepository.save(spinHistory);
+        throw new RuntimeException("Not supported function");
     }
 
     @Override
@@ -209,7 +184,6 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
         history.setPrizeItemId(prizeItem); // null for GOOD_LUCK
         history.setPrice(blindPackage.getPricePerSpin().doubleValue());
         history.setSuccess(success);
-        history.setRedeemed(false);
         history.setSpinTime(LocalDateTime.now());
 
 

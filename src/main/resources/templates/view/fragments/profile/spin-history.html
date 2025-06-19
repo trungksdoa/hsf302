@@ -1,0 +1,385 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="spin-history-with-bulk" class="tab-pane fade" id="spin-history">
+  <div class="card shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">My Prizes</h5>
+      <div class="d-flex gap-2">
+        <select class="form-select form-select-sm" id="prizeRarityFilter">
+          <option value="">All Rarities</option>
+          <option value="COMMON">Common</option>
+          <option value="UNCOMMON">Uncommon</option>
+          <option value="RARE">Rare</option>
+          <option value="SPECIAL">Special</option>
+          <option value="GOOD_LUCK">Good Luck</option>
+        </select>
+        <button class="btn btn-sm btn-outline-primary" id="filterPrizeHistoryBtn">
+          <i class="fas fa-filter"></i> Filter
+        </button>
+      </div>
+    </div>
+
+    <!-- Bulk Action Controls -->
+    <div class="card-body border-bottom bg-light py-2" th:if="${userSpinHistory.content != null and !userSpinHistory.content.isEmpty()}">
+      <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <div class="form-check me-3">
+            <input class="form-check-input" type="checkbox" id="selectAllItems">
+            <label class="form-check-label" for="selectAllItems">
+              Select All
+            </label>
+          </div>
+          <small class="text-muted">
+            <span id="selectedCount">0</span> items selected
+          </small>
+        </div>
+        <button type="button" class="btn btn-sm btn-primary" id="bulkClaimBtn" disabled>
+          <i class="fas fa-gift me-1"></i>Claim Selected
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+          <tr>
+            <th width="40">
+              <span class="visually-hidden">Select</span>
+            </th>
+            <th>Spin Date</th>
+            <th>Box Series</th>
+            <th>Prize Item</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr
+                  th:each="userPrize : ${userSpinHistory.content}"
+                  th:if="${userSpinHistory.content != null and !userSpinHistory.content.isEmpty()}"
+          >
+            <!-- Checkbox Column -->
+            <td>
+              <div class="form-check" th:if="${!userPrize.claimed and userPrize.spin != null and userPrize.spin.prizeItemId != null and userPrize.spin.prizeItemId.isClaimAble}">
+                <input
+                        class="form-check-input item-checkbox"
+                        type="checkbox"
+                        th:id="'item_' + ${userPrize.id}"
+                        th:value="${userPrize.id}"
+                >
+              </div>
+            </td>
+
+            <td>
+              <div th:text="${#temporals.format(userPrize.spin?.spinTime, 'MMM dd, yyyy')}">Mar 15, 2024</div>
+              <small class="text-muted" th:text="${#temporals.format(userPrize.spin?.spinTime, 'HH:mm')}">14:30</small>
+            </td>
+            <td>
+              <div class="fw-bold" th:text="${userPrize.spin?.blindBagId?.name ?: 'Unknown Box'}">Mystery Box</div>
+              <small class="text-muted" th:text="'$' + ${userPrize.spin?.price}">$9.99</small>
+            </td>
+            <td>
+              <div th:if="${userPrize.spin != null and userPrize.spin.prizeItemId != null and userPrize.spin.prizeItemId.itemId != null}" class="d-flex align-items-center">
+                <div>
+                  <div class="fw-bold" th:text="${userPrize.spin.prizeItemId.itemName}">Prize Name</div>
+                  <small class="text-muted" th:text="${userPrize.spin.prizeItemId.rarity?.value}">Common</small>
+                </div>
+              </div>
+              <div th:unless="${userPrize.spin != null and userPrize.spin.prizeItemId != null and userPrize.spin.prizeItemId.itemId != null}">
+                <span class="text-muted">No Prize</span>
+              </div>
+            </td>
+            <td>
+                <span
+                        class="badge"
+                        th:classappend="${userPrize.claimed} ? 'bg-success' : 'bg-warning'"
+                        th:text="${userPrize.claimed} ? 'Claimed' : 'Available'"
+                >Available</span
+                >
+              <div th:if="${userPrize.claimed}" class="small text-muted mt-1">
+                <span th:text="${#temporals.format(userPrize.claimedAt, 'MMM dd, yyyy')}">Claimed date</span>
+              </div>
+            </td>
+            <td>
+              <!-- Individual Claim Button -->
+              <button
+                      th:if="${!userPrize.claimed and userPrize.spin != null and userPrize.spin.prizeItemId != null and userPrize.spin.prizeItemId.isClaimAble}"
+                      class="btn btn-sm btn-outline-primary claim-prize-btn me-1"
+                      th:data-prize-id="${userPrize.id}"
+              >
+                <i class="fas fa-gift me-1"></i>Claim
+              </button>
+
+              <!-- Already claimed -->
+              <span th:if="${userPrize.claimed}" class="text-muted small">
+                  <i class="fas fa-check-circle text-success me-1"></i>Claimed
+                </span>
+
+              <!-- Special Prize (not claimable) -->
+              <span
+                      th:if="${!userPrize.claimed and userPrize.spin != null and userPrize.spin.prizeItemId != null and !userPrize.spin.prizeItemId.isClaimAble}"
+                      class="text-warning small"
+                      title="This special prize cannot be claimed but adds to your collection"
+              >
+                  <i class="fas fa-star me-1"></i>Special Prize
+                </span>
+
+              <!-- No prize (GOOD_LUCK) -->
+              <span th:if="${userPrize.spin != null and userPrize.spin.prizeItemId == null}" class="text-muted small">
+                  <i class="fas fa-times-circle me-1"></i>Better luck next time!
+                </span>
+            </td>
+          </tr>
+          <!-- Empty state -->
+          <tr th:if="${userSpinHistory == null or userSpinHistory.isEmpty()}">
+            <td colspan="6" class="text-center py-4">
+              <p class="text-muted mb-0">No prizes found.</p>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="card-footer bg-white" th:if="${userSpinHistory.totalPages > 0}">
+      <nav aria-label="Prize history pagination">
+        <ul class="pagination pagination-sm justify-content-center mb-0">
+          <!-- Previous -->
+          <li class="page-item" th:classappend="${userSpinHistory.first} ? 'disabled'">
+            <a class="page-link"
+               th:href="@{/users/profile(page=${userSpinHistory.number - 1}, size=${userSpinHistory.size})}"
+               aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+
+          <!-- Page numbers -->
+          <li class="page-item"
+              th:each="pageNum : ${#numbers.sequence(0, userSpinHistory.totalPages - 1)}"
+              th:classappend="${pageNum == userSpinHistory.number} ? 'active'">
+            <a class="page-link"
+               th:href="@{/users/profile(page=${pageNum}, size=${userSpinHistory.size})}"
+               th:text="${pageNum + 1}">1</a>
+          </li>
+
+          <!-- Next -->
+          <li class="page-item" th:classappend="${userSpinHistory.last} ? 'disabled'">
+            <a class="page-link"
+               th:href="@{/users/profile(page=${userSpinHistory.number + 1}, size=${userSpinHistory.size})}"
+               aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  
+  <!-- Script xử lý claim và checkbox -->
+  <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+      // Checkbox functionality for bulk claim
+      const selectAllCheckbox = document.getElementById('selectAllItems');
+      const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+      const bulkClaimBtn = document.getElementById('bulkClaimBtn');
+      const selectedCountSpan = document.getElementById('selectedCount');
+
+      // Select All functionality
+      if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+          const isChecked = this.checked;
+          
+          itemCheckboxes.forEach(checkbox => {
+            if (!checkbox.disabled) {
+              checkbox.checked = isChecked;
+            }
+          });
+          
+          updateSelectAllState();
+          updateBulkClaimButton();
+          updateSelectedCount();
+        });
+      }
+
+      // Individual checkbox functionality
+      itemCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          updateSelectAllState();
+          updateBulkClaimButton();
+          updateSelectedCount();
+        });
+      });
+
+      // Update Select All checkbox state based on individual checkboxes
+      function updateSelectAllState() {
+        if (!selectAllCheckbox) return;
+
+        const enabledCheckboxes = Array.from(itemCheckboxes).filter(cb => !cb.disabled);
+        const checkedEnabledBoxes = enabledCheckboxes.filter(cb => cb.checked);
+
+        if (enabledCheckboxes.length === 0) {
+          selectAllCheckbox.indeterminate = false;
+          selectAllCheckbox.checked = false;
+        } else if (checkedEnabledBoxes.length === enabledCheckboxes.length) {
+          selectAllCheckbox.indeterminate = false;
+          selectAllCheckbox.checked = true;
+        } else if (checkedEnabledBoxes.length > 0) {
+          selectAllCheckbox.indeterminate = true;
+          selectAllCheckbox.checked = false;
+        } else {
+          selectAllCheckbox.indeterminate = false;
+          selectAllCheckbox.checked = false;
+        }
+      }
+
+      // Update bulk claim button state
+      function updateBulkClaimButton() {
+        if (!bulkClaimBtn) return;
+
+        const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+        bulkClaimBtn.disabled = checkedBoxes.length === 0;
+      }
+
+      // Update selected count display
+      function updateSelectedCount() {
+        if (!selectedCountSpan) return;
+
+        const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+        selectedCountSpan.textContent = checkedBoxes.length;
+      }
+
+      // Individual claim button functionality
+      document.querySelectorAll('.claim-prize-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const prizeId = this.getAttribute('data-prize-id');
+          if (prizeId) {
+            claimPrize(prizeId);
+          }
+        });
+      });
+
+      // Bulk claim button functionality
+      if (bulkClaimBtn) {
+        bulkClaimBtn.addEventListener('click', function() {
+          const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+          const prizeIds = Array.from(checkedBoxes).map(cb => cb.value);
+          
+          if (prizeIds.length > 0) {
+            bulkClaimPrizes(prizeIds);
+          }
+        });
+      }
+
+      // Claim single prize function
+      function claimPrize(prizeId) {
+        if (!confirm('Are you sure you want to claim this prize?')) {
+          return;
+        }
+
+        // Disable the button to prevent multiple clicks
+        const button = document.querySelector(`.claim-prize-btn[data-prize-id="${prizeId}"]`);
+        if (button) {
+          button.disabled = true;
+          button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Claiming...';
+        }
+
+        fetch(`/user-prizes/${prizeId}/claim`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || ''
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            // Success, refresh the page or update UI
+            window.location.reload();
+          } else {
+            // Handle error
+            alert(data.message || 'Failed to claim prize');
+            if (button) {
+              button.disabled = false;
+              button.innerHTML = '<i class="fas fa-gift me-1"></i>Claim';
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error claiming prize:', error);
+          alert('Error claiming prize. Please try again later.');
+          if (button) {
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-gift me-1"></i>Claim';
+          }
+        });
+      }
+
+      // Bulk claim prizes function
+      function bulkClaimPrizes(prizeIds) {
+        if (!confirm(`Are you sure you want to claim ${prizeIds.length} prize(s)?`)) {
+          return;
+        }
+
+        // Disable button during processing
+        bulkClaimBtn.disabled = true;
+        bulkClaimBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Claiming...';
+
+        fetch('/user-prizes/bulk-claim', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || ''
+          },
+          body: JSON.stringify({ prizeIds: prizeIds })
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            // Success, refresh the page or update UI
+            window.location.reload();
+          } else {
+            // Handle error
+            alert(data.message || 'Failed to claim prizes');
+            bulkClaimBtn.disabled = false;
+            bulkClaimBtn.innerHTML = '<i class="fas fa-gift me-1"></i>Claim Selected';
+          }
+        })
+        .catch(error => {
+          console.error('Error claiming prizes:', error);
+          alert('Error claiming prizes. Please try again later.');
+          bulkClaimBtn.disabled = false;
+          bulkClaimBtn.innerHTML = '<i class="fas fa-gift me-1"></i>Claim Selected';
+        });
+      }
+
+      // Initialize states on page load
+      updateSelectAllState();
+      updateBulkClaimButton();
+      updateSelectedCount();
+
+      // Filter functionality
+      const filterBtn = document.getElementById('filterPrizeHistoryBtn');
+      const rarityFilter = document.getElementById('prizeRarityFilter');
+
+      if (filterBtn && rarityFilter) {
+        filterBtn.addEventListener('click', function() {
+          const rarity = rarityFilter.value;
+          // Redirect to filter URL
+          window.location.href = `/users/profile?rarity=${rarity}`;
+        });
+      }
+    });
+  </script>
+</div>
+</html>

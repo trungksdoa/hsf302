@@ -1,6 +1,7 @@
 package com.product.server.hsf_301.blindBox.service.impl;
 
 import com.product.server.hsf_301.blindBox.model.PackagesBox;
+import com.product.server.hsf_301.blindBox.model.PrizeItem;
 import com.product.server.hsf_301.blindBox.repository.BlindBoxRepository;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +45,23 @@ public class BlindBagTypeServiceImpl implements BlindBagTypeService {
     }
 
     @Override
-    public PackagesBox saveBlindBagType(PackagesBox blindBagType, MultipartFile imageFile) throws IOException {
+    public PackagesBox saveBlindBagType(PackagesBox blindPackage, MultipartFile imageFile) throws IOException {
         if (imageFile != null && !imageFile.isEmpty()) {
-            blindBagType.setImageData(imageFile.getBytes());
-            blindBagType.setImageType(imageFile.getContentType());
+            blindPackage.setImageData(imageFile.getBytes());
+            blindPackage.setImageType(imageFile.getContentType());
         }
-        return blindBagTypeRepository.save(blindBagType);
+
+        // Handle prize items
+        if (blindPackage.getPrizeItems() != null) {
+            for (PrizeItem prizeItem : blindPackage.getPrizeItems()) {
+                prizeItem.setBlindBagType(blindPackage);
+                // Set default values if needed
+                prizeItem.setActive(true);
+                prizeItem.setImageUrl("https://placehold.co/400");
+            }
+        }
+
+        return blindBagTypeRepository.save(blindPackage);
     }
 
     @Override

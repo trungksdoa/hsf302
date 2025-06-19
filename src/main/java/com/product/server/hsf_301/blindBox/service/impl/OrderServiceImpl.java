@@ -3,6 +3,7 @@ package com.product.server.hsf_301.blindBox.service.impl;
 import com.product.server.hsf_301.blindBox.model.*;
 import com.product.server.hsf_301.blindBox.repository.OrderRepository;
 import com.product.server.hsf_301.blindBox.service.OrderService;
+import com.product.server.hsf_301.user.model.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,34 +44,30 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order saveOrder(SpinHistory spinHistory) {
+    public Order saveOrder(UserPrizeItem spinHistory) {
         Order order = new Order();
         List<OrderItem>  orderItems= new ArrayList<>();
-        orderItems.add(new OrderItem(order,spinHistory.getPrizeItemId().getBlindBagType(),spinHistory.getPrizeItemId(),spinHistory.getPrice()));
+        orderItems.add(new OrderItem(order,spinHistory.getSpin().getPrizeItemId(),spinHistory.getSpin().getPrice()));
         order.setOrderItems(orderItems);
 
-        AppUser user = new AppUser();
-        user.setUserId(2);
-        order.setUser(user);
+        order.setUser(spinHistory.getUser());
         return orderRepository.save(order);
     }
 
     @Override
-    public Order saveOrder(List<SpinHistory> spinHistories) {
+    public Order saveOrder(List<UserPrizeItem> spinHistories) {
         Order order = new Order();
+
 
         // Sử dụng stream để tạo OrderItems từ SpinHistory list
         List<OrderItem> orderItems = spinHistories.stream()
                 .map(spinHistory -> new OrderItem(
                         order,
-                        spinHistory.getBlindBagId(),
-                        spinHistory.getPrizeItemId(),
-                        spinHistory.getPrice()
+                        spinHistory.getSpin().getPrizeItemId(),
+                        spinHistory.getSpin().getPrice()
                 ))
                 .collect(Collectors.toList());
-        AppUser user = new AppUser();
-        user.setUserId(2);
-        order.setUser(user);
+        order.setUser(spinHistories.get(0).getUser());
         order.setOrderItems(orderItems);
         return orderRepository.save(order);
     }

@@ -1,7 +1,7 @@
 package com.product.server.hsf_301.payment.model;
 
 
-import com.product.server.hsf_301.blindBox.model.AppUser;
+import com.product.server.hsf_301.user.model.AppUser;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;

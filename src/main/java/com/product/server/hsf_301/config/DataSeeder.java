@@ -517,6 +517,7 @@ public class DataSeeder implements CommandLineRunner {
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password)); // In real app, this should be encoded
         user.setBalance(BigDecimal.valueOf(9999999999L));
+        user.setRole(role);
         return user;
     }
 

@@ -1,0 +1,52 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="profile-overview" class="tab-pane fade show active" id="profile-overview">
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-white">
+      <h5 class="mb-0">Account Overview</h5>
+    </div>
+    <div class="card-body">
+      <!-- Statistics cards -->
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="stats-card text-center p-3 bg-light rounded">
+            <div class="stats-icon mb-2">
+              <i class="fas fa-trophy fa-2x text-warning"></i>
+            </div>
+            <h3 class="stats-number" th:text="${userSpinHistory?.getTotalElements ?: 0}">0</h3>
+            <p class="stats-title text-muted mb-0">Total Spins</p>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="stats-card text-center p-3 bg-light rounded">
+            <div class="stats-icon mb-2">
+              <i class="fas fa-shopping-cart fa-2x text-success"></i>
+            </div>
+            <h3 class="stats-number" th:text="${orderItemMap?.size ?: 0}">0</h3>
+            <p class="stats-title text-muted mb-0">Completed Orders</p>
+          </div>
+        </div>
+      </div>
+
+      <h6 class="mt-3 mb-3">Account Information</h6>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <p class="text-muted mb-1">Username</p>
+          <p class="mb-0" th:text="${user.username}">Username</p>
+        </div>
+        <div class="col-md-6 mb-3">
+          <p class="text-muted mb-1">Email</p>
+          <p class="mb-0" th:text="${user.email}">user@example.com</p>
+        </div>
+        <div class="col-md-6 mb-3">
+          <p class="text-muted mb-1">User ID</p>
+          <p class="mb-0" th:text="${user.userId}">123</p>
+        </div>
+        <div class="col-md-6 mb-3">
+          <p class="text-muted mb-1">Balance</p>
+          <p class="mb-0 text-success fw-bold" th:text="'$' + ${user.balance ?: '0.00'}">$0.00</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</html>

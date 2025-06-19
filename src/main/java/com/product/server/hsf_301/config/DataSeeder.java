@@ -5,8 +5,10 @@ import com.product.server.hsf_301.blindBox.repository.*;
 import com.product.server.hsf_301.payment.TopUpRepository;
 import com.product.server.hsf_301.payment.model.TopUpHistory;
 import com.product.server.hsf_301.blindBox.model.SpinHistory;
+import com.product.server.hsf_301.user.model.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -43,6 +45,11 @@ public class DataSeeder implements CommandLineRunner {
     @Autowired
     private BlogRepository blogRepository;
 
+    @Autowired
+    private UserPrizeitemRepository userPrizeItemRepository;
+    @Autowired
+    private  PasswordEncoder passwordEncoder;
+
     private final Random random = new Random();
 
     @Override
@@ -56,6 +63,7 @@ public class DataSeeder implements CommandLineRunner {
         seedOrders();
         seedOrderItems();
         seedSpinHistory();
+        seedUserPrizeItems();
         seedTopUpHistory();
 
         System.out.println("Data seeding completed!");
@@ -72,12 +80,12 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         List<AppUser> users = Arrays.asList(
-                createUser("admin", "admin@example.com", "Admin", "User", "ADMIN", "password123"),
-                createUser("john_doe", "john@example.com", "John", "Doe", "USER", "password123"),
-                createUser("jane_smith", "jane@example.com", "Jane", "Smith", "USER", "password123"),
-                createUser("bob_johnson", "bob@example.com", "Bob", "Johnson", "USER", "password123"),
-                createUser("alice_brown", "alice@example.com", "Alice", "Brown", "USER", "password123"),
-                createUser("charlie_wilson", "charlie@example.com", "Charlie", "Wilson", "MODERATOR", "password123")
+                createUser("admin", "admin@example.com", "Admin", "User", "ADMIN", "admin"),
+                createUser("john_doe", "john@example.com", "John", "Doe", "USER", "admin"),
+                createUser("jane_smith", "jane@example.com", "Jane", "Smith", "USER", "admin"),
+                createUser("bob_johnson", "bob@example.com", "Bob", "Johnson", "USER", "admin"),
+                createUser("alice_brown", "alice@example.com", "Alice", "Brown", "USER", "admin"),
+                createUser("charlie_wilson", "charlie@example.com", "Charlie", "Wilson", "MODERATOR", "admin")
         );
 
         userRepository.saveAll(users);
@@ -96,30 +104,30 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         List<Blog> blogs = Arrays.asList(
-            createBlog("Welcome to Our Platform",
-                "We're excited to introduce our new mystery box platform where you can discover amazing prizes!",
-                "This is the full content of our welcome blog post. Here you can learn about all the exciting features...",
-                "PUBLISHED", 2),
+                createBlog("Welcome to Our Platform",
+                        "We're excited to introduce our new mystery box platform where you can discover amazing prizes!",
+                        "This is the full content of our welcome blog post. Here you can learn about all the exciting features...",
+                        "PUBLISHED", 2),
 
-            createBlog("How to Open Your First Mystery Box",
-                "Learn the basics of opening mystery boxes and maximizing your chances of getting rare items.",
-                "Step 1: Choose your mystery box carefully... Step 2: Cross your fingers... Step 3: Open and enjoy!",
-                "PUBLISHED", 1),
+                createBlog("How to Open Your First Mystery Box",
+                        "Learn the basics of opening mystery boxes and maximizing your chances of getting rare items.",
+                        "Step 1: Choose your mystery box carefully... Step 2: Cross your fingers... Step 3: Open and enjoy!",
+                        "PUBLISHED", 1),
 
-            createBlog("Rare Items Showcase",
-                "Check out some of the rarest items you can win from our premium mystery boxes.",
-                "Our premium boxes contain incredible items including golden weapons, legendary armor, and exclusive cosmetics...",
-                "PUBLISHED", 1),
+                createBlog("Rare Items Showcase",
+                        "Check out some of the rarest items you can win from our premium mystery boxes.",
+                        "Our premium boxes contain incredible items including golden weapons, legendary armor, and exclusive cosmetics...",
+                        "PUBLISHED", 1),
 
-            createBlog("Tips for New Collectors",
-                "Essential tips for beginners who want to start their collection journey.",
-                "Starting your collection can be overwhelming, but with these tips you'll be on your way to success...",
-                "DRAFT", 2),
+                createBlog("Tips for New Collectors",
+                        "Essential tips for beginners who want to start their collection journey.",
+                        "Starting your collection can be overwhelming, but with these tips you'll be on your way to success...",
+                        "DRAFT", 2),
 
-            createBlog("Community Highlights",
-                "Featuring amazing collections from our community members.",
-                "This month we're showcasing some incredible collections from our most dedicated users...",
-                "PUBLISHED", 1)
+                createBlog("Community Highlights",
+                        "Featuring amazing collections from our community members.",
+                        "This month we're showcasing some incredible collections from our most dedicated users...",
+                        "PUBLISHED", 1)
         );
 
         blogRepository.saveAll(blogs);
@@ -229,32 +237,32 @@ public class DataSeeder implements CommandLineRunner {
 
         prizeItemRepository.saveAll(prizeItems);
         System.out.println("Prize Items seeded successfully: " + prizeItems.size() + " items");
-        
+
         // Print probability summary for verification
         System.out.println("\n=== PROBABILITY DISTRIBUTION SUMMARY ===");
         System.out.println("New Distribution Logic: GOOD_LUCK (highest) > COMMON > UNCOMMON > RARE > SPECIAL (lowest)");
         for (int i = 0; i < blindBoxes.size(); i++) {
             PackagesBox box = blindBoxes.get(i);
             System.out.println("\n" + box.getName() + ":");
-            
+
             // Calculate probabilities for this box
             List<PrizeItem> boxItems = prizeItems.subList(i * 5, (i + 1) * 5);
             double totalProb = 0;
-            
+
             // Sort by probability for better display
             boxItems.sort((a, b) -> Double.compare(b.getProbability(), a.getProbability()));
-            
+
             for (PrizeItem item : boxItems) {
                 String status = item.isClaimAble() ? "✅ Claimable" : "❌ No Prize";
-                System.out.printf("  %-25s | %-10s | %5.1f%% | %s\n", 
-                    item.getItemName(), 
-                    item.getRarity().getValue(), 
-                    item.getProbability() * 100,
-                    status);
+                System.out.printf("  %-25s | %-10s | %5.1f%% | %s\n",
+                        item.getItemName(),
+                        item.getRarity().getValue(),
+                        item.getProbability() * 100,
+                        status);
                 totalProb += item.getProbability();
             }
             System.out.printf("  Total Probability: %.1f%%\n", totalProb * 100);
-            
+
             if (Math.abs(totalProb - 1.0) > 0.001) {
                 System.out.println("  ⚠️  WARNING: Probabilities don't sum to 100%!");
             } else {
@@ -435,13 +443,79 @@ public class DataSeeder implements CommandLineRunner {
         System.out.println("Seeded " + spinHistories.size() + " spin histories");
     }
 
+    private void seedUserPrizeItems() {
+        System.out.println("Seeding User Prize Items...");
+
+        if (userPrizeItemRepository.count() > 0) {
+            System.out.println("User Prize Item data already exists, skipping...");
+            return;
+        }
+
+        // Get actual data from database
+        List<AppUser> users = userRepository.findAll();
+        List<PrizeItem> prizeItems = prizeItemRepository.findAll();
+        List<SpinHistory> spinHistories = spinHistoryRepository.findAll();
+
+        if (users.size() < 2 || prizeItems.isEmpty() || spinHistories.isEmpty()) {
+            System.out.println("Missing required data for user prize items, skipping...");
+            return;
+        }
+
+        List<UserPrizeItem> userPrizeItems = Arrays.asList(
+                // User john_doe won prizes - mix of claimed and unclaimed
+                createUserPrizeItem(users.get(1),  spinHistories.get(0), true, LocalDateTime.now().minusDays(5)),
+                createUserPrizeItem(users.get(1),  spinHistories.get(1), false, null),
+                createUserPrizeItem(users.get(1),
+                        spinHistories.size() > 9 ? spinHistories.get(9) : spinHistories.get(0), true, LocalDateTime.now().minusDays(2)),
+
+                // User jane_smith won prizes
+                createUserPrizeItem(users.get(2),
+                        spinHistories.get(2), false, null),
+                createUserPrizeItem(users.get(2),
+                        spinHistories.get(3), true, LocalDateTime.now().minusDays(8)),
+
+                // User bob_johnson won prizes
+                createUserPrizeItem(users.get(3),
+                        spinHistories.get(4), false, null),
+                createUserPrizeItem(users.get(3), spinHistories.get(5), true, LocalDateTime.now().minusDays(3)),
+
+                // User alice_brown won prizes
+                createUserPrizeItem(users.get(4),
+                        spinHistories.get(6), false, null),
+                createUserPrizeItem(users.get(4),
+                        spinHistories.get(7), false, null),
+
+                // User charlie_wilson won prizes
+                createUserPrizeItem(users.get(5), spinHistories.get(8), true, LocalDateTime.now().minusDays(1))
+        );
+
+        userPrizeItemRepository.saveAll(userPrizeItems);
+        System.out.println("Seeded " + userPrizeItems.size() + " user prize items");
+
+        // Print summary
+        System.out.println("\n=== USER PRIZE ITEMS SUMMARY ===");
+        for (AppUser user : users.subList(1, Math.min(6, users.size()))) {
+            long totalItems = userPrizeItems.stream()
+                    .filter(item -> item.getUser().getUserId().equals(user.getUserId()))
+                    .count();
+            long claimedItems = userPrizeItems.stream()
+                    .filter(item -> item.getUser().getUserId().equals(user.getUserId()) && item.isClaimed())
+                    .count();
+            long unclaimedItems = totalItems - claimedItems;
+
+            System.out.printf("User: %-15s | Total: %d | Claimed: %d | Unclaimed: %d\n",
+                    user.getUsername(), totalItems, claimedItems, unclaimedItems);
+        }
+        System.out.println("====================================\n");
+    }
+
     // Helper methods for creating entities
 
     private AppUser createUser(String username, String email, String firstName, String lastName, String role, String password) {
         AppUser user = new AppUser();
         user.setUsername(username);
         user.setEmail(email);
-        user.setPassword(password); // In real app, this should be encoded
+        user.setPassword(passwordEncoder.encode(password)); // In real app, this should be encoded
         user.setBalance(BigDecimal.valueOf(9999999999L));
         return user;
     }
@@ -498,7 +572,6 @@ public class DataSeeder implements CommandLineRunner {
 
         OrderItem orderItem = new OrderItem();
         orderItem.setOrder(order);
-        orderItem.setBlindBagId(bp);
         orderItem.setPrizeItemId(prizeItem);
         orderItem.setPrice(price);
         return orderItem;
@@ -525,12 +598,9 @@ public class DataSeeder implements CommandLineRunner {
         spinHistory.setPrizeItemId(prizeItem);
         spinHistory.setPrice(price);
         spinHistory.setSuccess(success);
-        spinHistory.setRedeemed(redeemed);
+
         spinHistory.setSpinTime(LocalDateTime.now().minusDays(new Random().nextInt(30)));
 
-        if (redeemed) {
-            spinHistory.setRedeemedAt(spinHistory.getSpinTime().plusHours(new Random().nextInt(48)));
-        }
 
         return spinHistory;
     }
@@ -547,14 +617,20 @@ public class DataSeeder implements CommandLineRunner {
         spinHistory.setPrizeItemId(prizeItem);
         spinHistory.setPrice(price);
         spinHistory.setSuccess(success);
-        spinHistory.setRedeemed(redeemed);
         spinHistory.setSpinTime(LocalDateTime.now().minusDays(new Random().nextInt(30)));
 
-        if (redeemed) {
-            spinHistory.setRedeemedAt(spinHistory.getSpinTime().plusHours(new Random().nextInt(48)));
-        }
 
         return spinHistory;
+    }
+
+    private UserPrizeItem createUserPrizeItem(AppUser user, SpinHistory spin, boolean claimed, LocalDateTime claimedAt) {
+        UserPrizeItem userPrizeItem = new UserPrizeItem();
+        userPrizeItem.setUser(user);
+        userPrizeItem.setSpin(spin);
+        userPrizeItem.setClaimed(claimed);
+        userPrizeItem.setClaimedAt(claimedAt);
+        userPrizeItem.setActive(true);
+        return userPrizeItem;
     }
 
     // Helper methods for creating entities with real database entities
@@ -583,7 +659,6 @@ public class DataSeeder implements CommandLineRunner {
     private OrderItem createOrderItemWithEntities(Order order, PackagesBox blindBox, PrizeItem prizeItem, double price) {
         OrderItem orderItem = new OrderItem();
         orderItem.setOrder(order); // Sử dụng order entity thực tế
-        orderItem.setBlindBagId(blindBox); // Sử dụng blindBox entity thực tế
         orderItem.setPrizeItemId(prizeItem); // Sử dụng prizeItem entity thực tế
         orderItem.setPrice(price);
         return orderItem;

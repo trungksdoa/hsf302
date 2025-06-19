@@ -19,9 +19,6 @@ public class OrderItem {
     @JsonBackReference
     private Order order;
 
-    @ManyToOne
-    @JoinColumn(name = "blind_bag_id")
-    private PackagesBox blindBagId;
 
     @ManyToOne
     @JoinColumn(name = "prize_item_id")
@@ -29,9 +26,8 @@ public class OrderItem {
 
     private Double price;
 
-    public OrderItem(Order order, PackagesBox bp, PrizeItem prizeItem, Double price) {
+    public OrderItem(Order order, PrizeItem prizeItem, Double price) {
         this.order = order;
-        this.blindBagId = bp;
         this.prizeItemId = prizeItem;
         this.price = price;
     }

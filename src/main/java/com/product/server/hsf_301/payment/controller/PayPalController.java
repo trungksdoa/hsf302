@@ -3,7 +3,7 @@ package com.product.server.hsf_301.payment.controller;
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
-import com.product.server.hsf_301.blindBox.model.AppUser;
+import com.product.server.hsf_301.user.model.AppUser;
 import com.product.server.hsf_301.blindBox.service.UserService;
 import com.product.server.hsf_301.payment.TopUpService;
 import com.product.server.hsf_301.payment.model.TopUpHistory;
@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -20,7 +23,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/pay")
 public class PayPalController {
 
@@ -42,6 +45,7 @@ public class PayPalController {
 
 
     @GetMapping("/create")
+    @ResponseBody
     public ResponseEntity<Void> pay(@RequestParam("value") String money) {
         Amount amount = new Amount();
         amount.setCurrency("USD");
@@ -104,8 +108,10 @@ public class PayPalController {
 
 
         //get current user from spring security
+
+
         //update to balance
-        AppUser curr = userService.getUserById(1);
+        AppUser curr = userService.getCurrentUser();
 
         BigDecimal currentBalance = curr.getBalance() != null ? curr.getBalance() : new BigDecimal("0");
         curr.setBalance(currentBalance.add(paymentAmount));
@@ -113,12 +119,13 @@ public class PayPalController {
 
         TopUpHistory topUpHistory = new TopUpHistory();
         topUpHistory.setAmount(amount);
+        topUpHistory.setUser(curr);
         topUpHistory.setCreated_at(LocalDate.now() + "");
         topUpHistory.setTransaction_id(executedPayment.getId());
         topUpHistory.setStatus(executedPayment.getState());
         topUpService.save(topUpHistory);
 
-        return "redirect://";
+        return "redirect:/";
     }
 
 
@@ -129,6 +136,7 @@ public class PayPalController {
 
     // Add balance endpoint
     @GetMapping("/users/balance")
+    @ResponseBody
     public String getUserBalance() {
         List<TopUpHistory> successfulTopUps = topUpService.getAllTopUp();
         double totalBalance = successfulTopUps.stream()

@@ -3,7 +3,8 @@ package com.product.server.hsf_301.blindBox.service;
 import com.product.server.hsf_301.blindBox.model.Order;
 import com.product.server.hsf_301.blindBox.model.PrizeItem;
 import com.product.server.hsf_301.blindBox.model.SpinHistory;
-import com.product.server.hsf_301.blindBox.model.AppUser;
+import com.product.server.hsf_301.blindBox.model.UserPrizeItem;
+import com.product.server.hsf_301.user.model.AppUser;
 
 import java.util.List;
 
@@ -16,8 +17,8 @@ public interface OrderService {
     
     List<Order> getOrdersByStatus(String status);
     
-    Order saveOrder(SpinHistory spinHistory);
-    Order saveOrder(List<SpinHistory> spinHistories);
+    Order saveOrder(UserPrizeItem spinHistory);
+    Order saveOrder(List<UserPrizeItem> spinHistories);
 
 
     Order updateOrderStatus(Integer orderId, String status);

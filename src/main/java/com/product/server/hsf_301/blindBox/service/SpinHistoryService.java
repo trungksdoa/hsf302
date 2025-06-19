@@ -2,7 +2,7 @@ package com.product.server.hsf_301.blindBox.service;
 
 import com.product.server.hsf_301.blindBox.model.*;
 
-import com.product.server.hsf_301.blindBox.model.AppUser;
+import com.product.server.hsf_301.user.model.AppUser;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

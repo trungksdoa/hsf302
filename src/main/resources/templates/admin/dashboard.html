@@ -15,99 +15,35 @@
             <div class="flex-fill p-4">
                 <h1 class="h3 mb-4">Admin Dashboard</h1>
                 
-                <!-- Stats Cards -->
-                <div class="row mb-12">
-                    <div class="col-md-3">
-                        <div class="card bg-primary text-white">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h5>Total Users</h5>
-                                        <h3 th:text="${adminStats?.totalUsers ?: '1,234'}">1,234</h3>
-                                    </div>
-                                    <i class="fas fa-users fa-2x"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-success text-white">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h5>Total Orders</h5>
-                                        <h3 th:text="${adminStats?.totalOrders ?: '856'}">856</h3>
-                                    </div>
-                                    <i class="fas fa-shopping-cart fa-2x"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-warning text-white">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h5>Blog Posts</h5>
-                                        <h3 th:text="${adminStats?.totalBlogPosts ?: '42'}">42</h3>
-                                    </div>
-                                    <i class="fas fa-blog fa-2x"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-info text-white">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h5>Blind Boxes</h5>
-                                        <h3 th:text="${adminStats?.totalBlindBoxes ?: '18'}">18</h3>
-                                    </div>
-                                    <i class="fas fa-cube fa-2x"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <hr/>
                 
-                <!-- Recent Activity -->
-                <div class="row mb-4">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Recent Activity</h5>
+                <!-- Prize Reset and Recent Activity Row -->
+                <div class="row mb-12">
+                    <!-- Prize Reset Section -->
+                    <div class="col-md-12 mb-4">
+                        <div class="card border-info">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-sync-alt me-2"></i>Prize Reset Management
+                                </h6>
                             </div>
                             <div class="card-body">
-                                <!-- Table with data -->
-                                <div th:if="${recentActivity != null and !recentActivity.isEmpty()}" class="table-responsive">
-                                    <table class="table table-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>Action</th>
-                                                <th>User</th>
-                                                <th>Date/Time</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr th:each="activity : ${recentActivity}">
-                                                <td th:text="${activity.action}">New order placed</td>
-                                                <td th:text="${activity.username}">john_doe</td>
-                                                <td th:text="${#temporals.format(activity.timestamp, 'yyyy-MM-dd HH:mm')}">2024-03-15 14:30</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                <div id="prizeStats" class="mb-3">
+                                    <p class="text-muted">Loading statistics...</p>
                                 </div>
                                 
-                                <!-- Empty state message -->
-                                <div th:if="${recentActivity == null or recentActivity.isEmpty()}" class="text-center py-3">
-                                    <i class="fas fa-history fa-2x text-muted mb-3"></i>
-                                    <p class="text-muted">No recent activity to display</p>
+                                <div class="d-grid gap-2">
+                                    <button id="manualResetBtn" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-redo me-2"></i>Manual Reset Prizes
+                                    </button>
+                                    <small class="text-muted">
+                                        Next automatic reset: Daily at 00:00
+                                    </small>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    
+            
                 </div>
                 
                 <!-- Quick Actions -->
@@ -136,5 +72,88 @@
             </div>
         </div>
     </div>
+    
+    <script th:inline="javascript">
+    // Load prize statistics
+    function loadPrizeStatistics() {
+        fetch('/admin/prizes/statistics')
+            .then(response => response.json())
+            .then(data => {
+                const statsHtml = `
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h6 class="text-primary">${data.totalPrizes}</h6>
+                            <small>Total</small>
+                        </div>
+                        <div class="col-4">
+                            <h6 class="text-success">${data.activePrizes}</h6>
+                            <small>Active</small>
+                        </div>
+                        <div class="col-4">
+                            <h6 class="text-danger">${data.inactivePrizes}</h6>
+                            <small>Inactive</small>
+                        </div>
+                    </div>
+                    <div class="progress mt-2" style="height: 8px;">
+                        <div class="progress-bar bg-success" 
+                             style="width: ${data.activePercentage}%">
+                        </div>
+                    </div>
+                    <small class="text-muted">
+                        ${data.activePercentage.toFixed(1)}% prizes available
+                    </small>
+                `;
+                document.getElementById('prizeStats').innerHTML = statsHtml;
+            })
+            .catch(error => {
+                console.error('Error loading prize statistics:', error);
+            });
+    }
+
+    // Manual reset function
+    document.addEventListener('DOMContentLoaded', function() {
+        const resetButton = document.getElementById('manualResetBtn');
+        if (resetButton) {
+            resetButton.addEventListener('click', function() {
+                if (!confirm('Are you sure you want to reset all prizes? This will make all inactive prizes available again.')) {
+                    return;
+                }
+                
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Resetting...';
+                
+                fetch('/admin/prizes/reset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`Success! ${data.resetCount} prizes were reset.`);
+                        loadPrizeStatistics(); // Reload stats
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Error occurred while resetting prizes');
+                    console.error('Error:', error);
+                })
+                .finally(() => {
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-redo me-2"></i>Manual Reset Prizes';
+                });
+            });
+        }
+
+        // Load statistics on page load
+        loadPrizeStatistics();
+        
+        // Refresh statistics every 30 seconds
+        setInterval(loadPrizeStatistics, 30000);
+    });
+    </script>
 </body>
 </html>

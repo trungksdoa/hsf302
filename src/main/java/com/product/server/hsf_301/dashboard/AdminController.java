@@ -2,13 +2,12 @@ package com.product.server.hsf_301.dashboard;
 
 
 import com.product.server.hsf_301.blindBox.model.*;
-import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
-import com.product.server.hsf_301.blindBox.service.BlogService;
-import com.product.server.hsf_301.blindBox.service.OrderService;
-import com.product.server.hsf_301.blindBox.service.UserService;
+import com.product.server.hsf_301.blindBox.service.*;
+import com.product.server.hsf_301.user.model.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +27,7 @@ public class AdminController {
     private final BlogService blogService;
     private final OrderService orderService; // Add OrderService
     private final UserService userService;
+    private final PrizeResetService resetService;
     private final String UPLOAD_DIR = "src/main/resources/static/uploads/blindbox/";
 
     // Trang Dashboard
@@ -123,9 +124,15 @@ public class AdminController {
     }
 
     // --- CRUD BlindBox ---
+    @GetMapping("/blindBoxes/{id}")
+    @ResponseBody
+    public PackagesBox getBlindPack(@PathVariable("id") Integer id) {
+        return blindBagTypeService.getBlindBagTypeById(id);
+    }
+
     @PostMapping("/blindBoxes")
     public String createBlindBox(@ModelAttribute PackagesBox blindPackage,
-                                 @RequestParam("image") MultipartFile imageFile,
+                                 @RequestParam("imageFile") MultipartFile imageFile,
                                  RedirectAttributes redirectAttributes) {
         try {
 
@@ -194,10 +201,45 @@ public class AdminController {
         blogService.deleteBlog(id);
         return ResponseEntity.ok().build();
     }
-//    @PostMapping("/blog/delete/{id}")
-//    public String deleteBlog(@PathVariable Long id) {
-//        System.out.println(blogService.getBlogById(id));
-//        blogService.deleteBlog(id);
-//        return "redirect:/admin/blogs";
-//    }
+
+
+
+    /**
+     * Manual reset prizes endpoint
+     */
+    @PostMapping("/prizes/reset")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> resetPrizes() {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            int resetCount = resetService.manualResetPrizes();
+
+            response.put("success", true);
+            response.put("message", "Prizes reset successfully");
+            response.put("resetCount", resetCount);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error resetting prizes: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    /**
+     * Get prize statistics
+     */
+    @GetMapping("/prizes/statistics")
+    @ResponseBody
+    public ResponseEntity<PrizeResetService.PrizeStatistics> getPrizeStatistics() {
+        try {
+            PrizeResetService.PrizeStatistics stats = resetService.getPrizeStatistics();
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 }

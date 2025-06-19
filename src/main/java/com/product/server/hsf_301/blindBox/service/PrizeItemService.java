@@ -11,7 +11,7 @@ public interface PrizeItemService {
     PrizeItem getPrizeItemById(Integer id);
     
     PrizeItem savePrizeItem(PrizeItem prizeItem);
-    
+    public PrizeItem updateItem(Integer id, PrizeItem updatedItem);
     void deletePrizeItem(Integer id);
     
     List<PrizeItem> getPrizeItemsByBlindBagType(PackagesBox blindBagType);

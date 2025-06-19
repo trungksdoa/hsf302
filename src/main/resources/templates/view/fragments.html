@@ -1,4 +1,7 @@
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{view/layout}">
 
 <head th:fragment="common_header(title, links)">
     <title th:text="${title}">HSF Store</title>
@@ -59,15 +62,8 @@
                         <li class="nav-item">
                             <a class="nav-link" 
                                th:classappend="${httpServletRequest != null and httpServletRequest.requestURI.contains('/blog')} ? 'active'" 
-                               href="/blog">
+                               href="/blogs">
                                Blog
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" 
-                               th:classappend="${httpServletRequest != null and httpServletRequest.requestURI.contains('/spin-history')} ? 'active'" 
-                               href="/spinHistory">
-                               Spin History
                             </a>
                         </li>
                     </ul>
@@ -220,16 +216,7 @@
             
             // Notification function
             function showNotification(message, type = 'info') {
-                Toastify({
-                    text: message,
-                    duration: 3000,
-                    close: true,
-                    gravity: "top",
-                    position: 'right',
-                    backgroundColor: type === 'success' ? "#4CAF50" : 
-                                   type === 'error' ? "#FF5252" : 
-                                   type === 'warning' ? "#FF9800" : "#2196F3"
-                }).showToast();
+                alert(message)
             }
 
             // Smooth scroll for navigation links

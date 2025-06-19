@@ -1,5 +1,6 @@
 package com.product.server.hsf_301.blindBox.model;
 
+import com.product.server.hsf_301.user.model.AppUser;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,9 +32,6 @@ public class SpinHistory {
     private Double price;
 
     private Boolean success;
-
-    private boolean redeemed;
-    private LocalDateTime redeemedAt;
 
     private LocalDateTime spinTime;
 

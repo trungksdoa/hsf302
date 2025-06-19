@@ -1,0 +1,20 @@
+MS\HSF\hsf302\src\main\resources\templates\view\fragments\profile\settings.html -->
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="settings" class="tab-pane fade" id="settings">
+  <div class="card shadow-sm">
+    <div class="card-header bg-white">
+      <h5 class="mb-0">Account Settings</h5>
+    </div>
+    <div class="card-body">
+      <form th:action="@{/users/update}" method="post">
+        <input type="hidden" name="userId" th:value="${user.userId}" />
+
+        <h6 class="mb-3">Account Information</h6>
+        <div class="row mb-4">
+          <!-- Settings form fields go here -->
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</html>

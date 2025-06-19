@@ -34,7 +34,7 @@
                         <tr th:each="post : ${blogs}">
                             <td th:text="${post.id}">1</td>
                             <td th:text="${post.title}">Blog Title</td>
-                            <td th:text="${post.author.username}">Admin</td>
+                            <td th:text="${post.author?.username}">Admin</td>
                             <td>
                                         <span class="badge" th:classappend="${post.status == 'PUBLISHED'} ? 'bg-success' : 'bg-warning'"
                                               th:text="${post.status}">Published</span>
@@ -88,10 +88,6 @@
                             <input type="text" class="form-control" id="blogTitle" name="title" required>
                         </div>
                         <div class="mb-3">
-                            <label for="blogAuthor" class="form-label">Author</label>
-                            <input type="text" class="form-control" id="blogAuthor" name="author" required>
-                        </div>
-                        <div class="mb-3">
                             <label for="blogContent" class="form-label">Content</label>
                             <textarea class="form-control" id="blogContent" name="content" rows="6" required></textarea>
                         </div>
@@ -128,10 +124,6 @@
                             <input type="text" class="form-control" id="updateBlogTitle" name="title" required>
                         </div>
                         <div class="mb-3">
-                            <label for="updateBlogAuthor" class="form-label">Author</label>
-                            <input type="text" class="form-control" id="updateBlogAuthor" name="author" required>
-                        </div>
-                        <div class="mb-3">
                             <label for="updateBlogContent" class="form-label">Content</label>
                             <textarea class="form-control" id="updateBlogContent" name="content" rows="6" required></textarea>
                         </div>
@@ -158,14 +150,14 @@
     function editBlog(button) {
         const id = button.getAttribute('data-id');
         const title = button.getAttribute('data-title');
-        const author = button.getAttribute('data-author');
+        // const author = button.getAttribute('data-author');
         const content = button.getAttribute('data-content');
         const status = button.getAttribute('data-status');
 
         // Populate update modal with existing data
         document.getElementById('updateBlogId').value = id;
         document.getElementById('updateBlogTitle').value = title;
-        document.getElementById('updateBlogAuthor').value = author;
+        // document.getElementById('updateBlogAuthor').value = author;
         document.getElementById('updateBlogContent').value = content;
         document.getElementById('updateBlogStatus').value = status;
 

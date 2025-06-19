@@ -251,13 +251,13 @@
         <div id="prizeItemTemplate" class="d-none">
             <div class="prize-item-row row mb-3 border-bottom pb-3">
                 <input type="hidden" name="prizeItems[INDEX].itemId" class="item-id">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <div class="mb-2">
                         <label class="form-label">Item Name</label>
                         <input type="text" class="form-control item-name" name="prizeItems[INDEX].itemName" required>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="mb-2">
                         <label class="form-label">Rarity</label>
                         <select class="form-select item-rarity" name="prizeItems[INDEX].rarity" required>
@@ -269,18 +269,35 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="mb-2">
                         <label class="form-label">Drop Rate (%)</label>
                         <input type="number" class="form-control item-droprate" name="prizeItems[INDEX].probability" step="0.01" min="0" max="100" required>
                     </div>
                 </div>
-                <div class="col-md-1 d-flex align-items-end mb-2">
-                    <button type="button" class="btn btn-danger btn-sm remove-item" onclick="removePrizeItem(this)">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                <div class="col-md-3">
+                    <div class="mb-2 d-flex gap-2 align-items-end">
+                        <div class="flex-grow-1">
+                            <label class="form-label small">Status</label>
+                            <select class="form-select form-select-sm item-active" name="prizeItems[INDEX].active">
+                                <option value="true" selected>Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="flex-grow-1">
+                            <label class="form-label small">Claim</label>
+                            <select class="form-select form-select-sm item-claimable" name="prizeItems[INDEX].claimAble">
+                                <option value="false" selected>No</option>
+                                <option value="true">Yes</option>
+                            </select>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-outline-danger btn-sm remove-item" onclick="removePrizeItem(this)" title="Remove item">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <input type="hidden" name="prizeItems[INDEX].isActive" value="true" class="item-active">
             </div>
         </div>
     </div>
@@ -311,7 +328,7 @@
                 prizeItemIndex = 0;
                 
                 // Fetch box details
-                fetch(`/blindbox/${id}`)
+                fetch(`/admin/blindBoxes/${id}`)
                     .then(response => response.json())
                     .then(data => {
                         // Populate form
@@ -394,7 +411,9 @@
                     clone.querySelector('.item-name').value = itemData.itemName || '';
                     clone.querySelector('.item-rarity').value = itemData.rarity || 'COMMON';
                     dropRateInput.value = itemData.probability || suggestedRate;
-                    clone.querySelector('.item-active').value = itemData.isActive !== false ? 'true' : 'false';
+                    clone.querySelector('.item-active').value = itemData.active !== false ? 'true' : 'false';
+                    clone.querySelector('.item-claimable').value = itemData.claimAble === true ? 'true' : 'false';
+
                 } else {
                     // For new items, set suggested drop rate
                     dropRateInput.value = suggestedRate;
@@ -491,8 +510,24 @@
                     clone.querySelector('.item-id').value = itemData.itemId || '';
                     clone.querySelector('.item-name').value = itemData.itemName || '';
                     clone.querySelector('.item-rarity').value = itemData.rarity || 'COMMON';
-                    dropRateInput.value = itemData.probability || suggestedRate;
-                    clone.querySelector('.item-active').value = itemData.isActive !== false ? 'true' : 'false';
+                    
+                    // Keep the probability value as is (in tens) instead of converting to decimal
+                    // If it's already in decimal format (less than 1), multiply by 100
+                    if (itemData.probability) {
+                        let probValue = itemData.probability;
+                        if (probValue < 1) {
+                            probValue = probValue * 100;
+                        }
+                        dropRateInput.value = probValue;
+                    } else {
+                        dropRateInput.value = suggestedRate;
+                    }
+                    
+                    clone.querySelector('.item-active').value = itemData.active !== false ? 'true' : 'false';
+                    const claimableSelect = clone.querySelector('.item-claimable');
+                    if (claimableSelect) {
+                        claimableSelect.value = itemData.claimAble === true ? 'true' : 'false';
+                    }
                 } else {
                     // For new items, set suggested drop rate
                     dropRateInput.value = suggestedRate;

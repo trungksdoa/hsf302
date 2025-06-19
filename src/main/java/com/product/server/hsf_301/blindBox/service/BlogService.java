@@ -4,6 +4,7 @@ package com.product.server.hsf_301.blindBox.service;
 
 import com.product.server.hsf_301.blindBox.model.Blog;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import java.util.Optional;

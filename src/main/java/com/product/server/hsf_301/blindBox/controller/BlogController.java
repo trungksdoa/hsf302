@@ -2,9 +2,10 @@ package com.product.server.hsf_301.blindBox.controller;
 
 
 import com.product.server.hsf_301.blindBox.model.Blog;
-import com.product.server.hsf_301.blindBox.model.AppUser;
 import com.product.server.hsf_301.blindBox.service.BlogService;
+import com.product.server.hsf_301.user.model.AppUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

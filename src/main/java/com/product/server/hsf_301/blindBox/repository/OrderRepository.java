@@ -1,7 +1,7 @@
 package com.product.server.hsf_301.blindBox.repository;
 
 import com.product.server.hsf_301.blindBox.model.Order;
-import com.product.server.hsf_301.blindBox.model.AppUser;
+import com.product.server.hsf_301.user.model.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

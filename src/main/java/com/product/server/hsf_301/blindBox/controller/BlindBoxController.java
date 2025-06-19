@@ -1,32 +1,20 @@
 package com.product.server.hsf_301.blindBox.controller;
 
 import com.product.server.hsf_301.blindBox.model.BlindPackage;
-import com.product.server.hsf_301.blindBox.model.PrizeItem;
-import com.product.server.hsf_301.blindBox.model.SpinHistory;
-import com.product.server.hsf_301.blindBox.model.User;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import com.product.server.hsf_301.blindBox.service.PrizeItemService;
 import com.product.server.hsf_301.blindBox.service.SpinHistoryService;
-import com.product.server.hsf_301.blindBox.service.UserService;
+
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.Principal;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/blindbox")
@@ -36,7 +24,7 @@ public class BlindBoxController {
     private final BlindBagTypeService blindBagTypeService;
     private final PrizeItemService prizeItemService;
     private final SpinHistoryService spinHistoryService;
-    private final UserService userService;
+
 
     
     // Directory where uploaded files will be stored

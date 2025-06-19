@@ -1,5 +1,6 @@
 package com.product.server.hsf_301.blindBox.model;
 
+import com.product.server.hsf_301.user.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

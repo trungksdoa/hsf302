@@ -6,7 +6,17 @@
 <body>
     <!-- Header -->
     <div th:replace="~{view/fragments :: header}"></div>
-
+@Configuration
+public class ThymeleafConfig {
+    @Bean
+    public SpringResourceTemplateResolver templateResolver() {
+        SpringResourceTemplateResolver resolver = new SpringResourceTemplateResolver();
+        resolver.setPrefix("classpath:/templates/");
+        resolver.setSuffix(".html");
+        resolver.setCacheable(false); // Disable cache during development
+        return resolver;
+    }
+}
 
     <!-- Main Content -->
     <div class="container-fluid" style="min-height: 100vh;">

@@ -4,7 +4,7 @@ package com.product.server.hsf_301.blindBox.service.impl;
 import com.product.server.hsf_301.blindBox.model.BlindPackage;
 import com.product.server.hsf_301.blindBox.model.PrizeItem;
 import com.product.server.hsf_301.blindBox.model.SpinHistory;
-import com.product.server.hsf_301.blindBox.model.User;
+import com.product.server.hsf_301.user.model.User;
 import com.product.server.hsf_301.blindBox.repository.SpinHistoryRepository;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import com.product.server.hsf_301.blindBox.service.PrizeItemService;

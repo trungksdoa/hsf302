@@ -17,17 +17,34 @@ public class MyAppUserService implements UserDetailsService {
     @Autowired
     private  MyAppUserRepository repository;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<MyAppUser> user = repository.findByUsername(username);
-        if (user.isPresent()) {
-            MyAppUser userObj = user.get();
-            return User.builder()
-                    .username(userObj.getUsername())
-                    .password(userObj.getPassword())
 
-                    .build();
+    //public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        Optional<MyAppUser> user = repository.findByUsername(username);
+//        if (user.isPresent()) {
+//            var userObj = user.get();
+//            return User.builder()
+//                    .username(userObj.getUsername())
+//                    .password(userObj.getPassword())
+//                    .roles(userObj.getRole())
+//                    .build();
+//        }else{
+//            throw new UsernameNotFoundException(username);
+//        }
+
+
+        @Override
+        public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+            Optional<com.product.server.hsf_301.user.model.User> user = repository.findByUsername(username);
+            if (user.isPresent()) {
+              com.product.server.hsf_301.user.model.User userObj = user.get();
+                String role = "ADMIN".equalsIgnoreCase(userObj.getRole()) ? "ADMIN" : "USER";
+                return User.builder()
+                        .username(userObj.getUsername())
+                        .password(userObj.getPassword())
+                        .roles(role)
+                        .build();
+            }
+            throw new UsernameNotFoundException("User not found: " + username);
         }
-        throw new UsernameNotFoundException("User not found: " + username);
-    }
+
 }

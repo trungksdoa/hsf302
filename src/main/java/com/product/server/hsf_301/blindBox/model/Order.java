@@ -1,9 +1,9 @@
 package com.product.server.hsf_301.blindBox.model;
 
+import com.product.server.hsf_301.user.model.User;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity(name = "BlindBoxOrder")

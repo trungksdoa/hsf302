@@ -1,7 +1,7 @@
 package com.product.server.hsf_301.blindBox.service.impl;
 
 import com.product.server.hsf_301.blindBox.model.Order;
-import com.product.server.hsf_301.blindBox.model.User;
+import com.product.server.hsf_301.user.model.User;
 import com.product.server.hsf_301.blindBox.repository.OrderRepository;
 import com.product.server.hsf_301.blindBox.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;

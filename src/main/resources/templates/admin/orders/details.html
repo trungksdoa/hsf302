@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Order Details</title>
+</head>
+<body>
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1">Order Details</h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="/admin/orders">Orders</a></li>
+                            <li class="breadcrumb-item active" th:text="'Order #' + ${order.orderId}">Order Details</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div>
+                    <a href="/admin/orders" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Order Information -->
+        <div class="col-lg-8">
+            <!-- Order Summary Card -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Order Summary</h5>
+                    <div>
+                            <span class="badge"
+                                  th:classappend="${order.status == 'COMPLETED' ? 'bg-success' :
+                                                  order.status == 'PENDING' ? 'bg-warning text-dark' :
+                                                  order.status == 'CANCELLED' ? 'bg-danger' : 'bg-secondary'}"
+                                  th:text="${order.status}">Status</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Order ID:</strong> <span th:text="${order.orderId}">#12345</span></p>
+                            <p><strong>Order Date:</strong>
+                                <span th:text="${#temporals.format(order.orderDate, 'MMM dd, yyyy HH:mm')}">Jan 15, 2024 10:30</span>
+                            </p>
+                            <p><strong>Customer:</strong>
+                                <span th:text="${order.user.username}">Customer Name</span>
+                            </p>
+                            <p><strong>Email:</strong>
+                                <span th:text="${order.user.email}">customer@example.com</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Payment Method:</strong>
+                                <span th:text="${order.paymentMethod ?: 'Credit Card'}">Credit Card</span>
+                            </p>
+                            <p><strong>Total Amount:</strong>
+                                <span class="text-success fw-bold" th:text="'$' + ${#numbers.formatDecimal(order.totalAmount, 1, 2)}">$99.99</span>
+                            </p>
+                            <p><strong>Shipping Address:</strong>
+                                <span th:text="${order.shippingAddress ?: 'Not provided'}">123 Main St, City, State</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Items</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Prize Item</th>
+                                <th>Type</th>
+                                <th>Price</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="item : ${order.orderItems}">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3 bg-primary rounded d-flex align-items-center justify-content-center"
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-gift text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0" th:text="${item.prizeItemId.itemName ?: 'Prize Item'}">Prize Item Name</h6>
+                                            <small class="text-muted" th:text="${item.prizeItemId.description ?: 'No description'}">Prize Description</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                            <span class="badge"
+                                                  th:classappend="${item.prizeItemId.rarity == 'COMMON' ? 'bg-secondary' :
+                                                                  item.prizeItemId.rarity == 'RARE' ? 'bg-primary' :
+                                                                  item.prizeItemId.rarity == 'EPIC' ? 'bg-warning' :
+                                                                  item.prizeItemId.rarity == 'LEGENDARY' ? 'bg-danger' : 'bg-info'}"
+                                                  th:text="${item.prizeItemId.rarity ?: 'COMMON'}">COMMON</span>
+                                </td>
+                                <td class="fw-bold" th:text="'$' + ${#numbers.formatDecimal(item.price, 1, 2)}">$19.99</td>
+                            </tr>
+                            </tbody>
+                            <tfoot class="table-light">
+                            <tr>
+                                <th colspan="2" class="text-end">Total Amount:</th>
+                                <th class="text-success" th:text="'$' + ${#numbers.formatDecimal(order.totalAmount, 1, 2)}">$99.99</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div th:if="${order.orderItems == null or #lists.isEmpty(order.orderItems)}"
+                         class="text-center py-4">
+                        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No items in this order</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Actions Sidebar -->
+        <div class="col-lg-4">
+            <!-- Status Management Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">Order Status Management</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Current Status:</label>
+                        <div>
+                                <span class="badge fs-6"
+                                      th:classappend="${order.status == 'COMPLETED' ? 'bg-success' :
+                                                      order.status == 'PENDING' ? 'bg-warning text-dark' :
+                                                      order.status == 'CANCELLED' ? 'bg-danger' : 'bg-secondary'}"
+                                      th:text="${order.status}">Status</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="statusSelect" class="form-label">Update Status:</label>
+                        <select class="form-select" id="statusSelect" th:value="${order.status}">
+                            <option value="PENDING" th:selected="${order.status == 'PENDING'}">Pending</option>
+                            <option value="PROCESSING" th:selected="${order.status == 'PROCESSING'}">Processing</option>
+                            <option value="COMPLETED" th:selected="${order.status == 'COMPLETED'}">Completed</option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn btn-primary w-100" th:onclick="'updateOrderStatus(' + ${order.orderId} + ')'">
+                        <i class="fas fa-save"></i> Update Status
+                    </button>
+                </div>
+            </div>
+
+            <!-- Customer Information Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Customer Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center"
+                             style="width: 60px; height: 60px;">
+                            <i class="fas fa-user fa-2x text-white"></i>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <h6 class="mb-1" th:text="${order.user.username}">Customer Name</h6>
+                        <p class="text-muted mb-2" th:text="${order.user.email}">customer@example.com</p>
+                        <p class="text-muted small mb-3" th:if="${order.user.phone}" th:text="${order.user.phone}">Phone</p>
+                    </div>
+                    <div class="d-grid">
+                        <a th:href="@{/admin/users/{id}(id=${order.user.userId})}"
+                           class="btn btn-outline-primary btn-sm">
+                            View Customer Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script>
+    function updateOrderStatus(orderId) {
+        // const orderId = /*[[${order.orderId}]]*/ 0;
+        const newStatus = document.getElementById('statusSelect').value;
+
+        // Show loading state
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        button.disabled = true;
+
+        fetch(`/admin/orders/${orderId}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: newStatus })
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Reload page to show updated status
+                    location.reload();
+                } else {
+                    throw new Error('Failed to update status');
+                }
+            })
+            .catch(error => {
+                alert('Error updating order status: ' + error.message);
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+    }
+</script>
+</body>
+</html>

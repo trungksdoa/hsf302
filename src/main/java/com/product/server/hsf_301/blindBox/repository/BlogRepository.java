@@ -3,6 +3,9 @@
 package com.product.server.hsf_301.blindBox.repository;
 
 import com.product.server.hsf_301.blindBox.model.Blog;
+import com.product.server.hsf_301.user.model.AppUser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -22,4 +25,10 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
 
     @Query("select b from Blog b where b.author.userId = ?1")
     Blog findByAuthor_UserId(Integer userId);
+
+    List<Blog> findByAuthor(AppUser author);
+
+    long countByAuthor(AppUser author);
+
+    Page<Blog> findByStatus(String status, Pageable pageable);
 }

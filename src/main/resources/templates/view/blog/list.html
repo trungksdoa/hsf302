@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{view/layout}">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <head>
-    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Blog</title>
+    <title >Blog</title>
 </head>
 
 <body>
@@ -15,15 +17,21 @@
                         <h1 class="h2 mb-0">Blog</h1>
                         <p class="text-muted">Latest news and updates</p>
                     </div>
-                    <!-- Add New Post Button (show only for authenticated users) -->
-                    <div>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                    <!-- Navigation Buttons -->
+                    <div class="d-flex gap-2">
+                        <!-- My Posts Button -->
+                        <a href="/blogs/my-posts" class="btn btn-outline-primary" sec:authorize="isAuthenticated()">
+                            <i class="fas fa-user-edit me-2"></i>My Posts
+                        </a>
+                        <!-- Add New Post Button -->
+                        <button sec:authorize="isAuthenticated()" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createPostModal">
                             <i class="fas fa-plus me-2"></i>Create New Post
                         </button>
                     </div>
                 </div>
             </div>
         </section>
+
 
         <!-- Blog Content -->
         <section class="py-4">

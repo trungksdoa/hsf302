@@ -3,6 +3,7 @@
 package com.product.server.hsf_301.blindBox.service;
 
 import com.product.server.hsf_301.blindBox.model.Blog;
+import com.product.server.hsf_301.user.model.AppUser;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 
@@ -16,9 +17,9 @@ public interface BlogService {
     Blog updateBlog(Long id, Blog blog);
     void deleteBlog(Long id);
 
-    List<Blog> getBlogsByAuthor(String currentUserId);
+    List<Blog> getBlogsByAuthor(AppUser appUser);
 
-    Blog getPostCountByAuthor(String currentUserId);
+    Long getPostCountByAuthor(AppUser currentUserId);
 
     Long getTotalPostCount();
 }

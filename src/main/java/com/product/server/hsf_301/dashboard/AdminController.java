@@ -123,6 +123,30 @@ public class AdminController {
         return "admin/layout";
     }
 
+    @GetMapping("/users/{userId}")
+    public String viewCustomerProfile(@PathVariable Integer userId, Model model) {
+        AppUser user = userService.getUserById(userId);
+        List<Order> userOrders = orderService.getOrdersByUser(user);
+
+        // Calculate statistics
+        double totalSpent = userOrders.stream()
+                .mapToDouble(Order::getTotalAmount)
+                .sum();
+
+        long completedOrders = userOrders.stream()
+                .filter(order -> "COMPLETED".equals(order.getStatus()))
+                .count();
+
+        model.addAttribute("showSidebar", true);
+        model.addAttribute("user", user);
+        model.addAttribute("userOrders", userOrders);
+        model.addAttribute("totalSpent", totalSpent);
+        model.addAttribute("completedOrders", completedOrders);
+        model.addAttribute("content", "admin/users/profile");
+        return "admin/layout";
+    }
+
+
     // --- CRUD BlindBox ---
     @GetMapping("/blindBoxes/{id}")
     @ResponseBody

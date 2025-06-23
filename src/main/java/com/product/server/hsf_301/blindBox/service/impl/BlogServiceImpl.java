@@ -7,6 +7,7 @@ import com.product.server.hsf_301.blindBox.repository.BlogRepository;
 import com.product.server.hsf_301.blindBox.repository.UserRepository;
 import com.product.server.hsf_301.blindBox.service.BlogService;
 import com.product.server.hsf_301.blindBox.service.UserService;
+import com.product.server.hsf_301.user.model.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +28,7 @@ public class BlogServiceImpl implements BlogService {
 
     public Page<Blog> getAllBlogs(int page, int size) {
         Pageable pageable = PageRequest.of(page, size); // Lấy trang đầu, mỗi trang gồm 10 bản ghi
-        return blogRepository.findAll(pageable);
+        return blogRepository.findByStatus("PUBLISHED",pageable);
     }
 
     @Override
@@ -61,13 +62,13 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    public List<Blog> getBlogsByAuthor(String currentUserId) {
-        return blogRepository.findAllByAuthor_UserId(Integer.parseInt(currentUserId));
+    public List<Blog> getBlogsByAuthor(AppUser currentUserId) {
+        return blogRepository.findByAuthor(currentUserId);
     }
 
     @Override
-    public Blog getPostCountByAuthor(String currentUserId) {
-        return blogRepository.findByAuthor_UserId(Integer.parseInt(currentUserId));
+    public Long getPostCountByAuthor(AppUser currentUserId) {
+        return blogRepository.countByAuthor(currentUserId);
     }
 
     @Override

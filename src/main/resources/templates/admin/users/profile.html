@@ -1,0 +1,278 @@
+<!-- src/main/resources/templates/admin/users/profile.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Customer Profile</title>
+</head>
+<body>
+<div class="container-fluid">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h2 class="mb-1">Customer Profile</h2>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+              <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+              <li class="breadcrumb-item"><a href="/admin/users">Users</a></li>
+              <li class="breadcrumb-item active" th:text="${user.username}">Customer Name</li>
+            </ol>
+          </nav>
+        </div>
+        <div>
+          <a href="/admin/users" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Users
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Customer Information -->
+    <div class="col-lg-4">
+      <!-- Profile Card -->
+      <div class="card mb-4">
+        <div class="card-body text-center">
+          <div class="mb-3">
+            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mx-auto"
+                 style="width: 100px; height: 100px;">
+              <i class="fas fa-user fa-3x text-white"></i>
+            </div>
+          </div>
+          <h4 class="mb-1" th:text="${user.username}">Customer Name</h4>
+          <p class="text-muted mb-3" th:text="${user.email}">customer@example.com</p>
+          <div class="row text-center">
+            <div class="col-4">
+              <div class="border-end">
+                <h5 class="mb-1 text-primary" th:text="${#lists.size(userOrders)}">0</h5>
+                <small class="text-muted">Orders</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="border-end">
+                <h5 class="mb-1 text-success" th:text="${completedOrders}">0</h5>
+                <small class="text-muted">Completed</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <h5 class="mb-1 text-warning" th:text="'$' + ${#numbers.formatDecimal(totalSpent, 1, 2)}">$0.00</h5>
+              <small class="text-muted">Total Spent</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer Details Card -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h6 class="mb-0">Customer Details</h6>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <small class="text-muted">User ID</small>
+            <div th:text="${user.userId}">#12345</div>
+          </div>
+          <div class="mb-3">
+            <small class="text-muted">Username</small>
+            <div th:text="${user.username}">customer_name</div>
+          </div>
+          <div class="mb-3">
+            <small class="text-muted">Email</small>
+            <div th:text="${user.email}">customer@example.com</div>
+          </div>
+          <div class="mb-3" th:if="${user.phone}">
+            <small class="text-muted">Phone</small>
+            <div th:text="${user.phone}">+1234567890</div>
+          </div>
+          <div class="mb-3" th:if="${user.role}">
+            <small class="text-muted">Role</small>
+            <div>
+                                <span class="badge"
+                                      th:classappend="${user.role == 'ADMIN' ? 'bg-danger' : 'bg-primary'}"
+                                      th:text="${user.role}">USER</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Order History -->
+    <div class="col-lg-8">
+      <!-- Statistics Cards -->
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <div class="card bg-primary text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h6 class="card-title">Total Orders</h6>
+                  <h3 class="mb-0" th:text="${#lists.size(userOrders)}">0</h3>
+                </div>
+                <div class="align-self-center">
+                  <i class="fas fa-shopping-cart fa-2x"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card bg-success text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h6 class="card-title">Completed Orders</h6>
+                  <h3 class="mb-0" th:text="${completedOrders}">0</h3>
+                </div>
+                <div class="align-self-center">
+                  <i class="fas fa-check-circle fa-2x"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card bg-warning text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h6 class="card-title">Total Spent</h6>
+                  <h3 class="mb-0" th:text="'$' + ${#numbers.formatDecimal(totalSpent, 1, 2)}">$0.00</h3>
+                </div>
+                <div class="align-self-center">
+                  <i class="fas fa-dollar-sign fa-2x"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order History Table -->
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Order History</h5>
+          <span class="badge bg-secondary" th:text="${#lists.size(userOrders)} + ' orders'">0 orders</span>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover" th:if="${!#lists.isEmpty(userOrders)}">
+              <thead class="table-light">
+              <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="order : ${userOrders}">
+                <td>
+                  <a th:href="@{/admin/orders/{id}(id=${order.orderId})}"
+                     class="text-decoration-none">
+                    <strong th:text="'#' + ${order.orderId}">#12345</strong>
+                  </a>
+                </td>
+                <td th:text="${#temporals.format(order.orderDate, 'MMM dd, yyyy HH:mm')}">Jan 15, 2024 10:30</td>
+                <td>
+                                            <span class="badge"
+                                                  th:classappend="${order.status == 'COMPLETED' ? 'bg-success' :
+                                                                  order.status == 'PENDING' ? 'bg-warning text-dark' :
+                                                                  order.status == 'CANCELLED' ? 'bg-danger' : 'bg-secondary'}"
+                                                  th:text="${order.status}">Status</span>
+                </td>
+                <td class="fw-bold" th:text="'$' + ${#numbers.formatDecimal(order.totalAmount, 1, 2)}">$99.99</td>
+                <td>
+                  <a th:href="@{/admin/orders/{id}(id=${order.orderId})}"
+                     class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-eye"></i> View
+                  </a>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(userOrders)}" class="text-center py-4">
+              <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+              <h5 class="text-muted">No orders found</h5>
+              <p class="text-muted">This customer hasn't placed any orders yet.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script>
+  function sendEmailToUser() {
+    const userEmail = /*[[${user.email}]]*/ '';
+    const userName = /*[[${user.username}]]*/ '';
+    const subject = `Message from Admin`;
+    const body = `Dear ${userName},\n\nWe hope you're enjoying our services.\n\nBest regards,\nAdmin Team`;
+
+    window.location.href = `mailto:${userEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  function viewUserActivity() {
+    // Placeholder for user activity view
+    alert('User activity feature coming soon!');
+  }
+
+  function suspendUser() {
+    const userId = /*[[${user.userId}]]*/ 0;
+    const userName = /*[[${user.username}]]*/ '';
+
+    if (confirm(`Are you sure you want to suspend user "${userName}"?`)) {
+      // Call suspend user API
+      fetch(`/admin/users/${userId}/suspend`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+              .then(response => {
+                if (response.ok) {
+                  location.reload();
+                } else {
+                  alert('Failed to suspend user');
+                }
+              })
+              .catch(error => {
+                alert('Error: ' + error.message);
+              });
+    }
+  }
+
+  function activateUser() {
+    const userId = /*[[${user.userId}]]*/ 0;
+    const userName = /*[[${user.username}]]*/ '';
+
+    if (confirm(`Are you sure you want to activate user "${userName}"?`)) {
+      // Call activate user API
+      fetch(`/admin/users/${userId}/activate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+              .then(response => {
+                if (response.ok) {
+                  location.reload();
+                } else {
+                  alert('Failed to activate user');
+                }
+              })
+              .catch(error => {
+                alert('Error: ' + error.message);
+              });
+    }
+  }
+</script>
+</body>
+</html>

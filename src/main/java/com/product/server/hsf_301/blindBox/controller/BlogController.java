@@ -3,6 +3,7 @@ package com.product.server.hsf_301.blindBox.controller;
 
 import com.product.server.hsf_301.blindBox.model.Blog;
 import com.product.server.hsf_301.blindBox.service.BlogService;
+import com.product.server.hsf_301.blindBox.service.UserService;
 import com.product.server.hsf_301.user.model.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/blogs")
 public class BlogController {
     private final BlogService blogService;
+    private final UserService userService;
 
     @GetMapping
     public String blog(Model model, 
@@ -30,10 +32,10 @@ public class BlogController {
         model.addAttribute("posts", blogService.getAllBlogs(page, size));
 
         // Get current user's posts (using hardcoded "2" for now, replace with actual user ID)
-        String currentUserId = "2";
-        model.addAttribute("userPosts", blogService.getBlogsByAuthor(currentUserId));
-        model.addAttribute("totalPosts", blogService.getTotalPostCount());
 
+        model.addAttribute("userPosts", blogService.getBlogsByAuthor(userService.getCurrentUser()));
+        model.addAttribute("totalPosts", blogService.getTotalPostCount());
+//        model.addAttribute("totalUserPost", blogService.getPostCountByAuthor(userService.getCurrentUser()));
 //        // If filtering by current user
 //        if ("current".equals(author)) {
 //            model.addAttribute("posts", blogService.getBlogsByAuthor(currentUserId));
@@ -42,6 +44,24 @@ public class BlogController {
         model.addAttribute("content", "view/blog/list");
         return "view/layout";
     }
+
+    @GetMapping("/my-posts")
+    public String myPosts(Model model,
+                          @RequestParam(defaultValue = "0") int page,
+                          @RequestParam(defaultValue = "10") int size) {
+        AppUser currentUser = userService.getCurrentUser();
+        List<Blog> userPosts = blogService.getBlogsByAuthor(currentUser);
+        Long totalUserPosts = blogService.getPostCountByAuthor(currentUser);
+
+        model.addAttribute("posts", userPosts);
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("totalUserPosts", totalUserPosts);
+        model.addAttribute("page", page);
+        model.addAttribute("size", size);
+        model.addAttribute("content", "view/blog/my-posts");
+        return "view/layout";
+    }
+
 
     @PostMapping
     public String postBlog(@ModelAttribute Blog blog) {

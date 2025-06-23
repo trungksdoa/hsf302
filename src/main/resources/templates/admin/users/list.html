@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
@@ -9,35 +10,128 @@
 <body>
 <div th:fragment="content">
     <div class="p-4">
-        <h1 class="h3 mb-4">User Management</h1>
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-1">User Management</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                        <li class="breadcrumb-item active">Users</li>
+                    </ol>
+                </nav>
+            </div>
+            <div>
+                <span class="badge bg-info fs-6" th:if="${users != null}" th:text="${users.getTotalElements()} + ' total users'">0 users</span>
+            </div>
+        </div>
 
         <!-- Users Table -->
         <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-users me-2"></i>All Users
+                </h5>
+                <div>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="refreshUsers()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
             <div class="card-body">
                 <!-- Table with data -->
                 <div th:if="${users != null and !users.isEmpty()}" class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
+                            <th scope="col">ID</th>
+                            <th scope="col">User</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Role</th>
+                            <th scope="col" class="text-center">Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="user : ${users}">
-                            <td th:text="${user.userId}">1</td>
-                            <td th:text="${user.username}">John Collector</td>
+                            <td>
+                                <span class="text-muted" th:text="'#' + ${user.userId}">#1</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3"
+                                         style="width: 40px; height: 40px;">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                </div>
+                            </td>
                             <td th:text="${user.email}">john.collector@email.com</td>
                             <td>
-                                        <span class="badge"
-                                              th:classappend="${user.role == 'ADMIN'} ? 'bg-secondary' : 'bg-primary'"
-                                              th:text="${user.role}">User</span>
+                                <span class="badge"
+                                      th:classappend="${user.role == 'ADMIN'} ? 'bg-danger' : 'bg-primary'"
+                                      th:text="${user.role}">User</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <!-- View Profile Button -->
+                                    <a th:href="@{/admin/users/{id}(id=${user.userId})}"
+                                       class="btn btn-outline-primary btn-sm"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="View Profile">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+
+                                </div>
                             </td>
                         </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Pagination -->
+                <div th:if="${users != null and users.getTotalPages() > 1}" class="d-flex justify-content-between align-items-center mt-4">
+                    <div>
+                        <small class="text-muted">
+                            Showing <span th:text="${users.getNumberOfElements()}">10</span> of
+                            <span th:text="${users.getTotalElements()}">100</span> users
+                        </small>
+                    </div>
+                    <nav aria-label="User pagination">
+                        <ul class="pagination pagination-sm mb-0">
+                            <!-- Previous Page -->
+                            <li class="page-item" th:classappend="${users.isFirst()} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/admin/users(page=${users.getNumber() - 1}, size=${users.getSize()})}"
+                                   th:unless="${users.isFirst()}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                                <span class="page-link" th:if="${users.isFirst()}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </span>
+                            </li>
+
+                            <!-- Page Numbers -->
+                            <li class="page-item"
+                                th:each="pageNum : ${#numbers.sequence(0, users.getTotalPages() - 1)}"
+                                th:classappend="${pageNum == users.getNumber()} ? 'active'">
+                                <a class="page-link"
+                                   th:href="@{/admin/users(page=${pageNum}, size=${users.getSize()})}"
+                                   th:text="${pageNum + 1}">1</a>
+                            </li>
+
+                            <!-- Next Page -->
+                            <li class="page-item" th:classappend="${users.isLast()} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/admin/users(page=${users.getNumber() + 1}, size=${users.getSize()})}"
+                                   th:unless="${users.isLast()}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <span class="page-link" th:if="${users.isLast()}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </span>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
 
                 <!-- Empty state message -->
@@ -47,6 +141,9 @@
                             <i class="fas fa-users fa-4x text-muted mb-4"></i>
                             <h4 class="text-muted mb-3">No Users Found</h4>
                             <p class="text-muted mb-4">There are no users in the system at the moment.</p>
+                            <button class="btn btn-primary" onclick="refreshUsers()">
+                                <i class="fas fa-sync-alt me-2"></i>Refresh List
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -54,5 +151,181 @@
         </div>
     </div>
 </div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm">
+                    <input type="hidden" id="editUserId" name="userId">
+                    <div class="mb-3">
+                        <label for="editUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="editUsername" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRole" class="form-label">Role</label>
+                        <select class="form-select" id="editRole" name="role">
+                            <option value="USER">User</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveUserChanges()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script>
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+
+    function refreshUsers() {
+        window.location.reload();
+    }
+
+    function editUser(button) {
+        const userId = button.getAttribute('data-user-id');
+        const username = button.getAttribute('data-username');
+        const email = button.getAttribute('data-email');
+        const role = button.getAttribute('data-role');
+
+        document.getElementById('editUserId').value = userId;
+        document.getElementById('editUsername').value = username;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editRole').value = role;
+
+        new bootstrap.Modal(document.getElementById('editUserModal')).show();
+    }
+
+    function saveUserChanges() {
+        const form = document.getElementById('editUserForm');
+        const formData = new FormData(form);
+        const userId = formData.get('userId');
+
+        // Convert FormData to JSON
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+
+        fetch(`/admin/users/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Failed to update user');
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+    }
+
+    function sendEmailToUser(link) {
+        const userEmail = link.getAttribute('data-email');
+        const userName = link.getAttribute('data-username');
+        const subject = `Message from Admin`;
+        const body = `Dear ${userName},\n\nWe hope you're enjoying our services.\n\nBest regards,\nAdmin Team`;
+
+        window.location.href = `mailto:${userEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
+
+    function suspendUser(link) {
+        const userId = link.getAttribute('data-user-id');
+        const userName = link.getAttribute('data-username');
+
+        if (confirm(`Are you sure you want to suspend user "${userName}"?`)) {
+            fetch(`/admin/users/${userId}/suspend`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Failed to suspend user');
+                    }
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+        }
+    }
+
+    function activateUser(link) {
+        const userId = link.getAttribute('data-user-id');
+        const userName = link.getAttribute('data-username');
+
+        if (confirm(`Are you sure you want to activate user "${userName}"?`)) {
+            fetch(`/admin/users/${userId}/activate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Failed to activate user');
+                    }
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+        }
+    }
+
+    function deleteUser(link) {
+        const userId = link.getAttribute('data-user-id');
+        const userName = link.getAttribute('data-username');
+
+        if (confirm(`Are you sure you want to DELETE user "${userName}"? This action cannot be undone!`)) {
+            fetch(`/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Failed to delete user');
+                    }
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+        }
+    }
+</script>
 </body>
 </html>

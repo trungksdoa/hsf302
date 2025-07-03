@@ -14,4 +14,5 @@ public interface SpinHistoryRepository extends JpaRepository<SpinHistory, Intege
     List<SpinHistory> findByUser(AppUser user);
     Page<SpinHistory> findByUser(AppUser user, Pageable pageable);
 
+    List<SpinHistory> findSpinHistoriesByUser(AppUser user);
 }

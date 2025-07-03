@@ -1,6 +1,7 @@
 package com.product.server.hsf_301.payment;
 
 import com.product.server.hsf_301.payment.model.TopUpHistory;
+import com.product.server.hsf_301.user.model.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +16,9 @@ public class TopUpService  {
         topUpRepository.save(topUpHistory);
     }
 
-    public List<TopUpHistory> getAllTopUp() {
-        return topUpRepository.findAllByUser_UserId(2);
+
+    public List<TopUpHistory> getAllTopUp(AppUser appUser) {
+        return topUpRepository.findAllByUser_UserId(appUser.getUserId());
     }
 
 

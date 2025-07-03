@@ -51,16 +51,11 @@ public class BlindBagTypeServiceImpl implements BlindBagTypeService {
             blindPackage.setImageType(imageFile.getContentType());
         }
 
-        // Handle prize items
-        if (blindPackage.getPrizeItems() != null) {
-            for (PrizeItem prizeItem : blindPackage.getPrizeItems()) {
-                prizeItem.setBlindBagType(blindPackage);
-                // Set default values if needed
-                prizeItem.setActive(true);
-                prizeItem.setImageUrl("https://placehold.co/400");
-            }
-        }
+        blindPackage.getPrizeItems().forEach(res->{
+            res.setBlindBagType(blindPackage);
+        });
 
+    
         return blindBagTypeRepository.save(blindPackage);
     }
 

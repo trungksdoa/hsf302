@@ -37,7 +37,6 @@
                                     <th>Order ID</th>
                                     <th>Customer</th>
                                     <th>Items Count</th>
-                                    <th>Total</th>
                                     <th>Status</th>
                                     <th>Date</th>
                                     <th>Actions</th>
@@ -63,11 +62,6 @@
                                     <td>
                                         <span class="badge bg-info" th:text="${order.orderItems?.size() ?: 0} + ' items'">
                                             3 items
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="fw-bold text-success"  th:text="${order.totalAmount}">
-                                            $99.99
                                         </span>
                                     </td>
                                     <td>
@@ -112,9 +106,6 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted">
                                         Total Orders: <span th:text="${orders.size()}">0</span>
-                                    </small>
-                                    <small class="text-muted">
-                                        Total Revenue: $<span th:text="${totalRevenue}">0.00</span>
                                     </small>
                                 </div>
                             </div>

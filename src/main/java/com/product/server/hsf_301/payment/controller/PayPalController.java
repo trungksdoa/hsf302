@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -89,7 +90,7 @@ public class PayPalController {
 
 
     @GetMapping("/success")
-    public String success(@RequestParam String paymentId, @RequestParam String PayerID) throws PayPalRESTException {
+    public String success(@RequestParam String paymentId, @RequestParam String PayerID, RedirectAttributes redirectAttributes) throws PayPalRESTException {
         Payment payment = new Payment();
         payment.setId(paymentId);
         PaymentExecution execution = new PaymentExecution();
@@ -125,6 +126,7 @@ public class PayPalController {
         topUpHistory.setStatus(executedPayment.getState());
         topUpService.save(topUpHistory);
 
+        redirectAttributes.addFlashAttribute("message", "Nạp tiền thành công " + paymentAmount);
         return "redirect:/";
     }
 
@@ -134,22 +136,5 @@ public class PayPalController {
         return "Payment cancelled";
     }
 
-    // Add balance endpoint
-    @GetMapping("/users/balance")
-    @ResponseBody
-    public String getUserBalance() {
-        List<TopUpHistory> successfulTopUps = topUpService.getAllTopUp();
-        double totalBalance = successfulTopUps.stream()
-                .filter(topUp -> "approved".equals(topUp.getStatus()))
-                .mapToDouble(topUp -> {
-                    try {
-                        return Double.parseDouble(topUp.getAmount());
-                    } catch (NumberFormatException e) {
-                        return 0.0;
-                    }
-                })
-                .sum();
-        
-        return String.format("%.2f", totalBalance);
-    }
+
 }

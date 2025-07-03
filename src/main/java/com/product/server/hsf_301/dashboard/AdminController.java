@@ -29,6 +29,8 @@ public class AdminController {
     private final UserService userService;
     private final PrizeResetService resetService;
     private final String UPLOAD_DIR = "src/main/resources/static/uploads/blindbox/";
+    private final SpinHistoryService spinHistoryService;
+    private final UserPityService userPityService; // Add UserPityService
 
     // Trang Dashboard
     @GetMapping
@@ -72,23 +74,7 @@ public class AdminController {
     public String orders(Model model) {
         List<Order> orders = orderService.getAllOrders(); // Fetch actual orders
         model.addAttribute("showSidebar", true);
-
-
-        orders.forEach(order -> {
-            if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
-                double calculatedTotal = order.getOrderItems().stream()
-                        .mapToDouble(OrderItem::getPrice)
-                        .sum();
-                order.setTotalAmount(calculatedTotal);
-            }
-        });
-
-        double totalRevenue = orders.stream()
-                .mapToDouble(Order::getTotalAmount)
-                .sum();
-
-        model.addAttribute("orders", orders);
-        model.addAttribute("totalRevenue", totalRevenue);
+        model.addAttribute("orders",orders);
         model.addAttribute("content", "admin/orders/list");
         return "admin/layout";
     }
@@ -128,19 +114,17 @@ public class AdminController {
         AppUser user = userService.getUserById(userId);
         List<Order> userOrders = orderService.getOrdersByUser(user);
 
-        // Calculate statistics
-        double totalSpent = userOrders.stream()
-                .mapToDouble(Order::getTotalAmount)
-                .sum();
-
+        List<SpinHistory> spinHistories = spinHistoryService.getSpinHistoryByUser(user);
         long completedOrders = userOrders.stream()
                 .filter(order -> "COMPLETED".equals(order.getStatus()))
                 .count();
+                
 
+
+        model.addAttribute("spins", spinHistories);
         model.addAttribute("showSidebar", true);
         model.addAttribute("user", user);
         model.addAttribute("userOrders", userOrders);
-        model.addAttribute("totalSpent", totalSpent);
         model.addAttribute("completedOrders", completedOrders);
         model.addAttribute("content", "admin/users/profile");
         return "admin/layout";
@@ -156,33 +140,36 @@ public class AdminController {
 
     @PostMapping("/blindBoxes")
     public String createBlindBox(@ModelAttribute PackagesBox blindPackage,
-                                 @RequestParam("imageFile") MultipartFile imageFile,
+                                 @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                                  RedirectAttributes redirectAttributes) {
         try {
-
+            System.out.println("Received blind package with " + 
+                (blindPackage.getPrizeItems() != null ? blindPackage.getPrizeItems().size() : 0) + " prize items");
+            
+            // Save the blind box with its prize items
             blindBagTypeService.saveBlindBagType(blindPackage, imageFile);
-            redirectAttributes.addFlashAttribute("message", "blindPackage created successfully!");
+            redirectAttributes.addFlashAttribute("success", "Blind box created successfully!");
             return "redirect:/admin/blindBoxes";
         } catch (IOException e) {
-            redirectAttributes.addAttribute("error", "Failed to upload image: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to upload image: " + e.getMessage());
             return "redirect:/admin/blindBoxes";
         } catch (Exception e) {
-            redirectAttributes.addAttribute("error", "Error creating blind box: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error creating blind box: " + e.getMessage());
             return "redirect:/admin/blindBoxes";
         }
     }
 
-    @PostMapping("/update/{id}")
+    @PostMapping("/blindBox/update/{id}")
     public String updateBlindBox(@PathVariable Integer id,
                                  @ModelAttribute PackagesBox blindPackage,
-                                 @RequestParam(value = "image", required = false) MultipartFile imageFile,
+                                 @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                                  RedirectAttributes redirectAttributes) {
         try {
             blindPackage.setId(id);
-
-
+            
+            // Update the blind box with its prize items
             blindBagTypeService.saveBlindBagType(blindPackage, imageFile);
-            redirectAttributes.addFlashAttribute("message", "blindPackage created successfully!");
+            redirectAttributes.addFlashAttribute("success", "Blind box updated successfully!");
             return "redirect:/admin/blindBoxes";
         } catch (IOException e) {
             redirectAttributes.addFlashAttribute("error", "Failed to upload image: " + e.getMessage());
@@ -191,6 +178,12 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("error", "Error updating blind box: " + e.getMessage());
             return "redirect:/admin/blindBoxes";
         }
+    }
+
+    @GetMapping("/blindBox/delete/{id}")
+    public String deleteBlindBox(@PathVariable Integer id) {
+        blindBagTypeService.deleteBlindBagType(id);
+        return "redirect:/admin/blindBoxes";
     }
 
     @GetMapping("/delete/{id}")

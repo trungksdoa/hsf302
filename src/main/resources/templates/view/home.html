@@ -18,17 +18,39 @@
         .item-inactive {
             opacity: 0.5;
         }
+
+        .pity-status .progress {
+            background-color: rgba(13, 110, 253, 0.1);
+            border-radius: 3px;
+        }
+
+        .pity-status .progress-bar {
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .pity-status small {
+            font-size: 0.875rem;
+        }
     </style>
 </head>
 
 <body>
 <div layout:fragment="content">
     <!-- Products Section -->
+    <div th:if="${message}" class="alert alert-success alert-dismissible fade show mb-0" role="alert">
+        <div class="container">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${message}">Success message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+
     <section id="products" class="py-5">
         <div class="container">
             <h2 class="text-center mb-5">Our Products</h2>
 
-            <!-- Products List - Keep as is -->
+            <!-- Products List -->
             <div th:if="${products != null and !products.isEmpty()}" class="row">
                 <div th:each="product : ${products}" class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm">
@@ -38,6 +60,7 @@
                                 <h5 class="card-title mb-0" th:text="${product.name}">Mystery Box #1</h5>
                             </div>
                             <p class="card-text" th:text="${product.description}">Contains rare collectible items</p>
+
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="h5 text-primary mb-0" th:text="'$' + ${product.pricePerSpin}">$29.99</span>
                                 <div class="btn-group">
@@ -80,13 +103,15 @@
                 <div class="modal-body">
                     <!-- Box details -->
                     <div id="openBoxDetails" class="text-center mb-4"></div>
-                    
+
+
+
                     <!-- Prize Preview Button -->
                     <div id="prizePreviewSection" class="mb-3 text-center">
                         <button type="button" class="btn btn-outline-secondary btn-sm" onclick="togglePrizeList()">
                             <i class="fas fa-list me-2"></i>View Possible Prizes
                         </button>
-                        <div id="prizeListContainer" class="mt-3" style="display: none;">
+                        <div id="prizeListContainer" class="mt-3 text-center" style="display: none;">
                             <div class="card">
                                 <div class="card-header">
                                     <h6 class="mb-0">Possible Prizes</h6>
@@ -366,7 +391,7 @@
 
         // Fetch box details from the server
         function fetchBoxDetails(productId, price) {
-            fetch(`/blindbox/spin/${productId}`)
+            fetch(`/blindbox/detail/${productId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -378,6 +403,8 @@
                             <h5>${blindPackage.name || `Mystery Box #${productId}`}</h5>
                             <p class="text-muted">${blindPackage.description || 'Contains rare collectible items'}</p>
                             <p class="text-primary fw-bold mb-3">Price: $${price} each</p>
+                            <p class="text-primary fw-bold mb-3">Pity: ${data.userPityStatus} </p>
+                            <small>( Pity 100 auto win special )</small>
                         `;
 
                         // Show and populate prize list if we have items
@@ -436,13 +463,15 @@
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
                 }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
+            }).then(response => {
+                    if (!response.ok) {
+                        // Convert non-2xx HTTP responses into errors
+                        return response.json().then(errData => {
+                            throw new Error(errData.message || 'Server error');
+                        });
+                    }
+                    return response.json();
+                })
             .then(data => {
                 console.log('Spin response:', data);
                 
@@ -453,7 +482,7 @@
                 }
             })
             .catch(error => {
-                console.error('Error during spin:', error);
+                console.log('Error during spin:', error);
                 showSpinError(error.message);
             });
         }
@@ -462,7 +491,7 @@
         function showSpinError(message) {
             elements.spinConfirmation.innerHTML = `
                 <div class="alert alert-danger">
-                    <p>Something went wrong: ${message}. Please try again later.</p>
+                    <p>${message}.</p>
                     <button type="button" class="btn btn-outline-secondary mt-2" data-bs-dismiss="modal">Close</button>
                 </div>
             `;
@@ -568,6 +597,8 @@
 
         // Build multi-spin results table
         function buildMultiSpinResultsTable(results) {
+
+            console.log(results)
             return results.map((prize, index) => {
                 const prizeRarity = prize.rarity || 'COMMON';
                 const prizeName = prize.itemName || prize.name || 'Mystery Prize';

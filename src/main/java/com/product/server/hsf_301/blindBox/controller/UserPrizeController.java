@@ -3,6 +3,8 @@ package com.product.server.hsf_301.blindBox.controller;
 
 import com.product.server.hsf_301.blindBox.model.UserPrizeItem;
 import com.product.server.hsf_301.blindBox.service.UserPrizeItemService;
+import com.product.server.hsf_301.blindBox.service.UserService;
+import com.product.server.hsf_301.user.model.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,16 +19,25 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserPrizeController {
     private final UserPrizeItemService userPrizeItemService;
-
+    private final UserService userService;
     @PostMapping("/bulk-claim")
     public ResponseEntity<Map<String, Object>> bulkClaim(@RequestBody Map<String, List<String>> request
     ) {
         Map<String, Object> response = new HashMap<>();
+        AppUser appUser = userService.getUserByUsername(userService.getCurrentUser().getUsername());
+        if(appUser.getAddress().isEmpty()){
+            response.put("success", false);
+            response.put("error","address is empty");
+            response.put("message", "No prize IDs provided");
+            return ResponseEntity.badRequest().body(response);
+        }
+
 
         try {
             List<String> prizeIdStrings = request.get("prizeIds");
             if (prizeIdStrings == null || prizeIdStrings.isEmpty()) {
                 response.put("success", false);
+                response.put("error","prizeIds is empty");
                 response.put("message", "No prize IDs provided");
                 return ResponseEntity.badRequest().body(response);
             }
@@ -57,6 +68,14 @@ public class UserPrizeController {
     public ResponseEntity<Map<String, Object>> claim(@PathVariable("prizeId") Long prizeId) {
         Map<String, Object> response = new HashMap<>();
 
+        AppUser appUser = userService.getUserByUsername(userService.getCurrentUser().getUsername());
+        if(appUser.getAddress().isEmpty()){
+            response.put("success", false);
+            response.put("error","address is empty");
+            response.put("message", "No prize IDs provided");
+            return ResponseEntity.badRequest().body(response);
+        }
+        
         try {
             UserPrizeItem claimedPrize = userPrizeItemService.claimPrize(prizeId);
 

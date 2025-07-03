@@ -26,9 +26,8 @@ public class OrderItem {
 
     private Double price;
 
-    public OrderItem(Order order, PrizeItem prizeItem, Double price) {
+    public OrderItem(Order order, PrizeItem prizeItem) {
         this.order = order;
         this.prizeItemId = prizeItem;
-        this.price = price;
     }
 }

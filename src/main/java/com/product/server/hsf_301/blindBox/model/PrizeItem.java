@@ -20,7 +20,7 @@ public class PrizeItem {
     @Column(name = "item_name", nullable = false, length = 100)
     private String itemName;
 
-    private String imageUrl;
+    private String imageUrl; // Ensure this field exists
 
     @Lob
     @Column(name = "image_data")
@@ -44,11 +44,6 @@ public class PrizeItem {
     @Column(name = "is_claim_able")
     private boolean isClaimAble = false;
     
-    // Add description field if needed
     @Column(name = "description")
     private String description;
-    
-
-    
-
 }

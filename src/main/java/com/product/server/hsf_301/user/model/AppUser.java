@@ -28,7 +28,7 @@ public class AppUser {
     private String address;
 
     @ColumnDefault(value = "100.00")
-    private BigDecimal balance;
+    private BigDecimal balance= new BigDecimal(100);
     
 
 

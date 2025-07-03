@@ -62,9 +62,6 @@
                             <p><strong>Payment Method:</strong>
                                 <span th:text="${order.paymentMethod ?: 'Credit Card'}">Credit Card</span>
                             </p>
-                            <p><strong>Total Amount:</strong>
-                                <span class="text-success fw-bold" th:text="'$' + ${#numbers.formatDecimal(order.totalAmount, 1, 2)}">$99.99</span>
-                            </p>
                             <p><strong>Shipping Address:</strong>
                                 <span th:text="${order.shippingAddress ?: 'Not provided'}">123 Main St, City, State</span>
                             </p>
@@ -85,7 +82,6 @@
                             <tr>
                                 <th>Prize Item</th>
                                 <th>Type</th>
-                                <th>Price</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -110,14 +106,9 @@
                                                                   item.prizeItemId.rarity == 'LEGENDARY' ? 'bg-danger' : 'bg-info'}"
                                                   th:text="${item.prizeItemId.rarity ?: 'COMMON'}">COMMON</span>
                                 </td>
-                                <td class="fw-bold" th:text="'$' + ${#numbers.formatDecimal(item.price, 1, 2)}">$19.99</td>
                             </tr>
                             </tbody>
                             <tfoot class="table-light">
-                            <tr>
-                                <th colspan="2" class="text-end">Total Amount:</th>
-                                <th class="text-success" th:text="'$' + ${#numbers.formatDecimal(order.totalAmount, 1, 2)}">$99.99</th>
-                            </tr>
                             </tfoot>
                         </table>
                     </div>
@@ -157,6 +148,9 @@
                             <option value="PENDING" th:selected="${order.status == 'PENDING'}">Pending</option>
                             <option value="PROCESSING" th:selected="${order.status == 'PROCESSING'}">Processing</option>
                             <option value="COMPLETED" th:selected="${order.status == 'COMPLETED'}">Completed</option>
+                            <option value="SHIPPED" th:selected="${order.status == 'SHIPPED'}">Shipped</option>
+                            <option value="DELIVERED" th:selected="${order.status == 'DELIVERED'}">Delivered</option>
+                            <option value="CANCELLED" th:selected="${order.status == 'CANCELLED'}">Cancelled</option>
                         </select>
                     </div>
 

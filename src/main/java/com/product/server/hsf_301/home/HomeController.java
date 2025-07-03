@@ -5,6 +5,7 @@ import com.product.server.hsf_301.blindBox.model.PackagesBox;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import com.product.server.hsf_301.blindBox.service.BlogService;
 import com.product.server.hsf_301.blindBox.service.PrizeItemService;
+import com.product.server.hsf_301.blindBox.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,7 @@ public class HomeController {
     private final BlindBagTypeService blindBagTypeService;
     private final BlogService blogService;
     private final PrizeItemService prizeItemService;
+    private final UserService userService;
     @GetMapping
     public String home(Model model, HttpServletRequest request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Map<String, String> contactInfor = new HashMap<>();
@@ -40,6 +42,8 @@ public class HomeController {
         }
 
         Page<PackagesBox> blindBagTypes = blindBagTypeService.getAllBlindBagTypes(page, size);
+
+        model.addAttribute("userId", userService.getCurrentUser().getUserId());
         model.addAttribute("products", blindBagTypes);
         model.addAttribute("recentPosts",blogService.getAllBlogs(0, 5));
         model.addAttribute("content", "view/home");

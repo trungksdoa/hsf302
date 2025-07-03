@@ -78,6 +78,12 @@ public class SecurityConfig {
                         }
                     });
                 })
+                .rememberMe(
+                        remembe -> remembe.key("keyekeykey")
+                                .tokenValiditySeconds(86400)
+                                .rememberMeParameter("remember-me")
+                                .rememberMeCookieName("remember-me-cookies")
+                                .userDetailsService(userDetailsService()))
                 .build();
     }
 }

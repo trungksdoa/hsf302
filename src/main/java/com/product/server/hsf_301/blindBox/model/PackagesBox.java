@@ -32,6 +32,7 @@ public class PackagesBox {
 
     @Column(name = "price_per_spin", nullable = false)
     private BigDecimal pricePerSpin;
+
     
     @Column(name = "description")
     private String description;
@@ -39,7 +40,7 @@ public class PackagesBox {
     @Column(name = "is_active")
     private boolean isActive = true;
     
-    @OneToMany(mappedBy = "blindBagType")
+    @OneToMany(mappedBy = "blindBagType", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PrizeItem> prizeItems;
 }
 

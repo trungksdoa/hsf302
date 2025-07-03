@@ -2,9 +2,12 @@ package com.product.server.hsf_301.blindBox.service.impl;
 
 import com.product.server.hsf_301.blindBox.model.*;
 import com.product.server.hsf_301.blindBox.repository.OrderRepository;
+import com.product.server.hsf_301.blindBox.repository.UserRepository;
 import com.product.server.hsf_301.blindBox.service.OrderService;
+import com.product.server.hsf_301.blindBox.service.UserService;
 import com.product.server.hsf_301.user.model.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,10 +19,14 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository, UserService userService) {
         this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -47,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
     public Order saveOrder(UserPrizeItem spinHistory) {
         Order order = new Order();
         List<OrderItem>  orderItems= new ArrayList<>();
-        orderItems.add(new OrderItem(order,spinHistory.getSpin().getPrizeItemId(),spinHistory.getSpin().getPrice()));
+        orderItems.add(new OrderItem(order,spinHistory.getSpin().getPrizeItemId()));
         order.setOrderItems(orderItems);
 
         order.setUser(spinHistory.getUser());
@@ -58,16 +65,16 @@ public class OrderServiceImpl implements OrderService {
     public Order saveOrder(List<UserPrizeItem> spinHistories) {
         Order order = new Order();
 
-
         // Sử dụng stream để tạo OrderItems từ SpinHistory list
         List<OrderItem> orderItems = spinHistories.stream()
                 .map(spinHistory -> new OrderItem(
                         order,
-                        spinHistory.getSpin().getPrizeItemId(),
-                        spinHistory.getSpin().getPrice()
+                        spinHistory.getSpin().getPrizeItemId()
                 ))
                 .collect(Collectors.toList());
-        order.setUser(spinHistories.get(0).getUser());
+
+        AppUser auth = userService.getCurrentUser();
+        order.setUser(auth);
         order.setOrderItems(orderItems);
         return orderRepository.save(order);
     }

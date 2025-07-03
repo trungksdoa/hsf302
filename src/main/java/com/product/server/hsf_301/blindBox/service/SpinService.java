@@ -22,9 +22,15 @@ public class SpinService {
     public SpinHistory spinItem(AppUser user, PackagesBox blindPackage){
         try{
             SpinHistory spinHistory = spinHistoryService.spin(user,blindPackage);
+
+            if(user.getBalance().compareTo(BigDecimal.valueOf(spinHistory.getPrice())) < 0){
+                throw new RuntimeException("Không đủ tiền");
+            }
+
             user.setBalance(
                     user.getBalance().subtract(BigDecimal.valueOf(spinHistory.getPrice()))
             );
+
             UserPrizeItem item = new UserPrizeItem();
             item.setUser(user);
             item.setClaimed(false);

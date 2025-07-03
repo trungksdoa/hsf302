@@ -13,7 +13,7 @@ public interface SpinHistoryService {
     SpinHistory getSpinHistoryById(Integer id);
     
     Page<SpinHistory> getSpinHistoryByUser(AppUser user, int page, int size);
-    
+    List<SpinHistory> getSpinHistoryByUser(AppUser user);
     SpinHistory saveSpinHistory(SpinHistory spinHistory);
     
     SpinHistory redeemPrize(Integer spinId);

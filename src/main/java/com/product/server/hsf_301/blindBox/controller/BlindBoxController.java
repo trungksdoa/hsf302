@@ -3,6 +3,7 @@ package com.product.server.hsf_301.blindBox.controller;
 import com.product.server.hsf_301.blindBox.model.PackagesBox;
 import com.product.server.hsf_301.blindBox.model.PrizeItem;
 import com.product.server.hsf_301.blindBox.model.SpinHistory;
+import com.product.server.hsf_301.blindBox.model.UserPityStatus;
 import com.product.server.hsf_301.blindBox.service.*;
 
 import com.product.server.hsf_301.user.model.AppUser;
@@ -19,6 +20,7 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/blindbox")
@@ -30,7 +32,7 @@ public class BlindBoxController {
 //    private final SpinHistoryService spinHistoryService;
     private final UserService userService;
     private final SpinService spin;
-    
+    private final UserPityService userPityService;
 
 
     @GetMapping("/{id}")
@@ -71,13 +73,16 @@ public class BlindBoxController {
         model.addAttribute("packages", activePackages);
         return "blind-box/packages";
     }
-    @GetMapping("/spin/{id}")
+    @GetMapping("/detail/{id}")
     @ResponseBody
     public ResponseEntity<?> getSpinPageData(@PathVariable Integer id) {
         try {
             PackagesBox blindPackage = blindBagTypeService.getBlindBagTypeById(id);
-            
+            UserPityStatus userPityStatus = userPityService.findUserPityStatusByUser(userService.getCurrentUser(), blindPackage);
+
             Map<String, Object> response = new HashMap<>();
+
+            response.put("userPityStatus", userPityStatus == null ? 0 : userPityStatus.getCurrent_pity());
             response.put("success", true);
             response.put("blindPackage", blindPackage);
             
@@ -121,7 +126,7 @@ public class BlindBoxController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
-                "message", "Error: " + e.getMessage()
+                "message",  e.getMessage()
             ));
         }
     }

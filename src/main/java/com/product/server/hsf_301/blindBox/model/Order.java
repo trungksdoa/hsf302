@@ -29,9 +29,6 @@ public class Order {
     @Column(name = "order_date", nullable = false)
     private LocalDateTime orderDate;
     
-    @Column(name = "total_amount", nullable = false)
-    private Double totalAmount;
-    
     @Column(name = "status", nullable = false)
     private String status;
     
@@ -57,11 +54,6 @@ public class Order {
         paymentStatus = "PAID";
         paymentMethod = "PAYPAL";
         status = "PENDING";
-        if(orderItems != null){
-            totalAmount = orderItems.stream()
-                    .map(OrderItem::getPrice)
-                    .reduce(0.0, Double::sum);
-        }
 
     }
 }

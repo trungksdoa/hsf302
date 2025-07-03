@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.core.Authentication;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -90,29 +91,11 @@ public class UserController {
     @PostMapping("/update")
     public String updateProfile(
             @ModelAttribute AppUser userUpdates,
-            @RequestParam(required = false) String currentPassword,
-            @RequestParam(required = false) String newPassword,
-            @RequestParam(required = false) String confirmPassword,
             RedirectAttributes redirectAttributes) {
 
         try {
-            // Check if we're updating the password
-            if (newPassword != null && !newPassword.isEmpty()) {
-                if (!userService.verifyPassword(userUpdates.getUserId(), currentPassword)) {
-                    redirectAttributes.addFlashAttribute("error", "Current password is incorrect");
-                    return "redirect:/users/profile";
-                }
-
-                if (!newPassword.equals(confirmPassword)) {
-                    redirectAttributes.addFlashAttribute("error", "New passwords don't match");
-                    return "redirect:/users/profile";
-                }
-
-                userService.updatePassword(userUpdates.getUserId(), newPassword);
-                redirectAttributes.addFlashAttribute("success", "Password updated successfully");
-            }
-
             // Update basic profile information
+            userUpdates.setBalance(userService.getCurrentUser().getBalance());
             AppUser updatedUser = userService.updateProfile(userUpdates);
             redirectAttributes.addFlashAttribute("success", "Profile updated successfully");
             redirectAttributes.addFlashAttribute("user", updatedUser);
@@ -124,6 +107,27 @@ public class UserController {
         }
     }
 
+    @PostMapping("/change-password")
+    public String changePasword(@RequestParam String oldPassword, @RequestParam String newPassword, @RequestParam String confirmPassword, RedirectAttributes redirectAttributes) {
+        AppUser updatedUser = userService.getCurrentUser();
+
+        if (newPassword != null && !newPassword.isEmpty()) {
+            if (!userService.verifyPassword(updatedUser.getUserId(), oldPassword)) {
+                redirectAttributes.addFlashAttribute("error", "Current password is incorrect");
+                return "redirect:/users/profile";
+            }
+
+            if (!newPassword.equals(confirmPassword)) {
+                redirectAttributes.addFlashAttribute("error", "New passwords don't match");
+                return "redirect:/users/profile";
+            }
+
+            userService.updatePassword(updatedUser.getUserId(), newPassword);
+            redirectAttributes.addFlashAttribute("success", "Password updated successfully");
+        }
+
+        return "redirect:/users/profile";
+    }
     @GetMapping("/balance")
     @ResponseBody
     public String balance(Model model) {
@@ -132,6 +136,10 @@ public class UserController {
 
         model.addAttribute("user", userService.getCurrentUser().getBalance());
 
-        return user.getBalance().toString();
+        BigDecimal money = user.getBalance();
+
+
+        String balance =  user.getBalance().toString();
+        return balance;
     }
 }

@@ -288,14 +288,14 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         List<Order> orders = Arrays.asList(
-                createOrderWithUser(users.get(1), 29.99, "COMPLETED", "PAID"),
-                createOrderWithUser(users.get(2), 49.99, "COMPLETED", "PAID"),
-                createOrderWithUser(users.get(3), 19.98, "COMPLETED", "PAID"),
-                createOrderWithUser(users.get(4), 9.99, "PENDING", "PENDING"),
-                createOrderWithUser(users.get(1), 79.97, "COMPLETED", "PAID"),
-                createOrderWithUser(users.get(2), 15.99, "CANCELLED", "REFUNDED"),
-                createOrderWithUser(users.get(3), 99.95, "COMPLETED", "PAID"),
-                createOrderWithUser(users.get(5), 24.99, "PROCESSING", "PAID")
+                createOrderWithUser(users.get(1),  "COMPLETED", "PAID"),
+                createOrderWithUser(users.get(2),  "COMPLETED", "PAID"),
+                createOrderWithUser(users.get(3), "COMPLETED", "PAID"),
+                createOrderWithUser(users.get(4),  "PENDING", "PENDING"),
+                createOrderWithUser(users.get(1),  "COMPLETED", "PAID"),
+                createOrderWithUser(users.get(2),  "CANCELLED", "REFUNDED"),
+                createOrderWithUser(users.get(3),  "COMPLETED", "PAID"),
+                createOrderWithUser(users.get(5), "PROCESSING", "PAID")
         );
 
         orderRepository.saveAll(orders);
@@ -554,12 +554,11 @@ public class DataSeeder implements CommandLineRunner {
         return prizeItem;
     }
 
-    private Order createOrder(String orderNumber, int userId, double totalAmount, String status, String paymentStatus) {
+    private Order createOrder(String orderNumber, int userId, String status, String paymentStatus) {
         AppUser user = new AppUser();
         user.setUserId(userId);
         Order order = new Order();
         order.setUser(user);
-        order.setTotalAmount(totalAmount);
         order.setStatus(status);
         order.setPaymentStatus(paymentStatus);
         return order;
@@ -574,7 +573,6 @@ public class DataSeeder implements CommandLineRunner {
         OrderItem orderItem = new OrderItem();
         orderItem.setOrder(order);
         orderItem.setPrizeItemId(prizeItem);
-        orderItem.setPrice(price);
         return orderItem;
     }
 
@@ -648,10 +646,9 @@ public class DataSeeder implements CommandLineRunner {
         return item;
     }
 
-    private Order createOrderWithUser(AppUser user, double totalAmount, String status, String paymentStatus) {
+    private Order createOrderWithUser(AppUser user, String status, String paymentStatus) {
         Order order = new Order();
         order.setUser(user); // Sử dụng user entity thực tế
-        order.setTotalAmount(totalAmount);
         order.setStatus(status);
         order.setPaymentStatus(paymentStatus);
         return order;
@@ -661,7 +658,6 @@ public class DataSeeder implements CommandLineRunner {
         OrderItem orderItem = new OrderItem();
         orderItem.setOrder(order); // Sử dụng order entity thực tế
         orderItem.setPrizeItemId(prizeItem); // Sử dụng prizeItem entity thực tế
-        orderItem.setPrice(price);
         return orderItem;
     }
 }

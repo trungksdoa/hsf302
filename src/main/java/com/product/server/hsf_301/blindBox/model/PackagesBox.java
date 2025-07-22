@@ -33,7 +33,7 @@ public class PackagesBox {
     @Column(name = "price_per_spin", nullable = false)
     private BigDecimal pricePerSpin;
 
-    
+
     @Column(name = "description")
     private String description;
     

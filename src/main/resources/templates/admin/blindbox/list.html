@@ -445,7 +445,8 @@
                     clone.querySelector('.item-id').value = itemData.itemId || '';
                     clone.querySelector('.item-name').value = itemData.itemName || '';
                     clone.querySelector('.item-rarity').value = itemData.rarity || 'COMMON';
-                    dropRateInput.value = itemData.probability || suggestedRate;
+                    clone.querySelector('.item-image-url').value = itemData.imageUrl || ''; // Add this line
+                    dropRateInput.value = itemData.probability || suggestedRate.toFixed(2);
                     clone.querySelector('.item-active').value = itemData.active !== false ? 'true' : 'false';
                     clone.querySelector('.item-claimable').value = itemData.claimAble === true ? 'true' : 'false';
                 } else {
@@ -546,10 +547,8 @@
                     clone.querySelector('.item-id').value = itemData.itemId || '';
                     clone.querySelector('.item-name').value = itemData.itemName || '';
                     clone.querySelector('.item-rarity').value = itemData.rarity || 'COMMON';
-                    
-                    // Use the probability value as is - already in decimal format (0-1)
+                    clone.querySelector('.item-image-url').value = itemData.imageUrl || ''; // Add this line
                     dropRateInput.value = itemData.probability || suggestedRate.toFixed(2);
-                    
                     clone.querySelector('.item-active').value = itemData.active !== false ? 'true' : 'false';
                     const claimableSelect = clone.querySelector('.item-claimable');
                     if (claimableSelect) {
@@ -659,6 +658,10 @@
             function saveBox() {
                 saveNewBox();
             }
+        </script>
+    </th:block>
+</body>
+</html>
         </script>
     </th:block>
 </body>

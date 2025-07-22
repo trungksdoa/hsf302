@@ -5,274 +5,498 @@
     <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Home</title>
     <!-- Remove unnecessary animation styles -->
     <style>
-        /* Keep only basic styling */
-        #prizeImageContainer {
-            margin-bottom: 15px;
+        .blind-box-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        
-        .badge {
+
+        .blind-box-card {
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .blind-box-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .package-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .package-title {
+            font-size: 1.6em;
+            font-weight: bold;
             margin-bottom: 10px;
         }
-        
-        /* Status indicators for prize items */
-        .item-inactive {
-            opacity: 0.5;
+
+        .package-description {
+            opacity: 0.9;
+            margin-bottom: 15px;
+            font-style: italic;
         }
 
-        .pity-status .progress {
-            background-color: rgba(13, 110, 253, 0.1);
-            border-radius: 3px;
+        .package-price {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+            font-size: 1.1em;
         }
 
-        .pity-status .progress-bar {
-            transition: width 0.3s ease;
-            border-radius: 3px;
+        .package-image {
+            width: 100%;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
         }
 
-        .pity-status small {
-            font-size: 0.875rem;
+        .prize-items-section {
+            margin-top: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding-bottom: 8px;
+        }
+
+        .prize-items-container {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .prize-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 8px 0;
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            border-left: 5px solid;
+            backdrop-filter: blur(5px);
+        }
+
+        .rarity-COMMON { border-left-color: #95a5a6; }
+        .rarity-UNCOMMON { border-left-color: #2ecc71; }
+        .rarity-RARE { border-left-color: #3498db; }
+        .rarity-SPECIAL { border-left-color: #9b59b6; }
+        .rarity-GOOD_LUCK { border-left-color: #f1c40f; }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .item-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .item-details h4 {
+            margin: 0 0 4px 0;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        .item-rarity {
+            font-size: 0.8em;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .item-description {
+            font-size: 0.75em;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
+        .probability-section {
+            text-align: right;
+            min-width: 120px;
+        }
+
+        .probability-display {
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 4px;
+        }
+
+        .probability-breakdown {
+            font-size: 0.75em;
+            opacity: 0.8;
+            line-height: 1.2;
+        }
+
+        .pity-bonus {
+            color: #f39c12;
+        }
+
+        .current-prob {
+            color: #2ecc71;
+        }
+
+        .no-items-message {
+            text-align: center;
+            padding: 20px;
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        .open-box-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .open-box-btn:hover {
+            background: linear-gradient(45deg, #c0392b, #a93226);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .inactive-package {
+            opacity: 0.6;
+            filter: grayscale(50%);
+        }
+
+        .inactive-package .open-box-btn {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .no-packages {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-packages h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .pagination {
+            text-align: center;
+            margin: 40px 0;
+            padding: 20px;
+        }
+
+        .pagination a, .pagination span {
+            margin: 0 8px;
+            padding: 10px 18px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .pagination a:hover {
+            background: #2980b9;
+        }
+
+        .pagination .current {
+            background: #2c3e50;
+            font-weight: bold;
+        }
+
+        /* Add new modal styles */
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            padding: 1.5rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-title {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .btn-close {
+            color: white;
+            filter: brightness(0) invert(1);
+        }
+
+        #openBoxDetails {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        #prizeResult {
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        }
+
+        .table {
+            margin-bottom: 0;
         }
     </style>
 </head>
-
 <body>
-<div layout:fragment="content">
-    <!-- Products Section -->
-    <div th:if="${message}" class="alert alert-success alert-dismissible fade show mb-0" role="alert">
-        <div class="container">
-            <i class="fas fa-check-circle me-2"></i>
-            <span th:text="${message}">Success message</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<div class="container">
+
+    <div th:if="${message}">
+            <p class="" th:text="${message}"></p>
+    </div>
+    <div th:if="${packagesBoxes.empty}" class="no-packages">
+        <h2>🚀 Coming Soon!</h2>
+        <p>We're working on adding new exciting blind boxes. Check back soon!</p>
+    </div>
+
+    <div class="blind-box-container" th:unless="${packagesBoxes.isEmpty()}">
+        <div th:each="packageBox : ${packagesBoxes.content}"
+             th:class="'blind-box-card' + (${packageBox.active} ? '' : ' inactive-package')">
+
+            <!-- Package Header -->
+            <div class="package-header">
+                <img th:if="${packageBox.imageUrl}"
+                     th:src="${packageBox.imageUrl}"
+                     th:alt="${packageBox.name}"
+                     class="package-image"
+                     onerror="this.style.display='none'">
+
+                <h2 class="package-title" th:text="${packageBox.name}">Package Name</h2>
+
+                <p th:if="${packageBox.description}"
+                   class="package-description"
+                   th:text="${packageBox.description}">
+                    Package Description
+                </p>
+
+                <div class="package-price">
+                    💰 <span th:text="${#numbers.formatCurrency(packageBox.pricePerSpin)}">$5.00</span> per spin
+                </div>
+            </div>
+
+            <!-- Prize Items Section -->
+            <div class="prize-items-section">
+                <div class="section-title">🎯 Available Prizes</div>
+
+                <div th:if="${packageBox.prizeItems == null or packageBox.prizeItems.isEmpty()}"
+                     class="no-items-message">
+                    No prize items available
+                </div>
+
+                <div th:unless="${packageBox.prizeItems == null or packageBox.prizeItems.isEmpty()}"
+                     class="prize-items-container">
+
+                    <div th:each="prizeItem : ${packageBox.prizeItems}"
+                         th:class="'prize-item rarity-' + ${prizeItem.rarity}">
+
+                        <div class="item-left">
+                            <img th:if="${prizeItem.imageUrl}"
+                                 th:src="${prizeItem.imageUrl}"
+                                 th:alt="${prizeItem.itemName}"
+                                 class="item-image"
+                                 onerror="this.style.display='none'">
+
+                            <div class="item-details">
+                                <h4 th:text="${prizeItem.itemName}">Item Name</h4>
+                                <div class="item-rarity" th:text="${prizeItem.rarity}">Rarity</div>
+                                <div th:if="${prizeItem.description}"
+                                     class="item-description"
+                                     th:text="${prizeItem.description}">Description</div>
+                            </div>
+                        </div>
+
+                        <div class="probability-section">
+                            <div class="probability-display">
+                                    <span th:if="${prizeItem.displayString}"
+                                          th:text="${prizeItem.displayString}">5.00%</span>
+                                <span th:unless="${prizeItem.displayString}"
+                                      th:text="${#numbers.formatDecimal(prizeItem.currentProbability * 100, 1, 2)} + '%'">5.00%</span>
+                            </div>
+
+                            <div th:if="${prizeItem.pityBonus != null and prizeItem.pityBonus > 0}"
+                                 class="probability-breakdown">
+                                Base: <span th:text="${#numbers.formatDecimal(prizeItem.baseProbability * 100, 1, 2)}">4.00</span>%<br>
+                                <span class="pity-bonus">Pity: +<span th:text="${#numbers.formatDecimal(prizeItem.pityBonus * 100, 1, 2)}">1.00</span>%</span><br>
+                                <span class="current-prob">Total: <span th:text="${#numbers.formatDecimal(prizeItem.currentProbability * 100, 1, 2)}">5.00</span>%</span>
+                            </div>
+
+                            <div th:unless="${prizeItem.pityBonus != null and prizeItem.pityBonus > 0}"
+                                 class="probability-breakdown">
+                                Standard Rate
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Open Box Button -->
+            <div class="d-flex flex-column gap-3">
+                <!-- Spin Options -->
+                <div id="spinOptions" class="d-flex justify-content-center gap-2">
+                    <div class="btn-group" role="group" aria-label="Spin count options">
+                        <button type="button" class="btn btn-outline-primary active" onclick="setSpinCount(1)">1x</button>
+                    </div>
+                </div>
+
+                <!-- Open Box Button -->
+                <button class="open-box-btn"
+                        th:onclick="'showOpenBox(' + ${packageBox.id} + ', ' + ${packageBox.pricePerSpin} + ', ' + ${packageBox.userPity} + ')'"
+                        th:disabled="${!packageBox.active}">
+                    <span th:if="${packageBox.active}">🎁 Open Blind Box</span>
+                    <span th:unless="${packageBox.active}">❌ Currently Unavailable</span>
+                </button>
+            </div>
         </div>
     </div>
 
-    <section id="products" class="py-5">
-        <div class="container">
-            <h2 class="text-center mb-5">Our Products</h2>
+    <!-- Pagination -->
+    <div th:if="${packagesBoxes != null and packagesBoxes.totalPages > 1}" class="pagination">
+        <a th:if="${packagesBoxes.hasPrevious()}"
+           th:href="@{/(page=${packagesBoxes.number - 1}, size=${packagesBoxes.size})}">
+            ⬅️ Previous
+        </a>
 
-            <!-- Products List -->
-            <div th:if="${products != null and !products.isEmpty()}" class="row">
-                <div th:each="product : ${products}" class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <img th:src="${product.imageUrl ?: 'https://via.placeholder.com/300x200'}" class="card-img-top" th:alt="${product.name}">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title mb-0" th:text="${product.name}">Mystery Box #1</h5>
-                            </div>
-                            <p class="card-text" th:text="${product.description}">Contains rare collectible items</p>
+        <span class="current"
+              th:text="'Page ' + ${packagesBoxes.number + 1} + ' of ' + ${packagesBoxes.totalPages}">
+                  Page Info
+            </span>
 
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="h5 text-primary mb-0" th:text="'$' + ${product.pricePerSpin}">$29.99</span>
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-primary" 
-                                            th:onclick="'showOpenBox(' + ${product.id} + ', ' + ${product.pricePerSpin} + ')'">
-                                        <i class="fas fa-box-open me-1"></i> Open
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <a th:if="${packagesBoxes.hasNext()}"
+           th:href="@{/(page=${packagesBoxes.number + 1}, size=${packagesBoxes.size})}">
+            Next ➡️
+        </a>
+    </div>
+</div>
+
+<!-- Open Box Modal -->
+<div class="modal fade" id="openBoxModal" tabindex="-1" aria-labelledby="openBoxModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="openBoxModalLabel">Open Blind Box</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div class="modal-body">
+                <!-- Box Details -->
+                <div id="openBoxDetails" class="text-center mb-4"></div>
 
-            <!-- Empty Products State - Keep as is -->
-            <div th:if="${products == null or products.isEmpty()}" class="text-center py-5">
-                <div class="card border-0">
-                    <div class="card-body">
-                        <i class="fas fa-cube fa-4x text-muted mb-4"></i>
-                        <h4 class="text-muted mb-3">No Products Available</h4>
-                        <p class="text-muted mb-4">We're working on adding new exciting blind boxes. Check back soon!</p>
-                        <a href="/contact" class="btn btn-outline-primary">Contact Us for Updates</a>
-                    </div>
+                <!-- Spin Count and Price -->
+                <div class="text-center mb-4">
+                    <p id="spinCountDisplay">Opening box</p>
+                    <p>Total Cost: $<span id="totalPrice">0.00</span></p>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Blog Section and Contact Section - Keep as is -->
-    <!-- ... -->
-
-    <!-- Simplified Open Box Modal -->
-    <div class="modal fade" id="openBoxModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Open Mystery Box</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Box details -->
-                    <div id="openBoxDetails" class="text-center mb-4"></div>
-
-
-
-                    <!-- Prize Preview Button -->
-                    <div id="prizePreviewSection" class="mb-3 text-center">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="togglePrizeList()">
-                            <i class="fas fa-list me-2"></i>View Possible Prizes
-                        </button>
-                        <div id="prizeListContainer" class="mt-3 text-center" style="display: none;">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h6 class="mb-0">Possible Prizes</h6>
-                                </div>
-                                <div class="card-body" id="prizeListContent">
-                                    <!-- Prize list will be populated here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Multi-spin options -->
-                    <div id="spinOptions" class="text-center mb-3">
-                        <div class="btn-group" role="group" aria-label="Spin options">
-                            <button type="button" class="btn btn-outline-primary active" onclick="setSpinCount(1)">x1</button>
-                            <button type="button" class="btn btn-outline-primary" onclick="setSpinCount(5)">x5</button>
-                        </div>
-                        <div class="mt-2">
-                            <span id="spinCountDisplay">Opening 1 box</span> - 
-                            <span id="totalPriceDisplay" class="fw-bold text-primary">$<span id="totalPrice"></span></span>
-                        </div>
-                    </div>
-                    
-                    <!-- Simplified opening button -->
-                    <div id="spinConfirmation" class="text-center">
-                        <button type="button" class="btn btn-primary" onclick="openBox()">
-                            <i class="fas fa-box-open me-2"></i><span id="openButtonText">Open Box</span>
+                <!-- Spin Confirmation Section -->
+                <div id="spinConfirmation" class="text-center">
+                    <div class="text-center mb-3">
+                        <button type="button" id="openButton" class="btn btn-primary btn-lg" onclick="openBox()">
+                            <i class="fas fa-box-open me-2"></i>
+                            <span id="openButtonText">Open Box</span>
                         </button>
                     </div>
-                    
-                    <!-- Prize result - Simplified -->
-                    <div id="prizeResult" class="text-center mt-3" style="display: none;">
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <!-- Prize display -->
-                                <div id="prizeImageContainer" class="text-center">
-                                    <img id="prizeImage" src="" alt="Prize" class="img-fluid mb-3" style="max-height: 150px;">
-                                </div>
-                                <h4 id="prizeName" class="mb-2">Prize Name</h4>
-                                <div id="prizeRarity" class="badge bg-primary mb-2">Common</div>
-                                <p id="prizeDescription" class="text-muted">Prize description</p>
-                            </div>
-                        </div>
+                    <p id="spinConfirmationText" class="text-muted small">Click to reveal your prize!</p>
+                </div>
 
-                        <!-- Multi-spin results -->
-                        <div id="multiSpinResults" class="card mb-3" style="display: none;">
-                            <div class="card-header">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0">All Prizes (<span id="spinCounter">0</span>/<span id="totalSpins">0</span>)</h6>
-                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="toggleMultiSpinResults()">
-                                        <i class="fas fa-chevron-down" id="toggleMultiSpinIcon"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body" id="multiSpinResultsContent" style="display: none; max-height: 200px; overflow-y: auto;">
-                                <div class="table-responsive">
-                                    <table class="table table-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Prize</th>
-                                                <th>Rarity</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="multiSpinResultsList">
-                                            <!-- Results will be added here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                                
-                        <!-- Action buttons -->
-                        <div class="d-flex justify-content-center gap-2 mt-3">
-                            <button type="button" class="btn btn-primary" onclick="openAnotherBox()">
-                                <i class="fas fa-redo me-2"></i>Open Another
+                <!-- Loading State Template (Initially Hidden) -->
+                <div id="loadingState" class="text-center" style="display: none;">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Opening...</span>
+                    </div>
+                    <p id="loadingText">Opening your box...</p>
+                </div>
+
+                <!-- Error State Template (Initially Hidden) -->
+                <div id="errorState" class="text-center alert alert-danger" style="display: none;">
+                    <p id="errorMessage"></p>
+                    <button type="button" class="btn btn-outline-secondary mt-2" data-bs-dismiss="modal">Close</button>
+                </div>
+
+                <!-- Prize Result Section -->
+                <div id="prizeResult" style="display: none;">
+                    <div class="text-center">
+                        <img id="prizeImage" class="img-fluid mb-3" style="max-height: 200px;" alt="Prize Image">
+                        <h3 id="prizeName" class="mb-2"></h3>
+                        <span id="prizeRarity" class="badge mb-2"></span>
+                        <p id="prizeDescription" class="text-muted"></p>
+                    </div>
+
+                    <!-- Multi-spin Results -->
+                    <div id="multiSpinResults" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">All Results (<span id="spinCounter">0</span>/<span id="totalSpins">0</span>)</h6>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="toggleMultiSpinResults()">
+                                <i id="toggleMultiSpinIcon" class="fas fa-chevron-down"></i>
                             </button>
                         </div>
+                        <div id="multiSpinResultsContent" style="display: none;">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Prize</th>
+                                            <th>Rarity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="multiSpinResultsList"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Edit Box Modal - New -->
-    <div class="modal fade" id="editBoxModal" tabindex="-1" aria-labelledby="editBoxModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editBoxModalLabel">Edit Mystery Box</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="editBoxModalBody">
-                    <!-- Dynamic content will be loaded here -->
-                </div>
-                <div class="modal-footer" id="editModalFooter">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Hidden template for prize item row - New -->
-    <div id="prizeItemTemplate" style="display: none;">
-        <div class="row g-3 prize-item-row">
-            <div class="col-md-6">
-                <input type="hidden" class="item-id">
-                <div class="input-group">
-                    <span class="input-group-text">Name</span>
-                    <input type="text" class="form-control item-name" placeholder="Enter item name">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="input-group">
-                    <span class="input-group-text">Drop Rate</span>
-                    <input type="number" class="form-control item-droprate" step="0.1" min="0" max="100" placeholder="%" aria-label="Drop rate">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="input-group">
-                    <span class="input-group-text">Rarity</span>
-                    <select class="form-select item-rarity">
-                        <option value="COMMON">Common</option>
-                        <option value="UNCOMMON">Uncommon</option>
-                        <option value="RARE">Rare</option>
-                        <option value="SPECIAL">Special</option>
-                        <option value="GOOD_LUCK">Good Luck</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="input-group">
-                    <span class="input-group-text">Description</span>
-                    <input type="text" class="form-control item-description" placeholder="Enter item description">
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="input-group">
-                    <span class="input-group-text">Active</span>
-                    <select class="form-select item-active">
-                        <option value="true">Yes</option>
-                        <option value="false">No</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="input-group">
-                    <span class="input-group-text">Claimable</span>
-                    <select class="form-select item-claimable">
-                        <option value="true">Yes</option>
-                        <option value="false">No</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="mb-3">
-                    <label class="form-label">Image</label>
-                    <input class="form-control" type="file" accept="image/*">
-                </div>
-                <div class="image-preview-container" style="display: none;">
-                    <img src="" alt="Image Preview" class="img-fluid image-preview">
+                    <div class="d-flex justify-content-center gap-2 mt-4">
+                        <button class="btn btn-primary" onclick="openAnotherBox()">Open Another</button>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -281,7 +505,7 @@
 
 <th:block layout:fragment="scripts">
     <script>
-        // Core state variables 
+        // Core state variables
         const state = {
             boxId: null,
             boxPrice: null,
@@ -292,6 +516,11 @@
             prizeItemIndex: 0,
             remainingDropRate: 100
         };
+
+        // Open blind box with appropriate UI state
+        function openBlindBox(packageId) {
+            window.location.href = `/blind-box/open/${packageId}`;
+        }
 
         // DOM elements - cache common elements for better performance
         const elements = {
@@ -322,19 +551,28 @@
         });
 
         // Show box opening modal with better organization
-        function showOpenBox(productId, price) {
+        function showOpenBox(productId, price, userPity) {
             // Reset state
             state.boxId = productId;
             state.boxPrice = price;
             state.spinCount = 1;
             state.spinResults = [];
             state.spinIndex = 0;
-            
-            // Reset UI - more organized approach
+            state.userPity = userPity;  // Add userPity to state
+
+            // Reset UI
             resetModalUI();
-            
+
             // Update price display
             updateTotalPrice();
+
+            // Add pity display to box details immediately
+            const pityDisplay = `
+                <div class="text-center mb-3">
+                    <span class="badge bg-info">Current Pity: ${userPity}/100</span>
+                </div>
+            `;
+            document.getElementById('openBoxDetails').insertAdjacentHTML('afterbegin', pityDisplay);
 
             // Fetch box details
             fetchBoxDetails(productId, price);
@@ -356,33 +594,20 @@
                 </div>
                 <p class="text-muted small">Click to reveal your prize!</p>
             `;
-            
+
             // Reset result section
             elements.prizeResult.style.display = 'none';
-            
-            // Reset prize preview section
-            const previewButton = elements.prizePreviewSection.querySelector('button');
-            if (previewButton) {
-                previewButton.innerHTML = '<i class="fas fa-list me-2"></i>View Possible Prizes';
-            }
-            elements.prizeListContainer.style.display = 'none';
-            
+
             // Reset multi-spin section
             elements.multiSpinResults.style.display = 'none';
             elements.multiSpinResultsContent.style.display = 'none';
             elements.multiSpinResultsList.innerHTML = '';
-            
+
             // Reset spin button states
             elements.spinButtons.forEach(btn => btn.classList.remove('active'));
             elements.spinButtons[0].classList.add('active');
-            
-            // Reset button text
-            elements.openButtonText = document.getElementById('openButtonText');
-            if (elements.openButtonText) {
-                elements.openButtonText.textContent = 'Open Box';
-            }
-            
-            // Reset spin count display
+
+            // Reset displays
             elements.spinCountDisplay = document.getElementById('spinCountDisplay');
             if (elements.spinCountDisplay) {
                 elements.spinCountDisplay.textContent = 'Opening 1 box';
@@ -440,7 +665,7 @@
             if (state.spinIndex === 0) {
                 state.spinResults = [];
             }
-            
+
             // Show loading state
             elements.spinConfirmation.innerHTML = `
                 <div class="text-center">
@@ -450,12 +675,13 @@
                     <p>${state.spinCount === 1 ? 'Opening your box...' : 'Opening 5 boxes...'}</p>
                 </div>
             `;
-            
+
+            console.log(`Spinning box ${state.boxId} for ${state.spinCount} times...`);
             // Choose endpoint based on spin count
-            const endpoint = state.spinCount === 1 
-                ? `/blindbox/spin/${state.boxId}/single` 
+            const endpoint = state.spinCount === 1
+                ? `/blindbox/spin/${state.boxId}/single`
                 : `/blindbox/spin/${state.boxId}/multiple`;
-            
+
             // Make API call to spin
             fetch(endpoint, {
                 method: 'POST',
@@ -470,11 +696,10 @@
                             throw new Error(errData.message || 'Server error');
                         });
                     }
-                    return response.json();
+                    return response.json(); // Call the json() method
                 })
             .then(data => {
                 console.log('Spin response:', data);
-                
                 if (state.spinCount === 1) {
                     handleSingleSpinResult(data);
                 } else {
@@ -499,87 +724,79 @@
 
         // Handle single spin result
         function handleSingleSpinResult(data) {
-            if (data.success === true) {
-                // Extract prize details
+
+            console.log('Single spin result:', data);
+            // Extract prize details
                 const imageUrl = data.itemImage || '/images/prize-default.png';
                 const itemName = data.itemName || 'Mystery Prize';
                 const description = data.description || 'You won a mystery prize!';
                 const rarity = data.rarity || 'COMMON';
-                
+
                 // Handle "Better luck next time" case
-                elements.prizeImage.src = (itemName === "Better luck next time!" || rarity === "GOOD_LUCK") 
-                    ? '/images/no-prize.png' 
+                elements.prizeImage.src = (itemName === "Better luck next time!" || rarity === "GOOD_LUCK")
+                    ? '/images/no-prize.png'
                     : imageUrl;
-                
+
                 // Update prize details
                 elements.prizeName.textContent = itemName;
                 elements.prizeDescription.textContent = description;
-                
+
                 // Set rarity with appropriate styling
                 elements.prizeRarity.textContent = rarity;
                 elements.prizeRarity.className = `badge ${getRarityBadgeClass(rarity)} mb-2`;
-                
+
                 // Show result, hide confirmation
                 elements.spinConfirmation.style.display = 'none';
                 elements.prizeResult.style.display = 'block';
-                
+
                 // Ensure action buttons are visible
                 const actionButtons = document.querySelector('#prizeResult .d-flex.justify-content-center.gap-2');
                 if (actionButtons) {
                     actionButtons.style.display = 'flex';
                 }
-            } else {
-                // Show error
-                elements.spinConfirmation.innerHTML = `
-                    <div class="alert alert-danger">
-                        <p>${data.message || 'Failed to open the box. Please try again.'}</p>
-                        <button type="button" class="btn btn-outline-secondary mt-2" data-bs-dismiss="modal">Close</button>
-                    </div>
-                `;
-            }
         }
 
         // Handle multiple spin results
         function handleMultipleSpinResults(data) {
             if (data.success === "OK nhớ" && data.items && data.items.length > 0) {
                 const results = data.items;
-                
+
                 // Show the first prize in the main display
                 const firstPrize = results[0];
                 const imageUrl = firstPrize.itemImage || firstPrize.image || '/images/prize-default.png';
                 const itemName = firstPrize.itemName || firstPrize.name || 'Mystery Prize';
                 const description = firstPrize.description || 'You won multiple prizes!';
                 const rarity = firstPrize.rarity || 'COMMON';
-                
+
                 // Handle "Better luck next time" case
-                elements.prizeImage.src = (itemName === "Better luck next time!" || rarity === "GOOD_LUCK") 
-                    ? '/images/no-prize.png' 
+                elements.prizeImage.src = (itemName === "Better luck next time!" || rarity === "GOOD_LUCK")
+                    ? '/images/no-prize.png'
                     : imageUrl;
-                
+
                 // Update prize details
                 elements.prizeName.textContent = itemName;
                 elements.prizeDescription.textContent = description;
-                
+
                 // Set rarity badge
                 elements.prizeRarity.textContent = rarity === 'GOOD_LUCK' ? 'BETTER LUCK NEXT TIME' : rarity;
                 elements.prizeRarity.className = `badge ${getRarityBadgeClass(rarity)} mb-2`;
-                
+
                 // Show multi-spin results section
                 elements.multiSpinResults.style.display = 'block';
                 elements.multiSpinResultsContent.style.display = 'block';
                 document.getElementById('toggleMultiSpinIcon').className = 'fas fa-chevron-up';
-                
+
                 // Update counters
                 document.getElementById('totalSpins').textContent = results.length;
                 document.getElementById('spinCounter').textContent = results.length;
-                
+
                 // Build results table with improved rendering
                 elements.multiSpinResultsList.innerHTML = buildMultiSpinResultsTable(results);
-                
+
                 // Show result, hide confirmation
                 elements.spinConfirmation.style.display = 'none';
                 elements.prizeResult.style.display = 'block';
-                
+
                 // Ensure action buttons are visible
                 const actionButtons = document.querySelector('#prizeResult .d-flex.justify-content-center.gap-2');
                 if (actionButtons) {
@@ -603,7 +820,7 @@
                 const prizeRarity = prize.rarity || 'COMMON';
                 const prizeName = prize.itemName || prize.name || 'Mystery Prize';
                 const isGoodLuck = prizeRarity === 'GOOD_LUCK' || prizeName === 'Better luck next time!';
-                
+
                 return `
                     <tr>
                         <td>${index + 1}</td>
@@ -618,18 +835,29 @@
         function setSpinCount(count) {
             state.spinCount = count;
             updateTotalPrice();
-            
+
             // Update button active state
             elements.spinButtons.forEach(button => {
                 button.classList.remove('active');
             });
             elements.spinButtons[count === 1 ? 0 : 1].classList.add('active');
+
+            // Update text displays - with null checks
+            const openButtonText = document.getElementById('openButtonText');
+            const spinCountDisplay = document.getElementById('spinCountDisplay');
+
+            if (openButtonText) {
+                openButtonText.textContent = count === 1 ? 'Open Box' : 'Open 5 Boxes';
+            }
             
-            // Update text displays
-            document.getElementById('openButtonText').textContent = count === 1 ? 'Open Box' : 'Open 5 Boxes';
-            document.getElementById('spinCountDisplay').textContent = count === 1 ? 'Opening 1 box' : 'Opening 5 boxes';
+            if (spinCountDisplay) {
+                spinCountDisplay.textContent = count === 1 ? 'Opening 1 box' : 'Opening 5 boxes';
+            }
+
+            // Debug log
+            console.log('Spin count set to:', count);
         }
-        
+
         // Update total price display
         function updateTotalPrice() {
             const totalPrice = (state.boxPrice * state.spinCount).toFixed(2);
@@ -638,12 +866,12 @@
                 elements.totalPrice.textContent = totalPrice;
             }
         }
-        
+
         // Toggle multi-spin results visibility
         function toggleMultiSpinResults() {
             const content = elements.multiSpinResultsContent;
             const icon = document.getElementById('toggleMultiSpinIcon');
-            
+
             if (content.style.display === 'none') {
                 content.style.display = 'block';
                 icon.className = 'fas fa-chevron-up';
@@ -653,84 +881,46 @@
             }
         }
 
-        // Toggle prize list visibility
-        function togglePrizeList() {
-            const container = elements.prizeListContainer;
-            const button = event.target.closest('button');
+        // Open another box
+        function openAnotherBox() {
+            // Store current values for reopening
+            const boxId = state.boxId;
+            const boxPrice = state.boxPrice;
 
-            if (container.style.display === 'none') {
-                container.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash me-2"></i>Hide Prizes';
+            // Reset variables first
+            state.spinCount = 1;
+            state.spinResults = [];
+            state.spinIndex = 0;
+
+            // Close current modal and reset state
+            const modalElement = document.getElementById('openBoxModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+
+            if (modalInstance) {
+                modalInstance.hide();
+
+                // Add event listener for when modal is fully hidden
+                modalElement.addEventListener('hidden.bs.modal', function onHidden() {
+                    // Remove the event listener to avoid duplicates
+                    modalElement.removeEventListener('hidden.bs.modal', onHidden);
+
+                    // Short delay to ensure DOM is ready
+                    setTimeout(() => {
+                        // If we have the box ID, reopen it
+                        if (boxId && boxPrice) {
+                            showOpenBox(boxId, boxPrice);
+                        }
+                    }, 300);
+                }, { once: true });
             } else {
-                container.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-list me-2"></i>View Possible Prizes';
-            }
-        }
+                console.error('Modal instance not found');
 
-        // Populate prize list with better organization and handling of GOOD_LUCK
-        function populatePrizeList(prizeItems) {
-            // Group prizes by rarity
-            const groupedByRarity = prizeItems.reduce((groups, item) => {
-                if (!groups[item.rarity]) {
-                    groups[item.rarity] = [];
-                }
-                groups[item.rarity].push(item);
-                return groups;
-            }, {});
-
-            // Sort rarity order
-            const rarityOrder = ['COMMON', 'UNCOMMON', 'RARE', 'SPECIAL', 'GOOD_LUCK'];
-            
-            // Build content with better template handling
-            const content = rarityOrder.map(rarity => {
-                if (!groupedByRarity[rarity]) return '';
-                
-                const rarityClass = getRarityClass(rarity);
-                const rarityBadgeClass = getRarityBadgeClass(rarity);
-                
-                return `
-                    <div class="rarity-group mb-3">
-                        <h6 class="rarity-title ${rarityClass} mb-2">
-                            <span class="badge ${rarityBadgeClass}">${rarity === 'GOOD_LUCK' ? 'NO PRIZE' : rarity}</span>
-                        </h6>
-                        <div class="row">
-                            ${groupedByRarity[rarity].map(item => {
-                                const probability = (item.probability * 100).toFixed(1);
-                                const isActive = item.active !== false;
-                                const disabledClass = isActive ? '' : 'opacity-50 text-decoration-line-through';
-                                const disabledIcon = isActive ? '' : '<i class="fas fa-ban text-danger ms-2" title="Not available"></i>';
-                                
-                                return `
-                                    <div class="col-6 mb-2">
-                                        <div class="d-flex align-items-center ${disabledClass}">
-                                            <span class="me-2">${item.itemName || (rarity === 'GOOD_LUCK' ? 'Better luck next time!' : 'Prize')}</span>
-                                            <span class="badge bg-light text-dark">${probability}%</span>
-                                            ${disabledIcon}
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            elements.prizeListContent.innerHTML = content;
-        }
-
-        // Check if there are enough active items for 5x spin
-        function checkActiveItems() {
-            const activeItems = state.prizeItems.filter(item => item.active !== false).length;
-            
-            const x5Button = elements.spinButtons[1]; // Second button is the 5x spin
-            if (x5Button) {
-                if (activeItems < 5) {
-                    x5Button.disabled = true;
-                    x5Button.title = 'Not enough active prizes for 5x spin';
-                } else {
-                    x5Button.disabled = false;
-                    x5Button.title = '';
-                }
+                // Fallback - try direct reopening after delay
+                setTimeout(() => {
+                    if (boxId && boxPrice) {
+                        showOpenBox(boxId, boxPrice);
+                    }
+                }, 500);
             }
         }
 
@@ -751,52 +941,9 @@
                 case 'COMMON': return 'bg-secondary';
                 case 'UNCOMMON': return 'bg-success';
                 case 'RARE': return 'bg-primary';
-                case 'SPECIAL': return 'bg-warning';
+                case 'SPECIAL': return 'bg-warning text-dark';
                 case 'GOOD_LUCK': return 'bg-danger';
                 default: return 'bg-info';
-            }
-        }
-
-        // Open another box
-        function openAnotherBox() {
-            // Store current values for reopening
-            const boxId = state.boxId;
-            const boxPrice = state.boxPrice;
-            
-            // Reset variables first
-            state.spinCount = 1;
-            state.spinResults = [];
-            state.spinIndex = 0;
-            
-            // Close current modal and reset state
-            const modalElement = document.getElementById('openBoxModal');
-            const modalInstance = bootstrap.Modal.getInstance(modalElement);
-            
-            if (modalInstance) {
-                modalInstance.hide();
-                
-                // Add event listener for when modal is fully hidden
-                modalElement.addEventListener('hidden.bs.modal', function onHidden() {
-                    // Remove the event listener to avoid duplicates
-                    modalElement.removeEventListener('hidden.bs.modal', onHidden);
-                    
-                    // Short delay to ensure DOM is ready
-                    setTimeout(() => {
-                        // If we have the box ID, reopen it
-                        if (boxId && boxPrice) {
-                            showOpenBox(boxId, boxPrice);
-                        }
-                    }, 300);
-                }, { once: true });
-            } else {
-                console.error('Modal instance not found');
-                
-                // Fallback - try direct reopening after delay
-                setTimeout(() => {
-                    if (boxId && boxPrice) {
-                        showOpenBox(boxId, boxPrice);
-                    }
-                }, 500);
             }
         }
     </script>

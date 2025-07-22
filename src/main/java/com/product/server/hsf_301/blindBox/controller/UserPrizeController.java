@@ -69,10 +69,10 @@ public class UserPrizeController {
         Map<String, Object> response = new HashMap<>();
 
         AppUser appUser = userService.getUserByUsername(userService.getCurrentUser().getUsername());
-        if(appUser.getAddress().isEmpty()){
+        if(appUser.getAddress() == null){
             response.put("success", false);
             response.put("error","address is empty");
-            response.put("message", "No prize IDs provided");
+            response.put("message", "Your address is empty, please update");
             return ResponseEntity.badRequest().body(response);
         }
         

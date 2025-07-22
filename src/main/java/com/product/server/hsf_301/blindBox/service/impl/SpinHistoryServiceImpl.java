@@ -142,8 +142,8 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
 
             PrizeItem selectedPrize = new PrizeItem();
 
-            //Tăng count để set
-            userPityStatus.setCount(userPityStatus.getCount() + 1);
+//            //Tăng count để set
+//            userPityStatus.setCount(userPityStatus.getCount() + 1);
 
             if (userPityStatus.getCurrent_pity() == 99) {
                 Optional<PrizeItem> prizeItem = availableItems.stream().filter(res -> res.getRarity().equals(RareEnum.SPECIAL)).findAny();
@@ -160,10 +160,13 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
             // Select prize based on probability
             selectedPrize = selectRandomPrize(availableItems, userPityStatus);
 
+
+
             if (selectedPrize == null) {
                 throw new RuntimeException("selected item is not available");
             }
 
+            updatePityAfterDraw(selectedPrize, userPityStatus);
 
             userPityService.updatePity(userPityStatus);
             // Check if it's GOOD_LUCK (no prize)
@@ -203,15 +206,49 @@ public class SpinHistoryServiceImpl implements SpinHistoryService {
         double randomValue = random.nextDouble();
         double cumulativeProbability = 0.0;
 
-        for (PrizeItem item : availableItems) {
-            cumulativeProbability += item.getProbability();
+        // Tính pity bonus đơn giản
+        double pityBonus = calculatePityBonus(userPityStatus.getCurrent_pity());
 
-            if (item.isActive() && randomValue <= cumulativeProbability) {
+        for (PrizeItem item : availableItems) {
+            if (!item.isActive()) continue;
+
+            double adjustedProbability = item.getProbability();
+
+
+            if (isRareItem(item.getRarity())) {
+                adjustedProbability *= (1 + pityBonus);
+            }
+
+            cumulativeProbability += adjustedProbability;
+
+            if (randomValue <= cumulativeProbability) {
                 return item;
             }
         }
 
         return null;
+    }
+
+    public double calculatePityBonus(int currentPity) {
+        // Tăng 2% mỗi 10 lần không trúng
+        return ((double) currentPity / 10) * 0.02;
+    }
+
+    public boolean isRareItem(RareEnum rarity) {
+        return rarity == RareEnum.RARE ||
+                rarity == RareEnum.SPECIAL;
+    }
+
+    public void updatePityAfterDraw(PrizeItem wonItem, UserPityStatus pityStatus) {
+        if (isRareItem(wonItem.getRarity())) {
+            // Reset pity nếu trúng rare
+            pityStatus.setCurrent_pity(0);
+        } else {
+            // Tăng pity nếu không trúng rare
+            pityStatus.setCurrent_pity(pityStatus.getCurrent_pity() + 1);
+        }
+
+        pityStatus.setCount(pityStatus.getCount() + 1);
     }
 
     private SpinHistory saveSpinHistory(AppUser user, PackagesBox blindPackage,

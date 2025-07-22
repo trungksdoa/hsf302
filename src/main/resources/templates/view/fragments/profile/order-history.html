@@ -43,6 +43,9 @@
                 <!-- List OrderItems ra luôn -->
                 <div th:if="${orderEntry.value != null and !orderEntry.value.isEmpty()}">
                   <div th:each="item : ${orderEntry.value}">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <span th:text="${item.prizeItemId.itemName}">Product Name</span>
+                    </div>
                   </div>
                 </div>
                 <div th:if="${orderEntry.value == null or orderEntry.value.isEmpty()}">
@@ -52,6 +55,8 @@
               <td>
                 <span th:switch="${orderEntry.key.status}" class="badge">
                   <span th:case="'COMPLETED'" class="badge bg-success">Completed</span>
+                  <span th:case="'PENDING'" class="badge bg-warning">Pending</span>
+                  <span th:case="'PROCESSING'" class="badge bg-info">Processing</span>
                 </span>
               </td>
             </tr>

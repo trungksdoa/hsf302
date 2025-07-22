@@ -2,6 +2,7 @@ package com.product.server.hsf_301.home;
 
 
 import com.product.server.hsf_301.blindBox.model.PackagesBox;
+import com.product.server.hsf_301.blindBox.model.PackagesBoxDisplayDTO;
 import com.product.server.hsf_301.blindBox.service.BlindBagTypeService;
 import com.product.server.hsf_301.blindBox.service.BlogService;
 import com.product.server.hsf_301.blindBox.service.PrizeItemService;
@@ -41,10 +42,10 @@ public class HomeController {
             model.addAttribute("httpServletRequest", request);
         }
 
-        Page<PackagesBox> blindBagTypes = blindBagTypeService.getAllBlindBagTypes(page, size);
+        Page<PackagesBoxDisplayDTO> blindBagTypes = blindBagTypeService.getAllBlindBagTypes(page, size);
 
         model.addAttribute("userId", userService.getCurrentUser().getUserId());
-        model.addAttribute("products", blindBagTypes);
+        model.addAttribute("packagesBoxes", blindBagTypes);
         model.addAttribute("recentPosts",blogService.getAllBlogs(0, 5));
         model.addAttribute("content", "view/home");
         return "view/layout";

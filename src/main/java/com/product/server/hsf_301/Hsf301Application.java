@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import java.math.BigDecimal;
 
 @SpringBootApplication
-@EnableScheduling  // Enable scheduling support
+// @EnableScheduling  // Enable scheduling support
 public class Hsf301Application {
 
     public static void main(String[] args) {

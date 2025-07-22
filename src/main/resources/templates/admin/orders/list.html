@@ -1,198 +1,178 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/layout}">
-
-<head>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{admin/layout}"
+>
+  <head>
     <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Order Management</title>
-</head>
+  </head>
 
-<body>
+  <body>
     <div th:fragment="content">
-        <div class="p-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h3">Order Management</h1>
-                <div class="d-flex gap-2">
-                    <select class="form-select form-select-sm" id="statusFilter">
-                        <option value="">All Status</option>
+      <div class="p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h1 class="h3">Order Management</h1>
+          <div class="d-flex gap-2">
+            <select class="form-select form-select-sm" id="statusFilter">
+              <option value="">All Status</option>
+              <option value="PENDING">Pending</option>
+              <option value="PROCESSING">Processing</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
+            <button class="btn btn-sm btn-outline-primary" onclick="filterOrders()">
+              <i class="fas fa-filter"></i> Filter
+            </button>
+          </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="card">
+          <div class="card-body">
+            <!-- Table with data -->
+            <div th:if="${orders != null and !orders.isEmpty()}" class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Items Count</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="order : ${orders}">
+                    <td>
+                      <span class="fw-bold text-primary" th:text="'#' + ${order.orderId}"> #ORD-001 </span>
+                    </td>
+                    <td>
+                      <div>
+                        <div class="fw-bold" th:text="${order.user?.username ?: 'Unknown User'}">John Doe</div>
+                        <small class="text-muted" th:text="${order.user?.email ?: 'No email'}">
+                          john@example.com
+                        </small>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge bg-info" th:text="${order.orderItems?.size() ?: 0} + ' items'"> 3 items </span>
+                    </td>
+                    <td>
+                      <select
+                        class="form-select form-select-sm status-select"
+                        th:data-order-id="${order.orderId}"
+                        onchange="updateStatusMVC(this)"
+                      >
                         <option value="PENDING">Pending</option>
                         <option value="PROCESSING">Processing</option>
                         <option value="COMPLETED">Completed</option>
-                        <option value="SHIPPED">Shipped</option>
-                        <option value="DELIVERED">Delivered</option>
-                        <option value="CANCELLED">Cancelled</option>
-                    </select>
-                    <button class="btn btn-sm btn-outline-primary" onclick="filterOrders()">
-                        <i class="fas fa-filter"></i> Filter
-                    </button>
+                      </select>
+                    </td>
+                    <td>
+                      <div th:text="${#temporals.format(order.orderDate, 'MMM dd, yyyy')}">Mar 15, 2024</div>
+                      <small class="text-muted" th:text="${#temporals.format(order.orderDate, 'HH:mm')}"> 14:30 </small>
+                    </td>
+                    <td>
+                      <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary" th:onclick="'viewOrder(' + ${order.orderId} + ')'">
+                          <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="btn btn-outline-info" th:onclick="'printOrder(' + ${order.orderId} + ')'">
+                          <i class="fas fa-print"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <!-- Summary -->
+              <div class="row mt-3">
+                <div class="col-12">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted"> Total Orders: <span th:text="${orders.size()}">0</span> </small>
+                  </div>
                 </div>
+              </div>
             </div>
-            
-            <!-- Orders Table -->
-            <div class="card">
+
+            <!-- Empty state message -->
+            <div th:if="${orders == null or orders.isEmpty()}" class="text-center py-5">
+              <div class="card border-0">
                 <div class="card-body">
-                    <!-- Table with data -->
-                    <div th:if="${orders != null and !orders.isEmpty()}" class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>Customer</th>
-                                    <th>Items Count</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="order : ${orders}">
-                                    <td>
-                                        <span class="fw-bold text-primary" th:text="'#' + ${order.orderId}">
-                                            #ORD-001
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <div class="fw-bold" th:text="${order.user?.username ?: 'Unknown User'}">
-                                                John Doe
-                                            </div>
-                                            <small class="text-muted" th:text="${order.user?.email ?: 'No email'}">
-                                                john@example.com
-                                            </small>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info" th:text="${order.orderItems?.size() ?: 0} + ' items'">
-                                            3 items
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <select class="form-select form-select-sm status-select"
-                                                th:data-order-id="${order.orderId}"
-                                                onchange="updateStatusMVC(this)">
-                                            <option value="PENDING" th:selected="${order.status == 'PENDING'}">Pending</option>
-                                            <option value="PROCESSING" th:selected="${order.status == 'PROCESSING'}">Processing</option>
-                                            <option value="COMPLETED" th:selected="${order.status == 'COMPLETED'}">Completed</option>
-                                            <option value="SHIPPED" th:selected="${order.status == 'SHIPPED'}">Shipped</option>
-                                            <option value="DELIVERED" th:selected="${order.status == 'DELIVERED'}">Delivered</option>
-                                            <option value="CANCELLED" th:selected="${order.status == 'CANCELLED'}">Cancelled</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <div th:text="${#temporals.format(order.orderDate, 'MMM dd, yyyy')}">
-                                            Mar 15, 2024
-                                        </div>
-                                        <small class="text-muted" th:text="${#temporals.format(order.orderDate, 'HH:mm')}">
-                                            14:30
-                                        </small>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-primary" 
-                                                    th:onclick="'viewOrder(' + ${order.orderId} + ')'">
-                                                <i class="fas fa-eye"></i> View
-                                            </button>
-                                            <button class="btn btn-outline-info" 
-                                                    th:onclick="'printOrder(' + ${order.orderId} + ')'">
-                                                <i class="fas fa-print"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        
-                        <!-- Summary -->
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted">
-                                        Total Orders: <span th:text="${orders.size()}">0</span>
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Empty state message -->
-                    <div th:if="${orders == null or orders.isEmpty()}" class="text-center py-5">
-                        <div class="card border-0">
-                            <div class="card-body">
-                                <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
-                                <h4 class="text-muted mb-3">No Orders Found</h4>
-                                <p class="text-muted mb-4">There are no orders in the system at the moment.</p>
-                                <small class="text-muted">Orders will appear here once customers start placing them.</small>
-                            </div>
-                        </div>
-                    </div>
+                  <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
+                  <h4 class="text-muted mb-3">No Orders Found</h4>
+                  <p class="text-muted mb-4">There are no orders in the system at the moment.</p>
+                  <small class="text-muted">Orders will appear here once customers start placing them.</small>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <th:block layout:fragment="scripts">
-        <script>
-            function viewOrder(orderId) {
-                window.location.href = `/admin/orders/${orderId}`;
+      <script>
+        function viewOrder(orderId) {
+          window.location.href = `/admin/orders/${orderId}`;
+        }
+
+        function filterOrders() {
+          const statusFilter = document.getElementById("statusFilter").value;
+          const rows = document.querySelectorAll("tbody tr");
+
+          rows.forEach((row) => {
+            if (!statusFilter) {
+              row.style.display = "";
+              return;
             }
 
-
-
-
-
-            function filterOrders() {
-                const statusFilter = document.getElementById('statusFilter').value;
-                const rows = document.querySelectorAll('tbody tr');
-                
-                rows.forEach(row => {
-                    if (!statusFilter) {
-                        row.style.display = '';
-                        return;
-                    }
-                    
-                    const statusSelect = row.querySelector('.status-select');
-                    if (statusSelect && statusSelect.value === statusFilter) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
+            const statusSelect = row.querySelector(".status-select");
+            if (statusSelect && statusSelect.value === statusFilter) {
+              row.style.display = "";
+            } else {
+              row.style.display = "none";
             }
+          });
+        }
 
-            function showNotification(message, type) {
-                // Create a simple notification
-                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-                const notification = document.createElement('div');
-                notification.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
-                notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-                notification.innerHTML = `
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+        function showNotification(message, type) {
+          // Create a simple notification
+          const alertClass = type === "success" ? "alert-success" : "alert-danger";
+          const notification = document.createElement("div");
+          notification.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+          notification.style.cssText = "top: 20px; right: 20px; z-index: 9999; min-width: 300px;";
+          notification.innerHTML = `
+                    <i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"} me-2"></i>
                     ${message}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 `;
-                
-                document.body.appendChild(notification);
-                
-                // Auto remove after 3 seconds
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.remove();
-                    }
-                }, 3000);
+
+          document.body.appendChild(notification);
+
+          // Auto remove after 3 seconds
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.remove();
             }
+          }, 3000);
+        }
 
-            function updateStatusMVC(selectElement) {
-                const orderId = selectElement.getAttribute('data-order-id');
-                const status = selectElement.value;
+        function updateStatusMVC(selectElement) {
+          const orderId = selectElement.getAttribute("data-order-id");
+          const status = selectElement.value;
 
-                if (!confirm(`Bạn có chắc chắn muốn thay đổi trạng thái order #${orderId} thành ${status}?`)) {
-                    location.reload();
-                    return;
-                }
+          if (!confirm(`Bạn có chắc chắn muốn thay đổi trạng thái order #${orderId} thành ${status}?`)) {
+            location.reload();
+            return;
+          }
 
-                // Gọi trực tiếp vào MVC endpoint
-                window.location.href = `/admin/orders/updateStatus/${status}/${orderId}`;
-            }
-
-        </script>
+          // Gọi trực tiếp vào MVC endpoint
+          window.location.href = `/admin/orders/updateStatus/${status}/${orderId}`;
+        }
+      </script>
     </th:block>
-</body>
+  </body>
 </html>

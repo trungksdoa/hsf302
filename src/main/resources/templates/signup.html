@@ -5,6 +5,58 @@
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
   <link rel="stylesheet" th:href="@{/css/signup.css}">
+  <style>
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .toast {
+      padding: 15px 25px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      color: white;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.3s ease-out;
+      min-width: 300px;
+    }
+
+    .toast-success {
+      background-color: #4CAF50;
+      border-left: 5px solid #45a049;
+    }
+
+    .toast-error {
+      background-color: #f44336;
+      border-left: 5px solid #da190b;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+  </style>
   <title></title>
   <script src="/js/signup.js" defer></script>
 </head>
@@ -43,37 +95,101 @@
 </body>
 </html>
 <script>
-  const submitButttom = document.getElementById("submit");
-  submitButttom.addEventListener('click',()=>{
-    const username = document.getElementById('username').value;
+  function showToast(message, type) {
+    // Create container if it doesn't exist
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'toast-container';
+      document.body.appendChild(container);
+    }
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <span>${type === 'success' ? '✅' : '❌'}</span>
+        <span>${message}</span>
+    `;
+
+    // Add to container
+    container.appendChild(toast);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+      toast.style.animation = 'fadeOut 0.3s ease-out forwards';
+      setTimeout(() => {
+        container.removeChild(toast);
+        if (container.children.length === 0) {
+          document.body.removeChild(container);
+        }
+      }, 300);
+    }, 3000);
+  }
+
+  const submitButton = document.getElementById("submit");
+  const form = document.getElementById("signupForm");
+
+  submitButton.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('passwordcon').value;
-    const email = document.getElementById('email').value;
-    const data ={
+    const email = document.getElementById('email').value.trim();
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      showToast('Email không hợp lệ. Vui lòng nhập đúng định dạng.', 'error');
+      return;
+    }
+
+    if (password.length < 3) {
+      showToast('Mật khẩu phải chứa ít nhất 3 ký tự.', 'error');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showToast('Mật khẩu và xác nhận mật khẩu không khớp.', 'error');
+      document.getElementById('password').value = '';
+      document.getElementById('passwordcon').value = '';
+      document.getElementById('password').focus();
+      return;
+    }
+
+    const data = {
       username,
       email,
-
       password
-    }
+    };
 
-    if(password == confirmPassword){
-      const jsonData = JSON.stringify(data);
-      fetch('/req/signup', {
-        method: 'POST',
-        headers:{
-          'Content-Type': 'application/json'
-        },
-        body: jsonData
-      })
-              .then(response =>{
-                //alert('succesfull');
-                //if(response.status == 200){
-                //alert('succesfull');
-                //xs}
-              })
-    }
-
-  })
-
-
+    fetch('/req/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+            .then(async response => {
+              if (response.ok) {
+                showToast('Đăng ký thành công!', 'success');
+                form.reset();
+                // Redirect to login page after 2 seconds
+                setTimeout(() => {
+                  window.location.href = '/req/login';
+                }, 2000);
+              } else {
+                // Handle specific error cases
+                const errorData = await response.json();
+                if (errorData.message = "Email already exists") {
+                  showToast('Email này đã được đăng ký. Vui lòng sử dụng email khác.', 'error');
+                  document.getElementById('email').focus();
+                } else {
+                  showToast('Đăng ký thất bại. Vui lòng thử lại.', 'error');
+                }
+              }
+            })
+    ;
+  });
 </script>
